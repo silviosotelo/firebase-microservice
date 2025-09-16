@@ -1928,3 +1928,22 @@ TypeError: Cannot read properties of null (reading 'projectId')
 2025-09-16 16:41:25.654 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758051685597_upla838u4","method":"GET","url":"/","statusCode":200,"responseTime":"56ms","contentLength":29628}
 2025-09-16 16:41:26.953 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758051686952_qi3l6s3wf","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
 2025-09-16 16:41:26.957 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758051686952_qi3l6s3wf","method":"GET","url":"/","statusCode":200,"responseTime":"4ms","contentLength":29628}
+2025-09-16 16:41:30.929 [INFO ] [FirebaseMicroservice] 🛑 Graceful shutdown initiated by SIGINT
+2025-09-16 16:41:30.930 [INFO ] [ServiceManager] 🛑 Stopping all services...
+2025-09-16 16:41:30.931 [INFO ] [NotificationService] 🧹 Cleaning up Notification service...
+2025-09-16 16:41:30.932 [INFO ] [QueueService] 🛑 Stopping Queue service...
+2025-09-16 16:41:30.937 [INFO ] [WebSocketService] 🧹 Cleaning up WebSocket service...
+2025-09-16 16:41:30.940 [ERROR] [DatabaseCore] ❌ Error closing database: {"errno":5,"code":"SQLITE_BUSY","__augmented":true}
+Error: SQLITE_BUSY: unable to close due to unfinalized statements or unfinished backups
+    at sqliteError (/home/project/node_modules/sqlite3/lib/sqlite3.pure.js:1:94706)
+    at 51656 (/home/project/node_modules/sqlite3/lib/sqlite3.pure.js:1:12557)
+    at _emscripten_asm_const_int (/home/project/node_modules/sqlite3/lib/sqlite3.pure.js:1:84040)
+    at eval (/home/project/node_modules/sqlite3/lib/pure/database.js:64:26)
+    at processTicksAndRejections (node:internal/process/task_queues:196:998)
+    at <anonymous> (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:295437)
+--> in Database#close([Function (anonymous)])
+    at eval (/home/project/src/core/database.js:449:25)
+    at <anonymous> (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:27890)
+    at new Promise (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:27849)
+    at DatabaseCore.close (/home/project/src/core/database.js:447:16)
+    at FirebaseMicroservice.gracefulShutdown (/home/project/app.js:313:37)
