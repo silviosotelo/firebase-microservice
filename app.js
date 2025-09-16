@@ -165,13 +165,7 @@ class FirebaseMicroservice {
         this.logger.info('⚙️ Registering and initializing services...');
         
         try {
-            // Register services with dependencies
-            this.serviceManager.register('websocket', WebSocketService, [], { io: this.io });
-            this.serviceManager.register('queue', QueueService, ['database'], { database: this.database });
-            this.serviceManager.register('notification', NotificationService, ['database', 'websocket', 'queue']);
-            this.serviceManager.register('stats', StatsService, ['database', 'websocket']);
-            
-            // Add database as a pseudo-service for dependency injection
+            // Add database as a pseudo-service for dependency injection FIRST
             this.serviceManager.services.set('database', {
                 name: 'database',
                 instance: this.database,
@@ -179,6 +173,12 @@ class FirebaseMicroservice {
                 dependencies: []
             });
 
+            // Register services with dependencies
+            this.serviceManager.register('websocket', WebSocketService, [], { io: this.io });
+            this.serviceManager.register('queue', QueueService, ['database'], { database: this.database });
+            this.serviceManager.register('notification', NotificationService, ['database', 'websocket', 'queue']);
+            this.serviceManager.register('stats', StatsService, ['database', 'websocket']);
+            
             // Initialize all services
             await this.serviceManager.initializeAll();
             
