@@ -2077,3 +2077,96 @@ TypeError: Cannot read properties of null (reading 'projectId')
 2025-09-16 19:33:37.001 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758062016999_2ltqms5e7","method":"GET","url":"/","statusCode":200,"responseTime":"2ms","contentLength":29628}
 2025-09-16 19:33:45.202 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758062025202_et9pfffeu","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
 2025-09-16 19:33:45.204 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758062025202_et9pfffeu","method":"GET","url":"/","statusCode":200,"responseTime":"2ms","contentLength":29628}
+2025-09-16 19:49:05.087 [INFO ] [DatabaseCore] 🗄️ Initializing database...
+2025-09-16 19:49:05.087 [INFO ] [DatabaseCore] 📍 Database path: /home/project/data/firebase_logs.db
+2025-09-16 19:49:05.093 [INFO ] [DatabaseCore] ✅ SQLite file database connected
+2025-09-16 19:49:05.155 [INFO ] [DatabaseCore] ✅ Database schema initialized
+2025-09-16 19:49:05.156 [INFO ] [DatabaseCore] ✅ Default configuration inserted
+2025-09-16 19:49:05.200 [INFO ] [DatabaseCore] ✅ Models initialized
+2025-09-16 19:49:05.200 [INFO ] [DatabaseCore] ✅ Database initialized successfully
+2025-09-16 19:49:05.202 [INFO ] [ServiceManager] 📦 Registering service: websocket
+2025-09-16 19:49:05.203 [INFO ] [ServiceManager] ✅ Service registered: websocket (deps: none)
+2025-09-16 19:49:05.203 [INFO ] [ServiceManager] 📦 Registering service: queue
+2025-09-16 19:49:05.203 [INFO ] [ServiceManager] ✅ Service registered: queue (deps: database)
+2025-09-16 19:49:05.203 [INFO ] [ServiceManager] 📦 Registering service: notification
+2025-09-16 19:49:05.203 [INFO ] [ServiceManager] ✅ Service registered: notification (deps: database, websocket, queue)
+2025-09-16 19:49:05.204 [INFO ] [ServiceManager] 📦 Registering service: stats
+2025-09-16 19:49:05.204 [INFO ] [ServiceManager] ✅ Service registered: stats (deps: database, websocket)
+2025-09-16 19:49:05.204 [INFO ] [ServiceManager] 🚀 Initializing all services...
+2025-09-16 19:49:05.204 [WARN ] [ServiceManager] ⚠️ Service database already initialized
+2025-09-16 19:49:05.205 [INFO ] [ServiceManager] 🔧 Initializing service: websocket
+2025-09-16 19:49:05.210 [INFO ] [ServiceManager] ✅ Service initialized: websocket
+2025-09-16 19:49:05.211 [INFO ] [ServiceManager] 🔧 Initializing service: queue
+2025-09-16 19:49:05.224 [INFO ] [ServiceManager] ✅ Service initialized: queue
+2025-09-16 19:49:05.226 [INFO ] [ServiceManager] 🔧 Initializing service: notification
+2025-09-16 19:49:05.349 [INFO ] [ServiceManager] ✅ Service initialized: notification
+2025-09-16 19:49:05.349 [INFO ] [ServiceManager] 🔧 Initializing service: stats
+2025-09-16 19:49:05.358 [INFO ] [ServiceManager] ✅ Service initialized: stats
+2025-09-16 19:49:05.358 [INFO ] [ServiceManager] ✅ All services initialized successfully
+2025-09-16 19:49:05.084 [INFO ] [FirebaseMicroservice] 🚀 Initializing Firebase Microservice...
+2025-09-16 19:49:05.085 [INFO ] [FirebaseMicroservice] 🛡️ Setting up global error handling...
+2025-09-16 19:49:05.085 [INFO ] [FirebaseMicroservice] 🔧 Setting up middleware...
+2025-09-16 19:49:05.087 [INFO ] [FirebaseMicroservice] ✅ Middleware configured
+2025-09-16 19:49:05.087 [INFO ] [FirebaseMicroservice] 📊 Initializing database...
+2025-09-16 19:49:05.200 [INFO ] [FirebaseMicroservice] ✅ Database initialized successfully
+2025-09-16 19:49:05.200 [INFO ] [FirebaseMicroservice] 🌐 HTTP server created
+2025-09-16 19:49:05.201 [INFO ] [FirebaseMicroservice] 🔌 Initializing WebSockets...
+2025-09-16 19:49:05.202 [INFO ] [FirebaseMicroservice] ✅ WebSockets initialized
+2025-09-16 19:49:05.202 [INFO ] [FirebaseMicroservice] ⚙️ Registering and initializing services...
+2025-09-16 19:49:05.365 [INFO ] [FirebaseMicroservice] ✅ All services initialized successfully
+2025-09-16 19:49:05.365 [INFO ] [FirebaseMicroservice] 🛣️ Setting up routes...
+2025-09-16 19:49:05.368 [ERROR] [FirebaseMicroservice] ❌ Failed to mount API routes: {"0":"C","1":"a","2":"n","3":"n","4":"o","5":"t","6":" ","7":"f","8":"i","9":"n","10":"d","11":" ","12":"m","13":"o","14":"d","15":"u","16":"l","17":"e","18":" ","19":"'","20":"e","21":"x","22":"p","23":"r","24":"e","25":"s","26":"s","27":"-","28":"r","29":"a","30":"t","31":"e","32":"-","33":"l","34":"i","35":"m","36":"i","37":"t","38":"'","39":"\n","40":"R","41":"e","42":"q","43":"u","44":"i","45":"r","46":"e","47":" ","48":"s","49":"t","50":"a","51":"c","52":"k","53":":","54":"\n","55":"-","56":" ","57":"/","58":"h","59":"o","60":"m","61":"e","62":"/","63":"p","64":"r","65":"o","66":"j","67":"e","68":"c","69":"t","70":"/","71":"s","72":"r","73":"c","74":"/","75":"r","76":"o","77":"u","78":"t","79":"e","80":"s","81":"/","82":"a","83":"p","84":"i","85":".","86":"j","87":"s","88":"\n","89":"-","90":" ","91":"/","92":"h","93":"o","94":"m","95":"e","96":"/","97":"p","98":"r","99":"o","100":"j","101":"e","102":"c","103":"t","104":"/","105":"a","106":"p","107":"p","108":".","109":"j","110":"s"}
+Error
+    at AppLogger.error (/home/project/src/utils/logger.js:246:39)
+    at FirebaseMicroservice.setupRoutes (/home/project/app.js:234:25)
+    at FirebaseMicroservice.initialize (/home/project/app.js:79:18)
+    at async FirebaseMicroservice.start (/home/project/app.js:344:9)
+2025-09-16 19:49:05.369 [ERROR] [FirebaseMicroservice] ❌ Failed to mount admin routes: {"0":"C","1":"a","2":"n","3":"n","4":"o","5":"t","6":" ","7":"f","8":"i","9":"n","10":"d","11":" ","12":"m","13":"o","14":"d","15":"u","16":"l","17":"e","18":" ","19":"'","20":"e","21":"x","22":"p","23":"r","24":"e","25":"s","26":"s","27":"-","28":"r","29":"a","30":"t","31":"e","32":"-","33":"l","34":"i","35":"m","36":"i","37":"t","38":"'","39":"\n","40":"R","41":"e","42":"q","43":"u","44":"i","45":"r","46":"e","47":" ","48":"s","49":"t","50":"a","51":"c","52":"k","53":":","54":"\n","55":"-","56":" ","57":"/","58":"h","59":"o","60":"m","61":"e","62":"/","63":"p","64":"r","65":"o","66":"j","67":"e","68":"c","69":"t","70":"/","71":"s","72":"r","73":"c","74":"/","75":"r","76":"o","77":"u","78":"t","79":"e","80":"s","81":"/","82":"a","83":"d","84":"m","85":"i","86":"n","87":".","88":"j","89":"s","90":"\n","91":"-","92":" ","93":"/","94":"h","95":"o","96":"m","97":"e","98":"/","99":"p","100":"r","101":"o","102":"j","103":"e","104":"c","105":"t","106":"/","107":"a","108":"p","109":"p","110":".","111":"j","112":"s"}
+Error
+    at AppLogger.error (/home/project/src/utils/logger.js:246:39)
+    at FirebaseMicroservice.setupRoutes (/home/project/app.js:243:25)
+    at FirebaseMicroservice.initialize (/home/project/app.js:79:18)
+    at async FirebaseMicroservice.start (/home/project/app.js:344:9)
+2025-09-16 19:49:05.371 [INFO ] [FirebaseMicroservice] ✅ Webhook routes mounted
+2025-09-16 19:49:05.372 [INFO ] [FirebaseMicroservice] ✅ Routes configured
+2025-09-16 19:49:05.372 [INFO ] [FirebaseMicroservice] ✅ Firebase Microservice initialized successfully
+2025-09-16 19:49:05.210 [INFO ] [WebSocketService] 🔌 Initializing WebSocket service...
+2025-09-16 19:49:05.210 [INFO ] [WebSocketService] ✅ WebSocket service initialized successfully
+2025-09-16 19:49:05.214 [INFO ] [QueueService] 📦 Initializing Queue service...
+2025-09-16 19:49:05.224 [INFO ] [QueueService] ✅ Queue service initialized
+2025-09-16 19:49:05.381 [INFO ] [FirebaseMicroservice] 🚀 Firebase Microservice running on port 3000
+2025-09-16 19:49:05.381 [INFO ] [FirebaseMicroservice] 📊 Dashboard: http://localhost:3000
+2025-09-16 19:49:05.381 [INFO ] [FirebaseMicroservice] 🔗 API: http://localhost:3000/api
+2025-09-16 19:49:05.382 [INFO ] [FirebaseMicroservice] 🔧 Environment: development
+2025-09-16 19:49:05.382 [INFO ] [FirebaseMicroservice] 📋 Service Status: {"services":{"database":{"status":"running","hasInstance":true,"dependencies":[]},"websocket":{"status":"running","startedAt":"2025-09-16T22:49:05.210Z","error":null,"hasInstance":true,"dependencies":[]},"queue":{"status":"running","startedAt":"2025-09-16T22:49:05.224Z","error":null,"hasInstance":true,"dependencies":["database"]},"notification":{"status":"running","startedAt":"2025-09-16T22:49:05.349Z","error":null,"hasInstance":true,"dependencies":["database","websocket","queue"]},"stats":{"status":"running","startedAt":"2025-09-16T22:49:05.358Z","error":null,"hasInstance":true,"dependencies":["database","websocket"]}},"initialized":true,"startOrder":["database","websocket","queue","notification","stats"]}
+2025-09-16 19:49:05.230 [INFO ] [NotificationService] 🔔 Initializing Notification service...
+2025-09-16 19:49:05.230 [INFO ] [NotificationService] ✅ Database models available
+2025-09-16 19:49:05.348 [INFO ] [NotificationService] ✅ Firebase service initialized
+2025-09-16 19:49:05.349 [INFO ] [NotificationService] ✅ Notification service initialized successfully
+2025-09-16 19:49:05.347 [INFO ] [FirebaseService] 🔥 Initializing Firebase service...
+2025-09-16 19:49:05.347 [INFO ] [FirebaseService] 📋 Loading Firebase configuration...
+2025-09-16 19:49:05.347 [INFO ] [FirebaseService] 📄 Loading Firebase config from JSON file...
+2025-09-16 19:49:05.348 [INFO ] [FirebaseService] 🎯 Firebase project configured: notificaciones-push-apex (source: json)
+2025-09-16 19:49:05.348 [INFO ] [FirebaseService] 🔐 Google Auth initialized
+2025-09-16 19:49:05.348 [INFO ] [FirebaseService] ✅ Firebase service initialized successfully
+2025-09-16 19:49:05.353 [INFO ] [App] 📊 Initializing Stats Service...
+2025-09-16 19:49:05.358 [INFO ] [App] ✅ Scheduled tasks initialized
+2025-09-16 19:49:05.358 [INFO ] [App] ✅ Stats Service initialized
+2025-09-16 19:49:05.360 [INFO ] [NotificationController] ✅ NotificationController initialized
+2025-09-16 19:49:05.373 [INFO ] [NotificationController] ✅ NotificationService initialized in controller
+2025-09-16 19:49:05.362 [INFO ] [NotificationService] 🔔 Initializing Notification service...
+2025-09-16 19:49:05.362 [INFO ] [NotificationService] ✅ Database models available
+2025-09-16 19:49:05.373 [INFO ] [NotificationService] ✅ Firebase service initialized
+2025-09-16 19:49:05.373 [INFO ] [NotificationService] ✅ Notification service initialized successfully
+2025-09-16 19:49:05.365 [INFO ] [FirebaseService] 🔥 Initializing Firebase service...
+2025-09-16 19:49:05.365 [INFO ] [FirebaseService] 📋 Loading Firebase configuration...
+2025-09-16 19:49:05.365 [INFO ] [FirebaseService] 📄 Loading Firebase config from JSON file...
+2025-09-16 19:49:05.365 [INFO ] [FirebaseService] 🎯 Firebase project configured: notificaciones-push-apex (source: json)
+2025-09-16 19:49:05.372 [INFO ] [FirebaseService] 🔐 Google Auth initialized
+2025-09-16 19:49:05.373 [INFO ] [FirebaseService] ✅ Firebase service initialized successfully
+2025-09-16 19:49:05.857 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758062945856_xnklo7ez6","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-16 19:49:05.866 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758062945856_xnklo7ez6","method":"GET","url":"/","statusCode":200,"responseTime":"9ms","contentLength":29628}
+2025-09-16 19:49:05.890 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758062945890_592ngaln9","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-16 19:49:05.893 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758062945890_592ngaln9","method":"GET","url":"/","statusCode":200,"responseTime":"3ms","contentLength":29628}
+2025-09-16 19:49:14.104 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758062954104_yu8qs3ns0","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-16 19:49:14.107 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758062954104_yu8qs3ns0","method":"GET","url":"/","statusCode":200,"responseTime":"3ms","contentLength":29628}
