@@ -2174,3 +2174,42 @@ Error
 2025-09-16 19:49:18.007 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758062958004_u7iubl63s","method":"GET","url":"/","statusCode":200,"responseTime":"3ms","contentLength":29628}
 2025-09-16 19:49:22.743 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758062962743_vyzdbgh5j","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
 2025-09-16 19:49:22.746 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758062962743_vyzdbgh5j","method":"GET","url":"/","statusCode":200,"responseTime":"3ms","contentLength":29628}
+2025-09-16 19:49:29.259 [INFO ] [FirebaseMicroservice] 🛑 Graceful shutdown initiated by SIGINT
+2025-09-16 19:49:29.260 [INFO ] [ServiceManager] 🛑 Stopping all services...
+2025-09-16 19:49:29.261 [INFO ] [NotificationService] 🧹 Cleaning up Notification service...
+2025-09-16 19:49:29.261 [INFO ] [FirebaseService] 🧹 Cleaning up Firebase service...
+2025-09-16 19:49:29.263 [INFO ] [QueueService] 🛑 Stopping Queue service...
+2025-09-16 19:49:29.267 [INFO ] [WebSocketService] 🧹 Cleaning up WebSocket service...
+2025-09-16 19:49:29.259 [INFO ] [FirebaseMicroservice] 🔌 WebSocket server closed
+2025-09-16 19:49:29.260 [INFO ] [FirebaseMicroservice] 📡 HTTP server closed
+2025-09-16 19:49:29.260 [INFO ] [ServiceManager] 🛑 Stopping service: stats
+2025-09-16 19:49:29.260 [INFO ] [ServiceManager] ✅ Service stopped: stats
+2025-09-16 19:49:29.261 [INFO ] [ServiceManager] 🛑 Stopping service: notification
+2025-09-16 19:49:29.262 [INFO ] [ServiceManager] ✅ Service stopped: notification
+2025-09-16 19:49:29.262 [INFO ] [ServiceManager] 🛑 Stopping service: queue
+2025-09-16 19:49:29.266 [INFO ] [ServiceManager] ✅ Service stopped: queue
+2025-09-16 19:49:29.266 [INFO ] [ServiceManager] 🛑 Stopping service: websocket
+2025-09-16 19:49:29.267 [INFO ] [ServiceManager] ✅ Service stopped: websocket
+2025-09-16 19:49:29.267 [INFO ] [ServiceManager] 🛑 Stopping service: database
+2025-09-16 19:49:29.267 [INFO ] [ServiceManager] ✅ Service stopped: database
+2025-09-16 19:49:29.267 [INFO ] [ServiceManager] ✅ All services stopped
+2025-09-16 19:49:29.262 [INFO ] [NotificationService] ✅ Notification service cleaned up
+2025-09-16 19:49:29.261 [INFO ] [FirebaseService] ✅ Firebase service cleaned up
+2025-09-16 19:49:29.266 [INFO ] [QueueService] ✅ Queue service stopped
+2025-09-16 19:49:29.267 [INFO ] [WebSocketService] ✅ WebSocket service cleaned up
+2025-09-16 19:49:29.269 [ERROR] [DatabaseCore] ❌ Error closing database: {"errno":5,"code":"SQLITE_BUSY","__augmented":true}
+Error: SQLITE_BUSY: unable to close due to unfinalized statements or unfinished backups
+    at sqliteError (/home/project/node_modules/sqlite3/lib/sqlite3.pure.js:1:94706)
+    at 51656 (/home/project/node_modules/sqlite3/lib/sqlite3.pure.js:1:12557)
+    at _emscripten_asm_const_int (/home/project/node_modules/sqlite3/lib/sqlite3.pure.js:1:84040)
+    at eval (/home/project/node_modules/sqlite3/lib/pure/database.js:64:26)
+    at processTicksAndRejections (node:internal/process/task_queues:196:998)
+    at Object.callback (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:295437)
+    at _0x1254d9 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:294767)
+    at _0xfd9abc (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:294952)
+--> in Database#close([Function (anonymous)])
+    at eval (/home/project/src/core/database.js:449:25)
+    at <anonymous> (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:27890)
+    at new Promise (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:27849)
+    at DatabaseCore.close (/home/project/src/core/database.js:447:16)
+    at FirebaseMicroservice.gracefulShutdown (/home/project/app.js:330:37)
