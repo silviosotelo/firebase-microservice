@@ -1540,3 +1540,138 @@ Error: SQLITE_BUSY: unable to close due to unfinalized statements or unfinished 
     at new Promise (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:27849)
     at DatabaseCore.close (/home/project/src/core/database.js:447:16)
     at FirebaseMicroservice.gracefulShutdown (/home/project/app.js:313:37)
+2025-09-16 16:37:43.506 [INFO ] [DatabaseCore] 🗄️ Initializing database...
+2025-09-16 16:37:43.507 [INFO ] [DatabaseCore] 📍 Database path: /tmp/firebase_logs.db
+2025-09-16 16:37:43.513 [INFO ] [DatabaseCore] ✅ SQLite file database connected
+2025-09-16 16:37:43.570 [INFO ] [DatabaseCore] ✅ Database schema initialized
+2025-09-16 16:37:43.571 [INFO ] [DatabaseCore] ✅ Default configuration inserted
+2025-09-16 16:37:43.595 [INFO ] [DatabaseCore] ✅ Models initialized
+2025-09-16 16:37:43.595 [INFO ] [DatabaseCore] ✅ Database initialized successfully
+2025-09-16 16:37:43.599 [INFO ] [ServiceManager] 📦 Registering service: websocket
+2025-09-16 16:37:43.599 [INFO ] [ServiceManager] ✅ Service registered: websocket (deps: none)
+2025-09-16 16:37:43.599 [INFO ] [ServiceManager] 📦 Registering service: queue
+2025-09-16 16:37:43.599 [INFO ] [ServiceManager] ✅ Service registered: queue (deps: database)
+2025-09-16 16:37:43.599 [INFO ] [ServiceManager] 📦 Registering service: notification
+2025-09-16 16:37:43.600 [INFO ] [ServiceManager] ✅ Service registered: notification (deps: database, websocket, queue)
+2025-09-16 16:37:43.600 [INFO ] [ServiceManager] 📦 Registering service: stats
+2025-09-16 16:37:43.600 [INFO ] [ServiceManager] ✅ Service registered: stats (deps: database, websocket)
+2025-09-16 16:37:43.600 [INFO ] [ServiceManager] 🚀 Initializing all services...
+2025-09-16 16:37:43.601 [WARN ] [ServiceManager] ⚠️ Service database already initialized
+2025-09-16 16:37:43.601 [INFO ] [ServiceManager] 🔧 Initializing service: websocket
+2025-09-16 16:37:43.607 [INFO ] [ServiceManager] ✅ Service initialized: websocket
+2025-09-16 16:37:43.608 [INFO ] [ServiceManager] 🔧 Initializing service: queue
+2025-09-16 16:37:43.625 [INFO ] [ServiceManager] ✅ Service initialized: queue
+2025-09-16 16:37:43.625 [INFO ] [ServiceManager] 🔧 Initializing service: notification
+2025-09-16 16:37:43.741 [INFO ] [ServiceManager] ✅ Service initialized: notification
+2025-09-16 16:37:43.741 [INFO ] [ServiceManager] 🔧 Initializing service: stats
+2025-09-16 16:37:43.750 [INFO ] [ServiceManager] ✅ Service initialized: stats
+2025-09-16 16:37:43.750 [INFO ] [ServiceManager] ✅ All services initialized successfully
+2025-09-16 16:37:43.503 [INFO ] [FirebaseMicroservice] 🚀 Initializing Firebase Microservice...
+2025-09-16 16:37:43.503 [INFO ] [FirebaseMicroservice] 🛡️ Setting up global error handling...
+2025-09-16 16:37:43.504 [INFO ] [FirebaseMicroservice] 🔧 Setting up middleware...
+2025-09-16 16:37:43.506 [INFO ] [FirebaseMicroservice] ✅ Middleware configured
+2025-09-16 16:37:43.506 [INFO ] [FirebaseMicroservice] 📊 Initializing database...
+2025-09-16 16:37:43.595 [INFO ] [FirebaseMicroservice] ✅ Database initialized successfully
+2025-09-16 16:37:43.596 [INFO ] [FirebaseMicroservice] 🌐 HTTP server created
+2025-09-16 16:37:43.596 [INFO ] [FirebaseMicroservice] 🔌 Initializing WebSockets...
+2025-09-16 16:37:43.598 [INFO ] [FirebaseMicroservice] ✅ WebSockets initialized
+2025-09-16 16:37:43.598 [INFO ] [FirebaseMicroservice] ⚙️ Registering and initializing services...
+2025-09-16 16:37:43.758 [INFO ] [FirebaseMicroservice] ✅ All services initialized successfully
+2025-09-16 16:37:43.760 [INFO ] [FirebaseMicroservice] 🛣️ Setting up routes...
+2025-09-16 16:37:43.763 [ERROR] [FirebaseMicroservice] ❌ Failed to mount API routes: {"0":"C","1":"a","2":"n","3":"n","4":"o","5":"t","6":" ","7":"f","8":"i","9":"n","10":"d","11":" ","12":"m","13":"o","14":"d","15":"u","16":"l","17":"e","18":" ","19":"'","20":"e","21":"x","22":"p","23":"r","24":"e","25":"s","26":"s","27":"-","28":"r","29":"a","30":"t","31":"e","32":"-","33":"l","34":"i","35":"m","36":"i","37":"t","38":"'","39":"\n","40":"R","41":"e","42":"q","43":"u","44":"i","45":"r","46":"e","47":" ","48":"s","49":"t","50":"a","51":"c","52":"k","53":":","54":"\n","55":"-","56":" ","57":"/","58":"h","59":"o","60":"m","61":"e","62":"/","63":"p","64":"r","65":"o","66":"j","67":"e","68":"c","69":"t","70":"/","71":"s","72":"r","73":"c","74":"/","75":"r","76":"o","77":"u","78":"t","79":"e","80":"s","81":"/","82":"a","83":"p","84":"i","85":"-","86":"s","87":"i","88":"m","89":"p","90":"l","91":"e","92":".","93":"j","94":"s","95":"\n","96":"-","97":" ","98":"/","99":"h","100":"o","101":"m","102":"e","103":"/","104":"p","105":"r","106":"o","107":"j","108":"e","109":"c","110":"t","111":"/","112":"a","113":"p","114":"p","115":".","116":"j","117":"s"}
+Error
+    at AppLogger.error (/home/project/src/utils/logger.js:246:39)
+    at FirebaseMicroservice.setupRoutes (/home/project/app.js:234:25)
+    at FirebaseMicroservice.initialize (/home/project/app.js:79:18)
+    at async FirebaseMicroservice.start (/home/project/app.js:327:9)
+2025-09-16 16:37:43.763 [INFO ] [FirebaseMicroservice] ✅ Routes configured
+2025-09-16 16:37:43.764 [INFO ] [FirebaseMicroservice] ✅ Firebase Microservice initialized successfully
+2025-09-16 16:37:43.607 [INFO ] [WebSocketService] 🔌 Initializing WebSocket service...
+2025-09-16 16:37:43.607 [INFO ] [WebSocketService] ✅ WebSocket service initialized successfully
+2025-09-16 16:37:43.611 [INFO ] [QueueService] 📦 Initializing Queue service...
+2025-09-16 16:37:43.625 [INFO ] [QueueService] ✅ Queue service initialized
+2025-09-16 16:37:43.785 [INFO ] [ServiceManager] 🛑 Stopping all services...
+2025-09-16 16:37:43.786 [INFO ] [ServiceManager] 🛑 Stopping service: stats
+2025-09-16 16:37:43.786 [INFO ] [ServiceManager] ✅ Service stopped: stats
+2025-09-16 16:37:43.786 [INFO ] [ServiceManager] 🛑 Stopping service: notification
+2025-09-16 16:37:43.788 [INFO ] [ServiceManager] ✅ Service stopped: notification
+2025-09-16 16:37:43.789 [INFO ] [ServiceManager] 🛑 Stopping service: queue
+2025-09-16 16:37:43.780 [INFO ] [FirebaseMicroservice] 🚀 Firebase Microservice running on port 3000
+2025-09-16 16:37:43.780 [INFO ] [FirebaseMicroservice] 📊 Dashboard: http://localhost:3000
+2025-09-16 16:37:43.780 [INFO ] [FirebaseMicroservice] 🔗 API: http://localhost:3000/api
+2025-09-16 16:37:43.780 [INFO ] [FirebaseMicroservice] 🔧 Environment: development
+2025-09-16 16:37:43.780 [INFO ] [FirebaseMicroservice] 📋 Service Status: {"services":{"database":{"status":"running","hasInstance":true,"dependencies":[]},"websocket":{"status":"running","startedAt":"2025-09-16T19:37:43.607Z","error":null,"hasInstance":true,"dependencies":[]},"queue":{"status":"running","startedAt":"2025-09-16T19:37:43.625Z","error":null,"hasInstance":true,"dependencies":["database"]},"notification":{"status":"running","startedAt":"2025-09-16T19:37:43.741Z","error":null,"hasInstance":true,"dependencies":["database","websocket","queue"]},"stats":{"status":"running","startedAt":"2025-09-16T19:37:43.750Z","error":null,"hasInstance":true,"dependencies":["database","websocket"]}},"initialized":true,"startOrder":["database","websocket","queue","notification","stats"]}
+2025-09-16 16:37:43.783 [INFO ] [FirebaseMicroservice] 🛑 Graceful shutdown initiated by SIGTERM
+2025-09-16 16:37:43.785 [INFO ] [FirebaseMicroservice] 🔌 WebSocket server closed
+2025-09-16 16:37:43.789 [INFO ] [QueueService] 🛑 Stopping Queue service...
+2025-09-16 16:37:43.628 [INFO ] [NotificationService] 🔔 Initializing Notification service...
+2025-09-16 16:37:43.628 [INFO ] [NotificationService] ✅ Database models available
+2025-09-16 16:37:43.740 [WARN ] [NotificationService] ⚠️ Firebase service not available: {"0":"C","1":"a","2":"n","3":"n","4":"o","5":"t","6":" ","7":"r","8":"e","9":"a","10":"d","11":" ","12":"p","13":"r","14":"o","15":"p","16":"e","17":"r","18":"t","19":"i","20":"e","21":"s","22":" ","23":"o","24":"f","25":" ","26":"n","27":"u","28":"l","29":"l","30":" ","31":"(","32":"r","33":"e","34":"a","35":"d","36":"i","37":"n","38":"g","39":" ","40":"'","41":"p","42":"r","43":"o","44":"j","45":"e","46":"c","47":"t","48":"I","49":"d","50":"'","51":")"}
+2025-09-16 16:37:43.741 [INFO ] [NotificationService] ✅ Notification service initialized successfully
+2025-09-16 16:37:43.788 [INFO ] [NotificationService] 🧹 Cleaning up Notification service...
+2025-09-16 16:37:43.788 [INFO ] [NotificationService] ✅ Notification service cleaned up
+2025-09-16 16:37:43.738 [INFO ] [FirebaseService] 🔥 Initializing Firebase service...
+2025-09-16 16:37:43.739 [INFO ] [FirebaseService] 📋 Loading Firebase configuration...
+2025-09-16 16:37:43.739 [INFO ] [FirebaseService] 📄 firebase-service-account.json not found
+2025-09-16 16:37:43.739 [INFO ] [FirebaseService] 📋 Incomplete Firebase config in environment
+2025-09-16 16:37:43.740 [ERROR] [FirebaseService] ❌ Failed to load Firebase configuration:
+TypeError: Cannot read properties of null (reading 'projectId')
+    at FirebaseService.loadConfiguration (file:///home/project/src/services/firebaseService.js#cjs:71:26)
+    at async FirebaseService.initialize (file:///home/project/src/services/firebaseService.js#cjs:39:13)
+    at async NotificationService.initialize (file:///home/project/src/services/notificationService.js#cjs:61:17)
+    at async ServiceManager.initializeService (file:///home/project/src/core/serviceManager.js#cjs:145:17)
+    at async ServiceManager.initializeAll (file:///home/project/src/core/serviceManager.js#cjs:96:17)
+    at async FirebaseMicroservice.initializeServices (file:///home/project/app.js#cjs:183:13)
+    at async FirebaseMicroservice.initialize (file:///home/project/app.js#cjs:76:13)
+    at async FirebaseMicroservice.start (file:///home/project/app.js#cjs:327:9)
+2025-09-16 16:37:43.740 [ERROR] [FirebaseService] ❌ Firebase service initialization failed:
+TypeError: Cannot read properties of null (reading 'projectId')
+    at FirebaseService.loadConfiguration (file:///home/project/src/services/firebaseService.js#cjs:71:26)
+    at async FirebaseService.initialize (file:///home/project/src/services/firebaseService.js#cjs:39:13)
+    at async NotificationService.initialize (file:///home/project/src/services/notificationService.js#cjs:61:17)
+    at async ServiceManager.initializeService (file:///home/project/src/core/serviceManager.js#cjs:145:17)
+    at async ServiceManager.initializeAll (file:///home/project/src/core/serviceManager.js#cjs:96:17)
+    at async FirebaseMicroservice.initializeServices (file:///home/project/app.js#cjs:183:13)
+    at async FirebaseMicroservice.initialize (file:///home/project/app.js#cjs:76:13)
+    at async FirebaseMicroservice.start (file:///home/project/app.js#cjs:327:9)
+2025-09-16 16:37:43.744 [INFO ] [App] 📊 Initializing Stats Service...
+2025-09-16 16:37:43.749 [INFO ] [App] ✅ Scheduled tasks initialized
+2025-09-16 16:37:43.749 [INFO ] [App] ✅ Stats Service initialized
+2025-09-16 16:37:43.753 [INFO ] [NotificationController] ✅ NotificationController initialized
+2025-09-16 16:37:43.766 [INFO ] [NotificationController] ✅ NotificationService initialized in controller
+2025-09-16 16:37:43.755 [INFO ] [NotificationService] 🔔 Initializing Notification service...
+2025-09-16 16:37:43.755 [INFO ] [NotificationService] ✅ Database models available
+2025-09-16 16:37:43.765 [WARN ] [NotificationService] ⚠️ Firebase service not available: {"0":"C","1":"a","2":"n","3":"n","4":"o","5":"t","6":" ","7":"r","8":"e","9":"a","10":"d","11":" ","12":"p","13":"r","14":"o","15":"p","16":"e","17":"r","18":"t","19":"i","20":"e","21":"s","22":" ","23":"o","24":"f","25":" ","26":"n","27":"u","28":"l","29":"l","30":" ","31":"(","32":"r","33":"e","34":"a","35":"d","36":"i","37":"n","38":"g","39":" ","40":"'","41":"p","42":"r","43":"o","44":"j","45":"e","46":"c","47":"t","48":"I","49":"d","50":"'","51":")"}
+2025-09-16 16:37:43.766 [INFO ] [NotificationService] ✅ Notification service initialized successfully
+2025-09-16 16:37:43.757 [INFO ] [FirebaseService] 🔥 Initializing Firebase service...
+2025-09-16 16:37:43.758 [INFO ] [FirebaseService] 📋 Loading Firebase configuration...
+2025-09-16 16:37:43.758 [INFO ] [FirebaseService] 📄 firebase-service-account.json not found
+2025-09-16 16:37:43.759 [INFO ] [FirebaseService] 📋 Incomplete Firebase config in environment
+2025-09-16 16:37:43.759 [ERROR] [FirebaseService] ❌ Failed to load Firebase configuration:
+TypeError: Cannot read properties of null (reading 'projectId')
+    at FirebaseService.loadConfiguration (file:///home/project/src/services/firebaseService.js#cjs:71:26)
+    at async FirebaseService.initialize (file:///home/project/src/services/firebaseService.js#cjs:39:13)
+    at async NotificationService.initialize (file:///home/project/src/services/notificationService.js#cjs:61:17)
+    at async NotificationController.initializeService (file:///home/project/src/controllers/notificationController.js#cjs:42:13)
+2025-09-16 16:37:43.764 [ERROR] [FirebaseService] ❌ Firebase service initialization failed:
+TypeError: Cannot read properties of null (reading 'projectId')
+    at FirebaseService.loadConfiguration (file:///home/project/src/services/firebaseService.js#cjs:71:26)
+    at async FirebaseService.initialize (file:///home/project/src/services/firebaseService.js#cjs:39:13)
+    at async NotificationService.initialize (file:///home/project/src/services/notificationService.js#cjs:61:17)
+    at async NotificationController.initializeService (file:///home/project/src/controllers/notificationController.js#cjs:42:13)
+2025-09-16 16:37:43.797 [INFO ] [WebSocketService] 🧹 Cleaning up WebSocket service...
+2025-09-16 16:37:43.801 [ERROR] [DatabaseCore] ❌ Error closing database: {"errno":5,"code":"SQLITE_BUSY","__augmented":true}
+Error: SQLITE_BUSY: unable to close due to unfinalized statements or unfinished backups
+    at sqliteError (/home/project/node_modules/sqlite3/lib/sqlite3.pure.js:1:94706)
+    at 51656 (/home/project/node_modules/sqlite3/lib/sqlite3.pure.js:1:12557)
+    at _emscripten_asm_const_int (/home/project/node_modules/sqlite3/lib/sqlite3.pure.js:1:84040)
+    at eval (/home/project/node_modules/sqlite3/lib/pure/database.js:64:26)
+    at processTicksAndRejections (node:internal/process/task_queues:196:998)
+    at runNextTicks (node:internal/process/task_queues:196:829)
+    at <anonymous> (node:internal/timers:253:5438)
+--> in Database#close([Function (anonymous)])
+    at eval (/home/project/src/core/database.js:449:25)
+    at <anonymous> (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:27890)
+    at new Promise (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:27849)
+    at DatabaseCore.close (/home/project/src/core/database.js:447:16)
+    at FirebaseMicroservice.gracefulShutdown (/home/project/app.js:313:37)
