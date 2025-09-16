@@ -34,19 +34,19 @@ class AppLogger {
                 format: 'YYYY-MM-DD HH:mm:ss.SSS'
             }),
             winston.format.errors({ stack: true }),
-            winston.format.metadata({ 
-                fillExcept: ['timestamp', 'level', 'message', 'stack'] 
-            }),
             winston.format.printf((info) => {
-                const { timestamp, level, message, metadata, stack } = info;
+                const { timestamp, level, message, stack, ...metadata } = info;
                 const module = metadata.module || this.module;
                 
                 // Base log message
                 let logMessage = `${timestamp} [${level.toUpperCase().padEnd(5)}] [${module}] ${message}`;
                 
-                // Add metadata if present
-                if (metadata && Object.keys(metadata).length > 0) {
-                    const metaString = JSON.stringify(metadata, null, 0);
+                // Add metadata if present (excluding module)
+                const cleanMetadata = { ...metadata };
+                delete cleanMetadata.module;
+                
+                if (Object.keys(cleanMetadata).length > 0) {
+                    const metaString = JSON.stringify(cleanMetadata, null, 0);
                     if (metaString !== '{}') {
                         logMessage += ` ${metaString}`;
                     }
@@ -68,8 +68,8 @@ class AppLogger {
                 format: 'HH:mm:ss.SSS'
             }),
             winston.format.printf((info) => {
-                const { timestamp, level, message, metadata } = info;
-                const module = metadata?.module || this.module;
+                const { timestamp, level, message, ...metadata } = info;
+                const module = metadata.module || this.module;
                 const emoji = this.getLevelEmoji(info.level);
                 
                 let logMessage = `${timestamp} ${emoji} [${module}] ${message}`;
@@ -159,8 +159,8 @@ class AppLogger {
             format: logFormat,
             transports,
             exitOnError: false,
-            exceptionHandlers: transports.filter(t => t.handleExceptions),
-            rejectionHandlers: transports.filter(t => t.handleRejections)
+            handleExceptions: true,
+            handleRejections: true
         });
     }
 

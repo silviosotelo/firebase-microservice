@@ -9,50 +9,12 @@ class ResponseModel {
     constructor(db) {
         this.db = db;
         this.logger = new AppLogger('ResponseModel');
-        
-        // Prepared statements for optimal performance
-        this.insertStmt = this.db.prepare(`
-            INSERT INTO firebase_responses (
-                notification_id, token, success, error_code,
-                error_message, firebase_message_id, attempt_number
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)
-        `);
-
-        this.findByNotificationStmt = this.db.prepare(`
-            SELECT * FROM firebase_responses 
-            WHERE notification_id = ? 
-            ORDER BY created_at ASC
-        `);
-
-        this.findByTokenStmt = this.db.prepare(`
-            SELECT * FROM firebase_responses 
-            WHERE token = ? 
-            ORDER BY created_at DESC 
-            LIMIT ? OFFSET ?
-        `);
-
-        this.findFailedByTokenStmt = this.db.prepare(`
-            SELECT * FROM firebase_responses 
-            WHERE token = ? AND success = 0
-            ORDER BY created_at DESC 
-            LIMIT ?
-        `);
-
-        this.updateStmt = this.db.prepare(`
-            UPDATE firebase_responses 
-            SET success = ?, error_code = ?, error_message = ?, firebase_message_id = ?
-            WHERE id = ?
-        `);
-
-        this.deleteByNotificationStmt = this.db.prepare(`
-            DELETE FROM firebase_responses WHERE notification_id = ?
-        `);
     }
 
     /**
      * Create new response record
      */
-    create(data) {
+    async create(data) {
         try {
             const {
                 notification_id,
@@ -64,7 +26,14 @@ class ResponseModel {
                 attempt_number = 1
             } = data;
 
-            const result = this.insertStmt.run(
+            const sql = `
+                INSERT INTO firebase_responses (
+                    notification_id, token, success, error_code,
+                    error_message, firebase_message_id, attempt_number
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            `;
+
+            const result = await this.runQuery(sql, [
                 notification_id,
                 token,
                 success ? 1 : 0,
@@ -72,11 +41,11 @@ class ResponseModel {
                 error_message,
                 firebase_message_id,
                 attempt_number
-            );
+            ]);
 
-            this.logger.debug(`📝 Response recorded: ${result.lastInsertRowid} (${success ? 'success' : 'failed'})`);
+            this.logger.debug(`📝 Response recorded: ${result.lastID} (${success ? 'success' : 'failed'})`);
             
-            return result.lastInsertRowid;
+            return result.lastID;
 
         } catch (error) {
             this.logger.error('❌ Failed to create response:', error);
@@ -115,9 +84,14 @@ class ResponseModel {
     /**
      * Get responses by notification ID
      */
-    getByNotificationId(notificationId) {
+    async getByNotificationId(notificationId) {
         try {
-            const responses = this.findByNotificationStmt.all(notificationId);
+            const sql = `
+                SELECT * FROM firebase_responses 
+                WHERE notification_id = ? 
+                ORDER BY created_at ASC
+            `;
+            const responses = await this.query(sql, [notificationId]);
             
             return responses.map(response => ({
                 ...response,
@@ -130,6 +104,35 @@ class ResponseModel {
         }
     }
 
+    /**
+     * Helper methods for database operations
+     */
+    async runQuery(sql, params = []) {
+        return new Promise((resolve, reject) => {
+            this.db.run(sql, params, function(err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve({
+                        lastID: this.lastID,
+                        changes: this.changes
+                    });
+                }
+            });
+        });
+    }
+
+    async query(sql, params = []) {
+        return new Promise((resolve, reject) => {
+            this.db.all(sql, params, (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows);
+                }
+            });
+        });
+    }
     /**
      * Get responses by token
      */
@@ -594,25 +597,27 @@ class ResponseModel {
     async healthCheck() {
         try {
             // Test basic operations
-            const recentCount = this.db.prepare(`
+            const recentSql = `
                 SELECT COUNT(*) as count 
                 FROM firebase_responses 
                 WHERE created_at >= datetime('now', '-1 hour')
-            `).get();
+            `;
+            const recentCount = await this.query(recentSql);
 
-            const totalCount = this.db.prepare('SELECT COUNT(*) as count FROM firebase_responses').get();
+            const totalCount = await this.query('SELECT COUNT(*) as count FROM firebase_responses');
 
-            const successRate = this.db.prepare(`
+            const successRateSql = `
                 SELECT AVG(CASE WHEN success = 1 THEN 1.0 ELSE 0.0 END) * 100 as rate
                 FROM firebase_responses 
                 WHERE created_at >= datetime('now', '-24 hours')
-            `).get();
+            `;
+            const successRate = await this.query(successRateSql);
 
             return {
                 healthy: true,
-                totalResponses: totalCount.count,
-                recentResponses: recentCount.count,
-                recent24hSuccessRate: successRate.rate || 0,
+                totalResponses: totalCount[0]?.count || 0,
+                recentResponses: recentCount[0]?.count || 0,
+                recent24hSuccessRate: successRate[0]?.rate || 0,
                 timestamp: new Date().toISOString()
             };
 

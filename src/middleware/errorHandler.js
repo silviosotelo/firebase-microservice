@@ -1,6 +1,6 @@
 // ==========================================
-// ERROR HANDLER MIDDLEWARE - VERSIÓN MEJORADA
-// Manejo robusto de errores que no para el servicio
+// ERROR HANDLER MIDDLEWARE - OPTIMIZED VERSION
+// Robust error handling with better categorization
 // ==========================================
 
 const AppLogger = require('../utils/logger');
@@ -8,89 +8,133 @@ const AppLogger = require('../utils/logger');
 const logger = new AppLogger('ErrorHandler');
 
 /**
+ * Custom error classes for better error handling
+ */
+class AppError extends Error {
+    constructor(message, statusCode = 500, code = 'INTERNAL_ERROR', isOperational = true) {
+        super(message);
+        this.name = this.constructor.name;
+        this.statusCode = statusCode;
+        this.code = code;
+        this.isOperational = isOperational;
+        this.timestamp = new Date().toISOString();
+        
+        Error.captureStackTrace(this, this.constructor);
+    }
+}
+
+class ValidationError extends AppError {
+    constructor(message, details = []) {
+        super(message, 400, 'VALIDATION_ERROR');
+        this.details = details;
+    }
+}
+
+class NotFoundError extends AppError {
+    constructor(message = 'Resource not found') {
+        super(message, 404, 'NOT_FOUND');
+    }
+}
+
+class UnauthorizedError extends AppError {
+    constructor(message = 'Authentication required') {
+        super(message, 401, 'UNAUTHORIZED');
+    }
+}
+
+class ForbiddenError extends AppError {
+    constructor(message = 'Access denied') {
+        super(message, 403, 'FORBIDDEN');
+    }
+}
+
+class ServiceUnavailableError extends AppError {
+    constructor(message = 'Service temporarily unavailable') {
+        super(message, 503, 'SERVICE_UNAVAILABLE');
+    }
+}
+
+/**
  * Middleware global de manejo de errores
  */
 const globalErrorHandler = (error, req, res, next) => {
     try {
-        // Log del error
-        logger.error('❌ Global error caught:', {
+        // Enhanced error logging
+        const errorContext = {
             error: error.message,
-            stack: error.stack,
-            url: req.originalUrl,
-            method: req.method,
-            ip: req.ip,
-            userAgent: req.headers['user-agent']
-        });
+            name: error.name,
+            code: error.code,
+            statusCode: error.statusCode,
+            isOperational: error.isOperational,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+            request: {
+                url: req.originalUrl,
+                method: req.method,
+                ip: req.ip,
+                userAgent: req.headers['user-agent'],
+                requestId: req.headers['x-request-id']
+            },
+            timestamp: new Date().toISOString()
+        };
 
-        // Si la respuesta ya fue enviada, delegar al error handler por defecto de Express
+        // Log based on error type
+        if (error.isOperational === false || error.statusCode >= 500) {
+            logger.error('❌ Critical error caught:', errorContext);
+        } else {
+            logger.warn('⚠️ Operational error caught:', errorContext);
+        }
+
+        // If response already sent, delegate to Express default handler
         if (res.headersSent) {
             return next(error);
         }
 
-        // Determinar el código de estado
-        let statusCode = 500;
-        let errorType = 'INTERNAL_SERVER_ERROR';
-        let userMessage = 'An internal server error occurred';
+        // Determine response details
+        const statusCode = error.statusCode || 500;
+        const errorCode = error.code || 'INTERNAL_ERROR';
+        let userMessage = error.message;
 
-        // Manejar tipos específicos de errores
-        if (error.name === 'ValidationError') {
-            statusCode = 400;
-            errorType = 'VALIDATION_ERROR';
-            userMessage = 'Validation failed';
-        } else if (error.name === 'UnauthorizedError') {
-            statusCode = 401;
-            errorType = 'UNAUTHORIZED';
-            userMessage = 'Authentication required';
-        } else if (error.name === 'ForbiddenError') {
-            statusCode = 403;
-            errorType = 'FORBIDDEN';
-            userMessage = 'Access denied';
-        } else if (error.name === 'NotFoundError') {
-            statusCode = 404;
-            errorType = 'NOT_FOUND';
-            userMessage = 'Resource not found';
-        } else if (error.code === 'ECONNREFUSED') {
-            statusCode = 503;
-            errorType = 'SERVICE_UNAVAILABLE';
-            userMessage = 'External service unavailable';
-        } else if (error.code === 'SQLITE_BUSY' || error.code === 'SQLITE_LOCKED') {
-            statusCode = 503;
-            errorType = 'DATABASE_BUSY';
-            userMessage = 'Database temporarily unavailable';
+        // Sanitize error message for production
+        if (process.env.NODE_ENV === 'production' && statusCode >= 500) {
+            userMessage = 'An internal server error occurred';
         }
 
-        // Preparar respuesta de error
+        // Prepare error response
         const errorResponse = {
             success: false,
             error: userMessage,
-            type: errorType,
+            code: errorCode,
             timestamp: new Date().toISOString(),
             requestId: req.headers['x-request-id'] || `req_${Date.now()}`
         };
 
-        // En desarrollo, incluir más detalles
+        // Add details for validation errors
+        if (error instanceof ValidationError && error.details) {
+            errorResponse.details = error.details;
+        }
+
+        // Add development details
         if (process.env.NODE_ENV === 'development') {
-            errorResponse.details = {
-                message: error.message,
+            errorResponse.debug = {
+                originalMessage: error.message,
                 name: error.name,
                 code: error.code,
-                stack: error.stack?.split('\n').slice(0, 5) // Solo las primeras 5 líneas del stack
+                stack: error.stack?.split('\n').slice(0, 5)
             };
         }
 
-        // Enviar respuesta
+        // Send response
         res.status(statusCode).json(errorResponse);
 
-        // No relanzar el error para evitar que el proceso se cierre
-        
     } catch (handlerError) {
-        // Si hay un error en el error handler, usar respuesta mínima
+        // Fallback error handling
         logger.error('❌ Error in error handler:', handlerError);
         
         if (!res.headersSent) {
             res.status(500).json({
                 success: false,
                 error: 'Critical server error',
+                code: 'HANDLER_ERROR',
                 timestamp: new Date().toISOString()
             });
         }
@@ -118,11 +162,22 @@ const notFoundHandler = (req, res, next) => {
 };
 
 /**
- * Wrapper para async route handlers
+ * Enhanced async handler with better error context
  */
 const asyncHandler = (fn) => {
     return (req, res, next) => {
-        Promise.resolve(fn(req, res, next)).catch(next);
+        Promise.resolve(fn(req, res, next)).catch((error) => {
+            // Add request context to error
+            if (!error.requestContext) {
+                error.requestContext = {
+                    method: req.method,
+                    url: req.originalUrl,
+                    ip: req.ip,
+                    userAgent: req.headers['user-agent']
+                };
+            }
+            next(error);
+        });
     };
 };
 
@@ -192,60 +247,36 @@ const sanitizeDatabaseError = (error, req, res, next) => {
 };
 
 /**
- * Crear error personalizado
+ * Create standardized error responses
  */
-class AppError extends Error {
-    constructor(message, statusCode = 500, type = 'APP_ERROR') {
-        super(message);
-        this.name = 'AppError';
-        this.statusCode = statusCode;
-        this.type = type;
-        this.timestamp = new Date().toISOString();
-        
-        Error.captureStackTrace(this, this.constructor);
-    }
-}
+const createErrorResponse = (message, code = 'INTERNAL_ERROR', statusCode = 500, details = null) => {
+    return {
+        success: false,
+        error: message,
+        code,
+        details,
+        timestamp: new Date().toISOString()
+    };
+};
 
 /**
- * Crear error de validación
+ * Error factory functions
  */
-class ValidationError extends AppError {
-    constructor(message, details = []) {
-        super(message, 400, 'VALIDATION_ERROR');
-        this.name = 'ValidationError';
-        this.details = details;
-    }
-}
+const createValidationError = (message, details = []) => {
+    return new ValidationError(message, details);
+};
 
-/**
- * Crear error de autorización
- */
-class UnauthorizedError extends AppError {
-    constructor(message = 'Authentication required') {
-        super(message, 401, 'UNAUTHORIZED');
-        this.name = 'UnauthorizedError';
-    }
-}
+const createNotFoundError = (resource = 'Resource') => {
+    return new NotFoundError(`${resource} not found`);
+};
 
-/**
- * Crear error de permisos
- */
-class ForbiddenError extends AppError {
-    constructor(message = 'Access denied') {
-        super(message, 403, 'FORBIDDEN');
-        this.name = 'ForbiddenError';
-    }
-}
+const createUnauthorizedError = (message = 'Authentication required') => {
+    return new UnauthorizedError(message);
+};
 
-/**
- * Crear error de recurso no encontrado
- */
-class NotFoundError extends AppError {
-    constructor(message = 'Resource not found') {
-        super(message, 404, 'NOT_FOUND');
-        this.name = 'NotFoundError';
-    }
-}
+const createServiceError = (service, message = 'Service unavailable') => {
+    return new ServiceUnavailableError(`${service}: ${message}`);
+};
 
 /**
  * Middleware para logging de errores críticos
@@ -309,12 +340,20 @@ module.exports = {
     sanitizeDatabaseError,
     logCriticalError,
     
-    // Clases de error
+    // Error classes
     AppError,
     ValidationError,
+    NotFoundError,
     UnauthorizedError,
     ForbiddenError,
-    NotFoundError,
+    ServiceUnavailableError,
+    
+    // Error factory functions
+    createErrorResponse,
+    createValidationError,
+    createNotFoundError,
+    createUnauthorizedError,
+    createServiceError,
     
     // Utilities
     errorHandlerHealthCheck

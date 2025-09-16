@@ -91,25 +91,15 @@ class ConfigModel {
             
             const iv = Buffer.from(ivHex, 'hex');
             const decipher = crypto.createDecipheriv('aes-256-cbc', this.encryptionKey, iv);
-            
-            let decrypted = decipher.update(encrypted, 'hex', 'utf8');
-            decrypted += decipher.final('utf8');
-            
-            return decrypted;
-            
-        } catch (error) {
-            this.logger.error('❌ Decryption failed for config value:', error.message);
-            // Return original value if decryption fails
-            return encryptedValue;
-        }
     }
 
     /**
      * Get configuration value
      */
-    get(key) {
+    async get(key) {
         try {
-            const result = this.getStmt.get(key);
+            const sql = 'SELECT * FROM config WHERE key = ?';
+            const result = await this.getQuery(sql, [key]);
             
             if (!result) {
                 return null;
@@ -134,7 +124,7 @@ class ConfigModel {
 /**
      * Set configuration value
      */
-    set(key, value, description = null, type = 'string', encrypted = false) {
+    async set(key, value, description = null, type = 'string', encrypted = false) {
         try {
             this.logger.debug(`🔧 Setting config: ${key} (type: ${type}, encrypted: ${encrypted})`);
             
@@ -152,7 +142,11 @@ class ConfigModel {
             const encryptedInt = encrypted ? 1 : 0;
             this.logger.debug(`💾 Executing setStmt with params: key=${key}, value=${stringValue.substring(0, 20)}..., description=${description}, type=${type}, encrypted=${encryptedInt}`);
             
-            const result = this.setStmt.run(key, stringValue, description, type, encryptedInt);
+            const sql = `
+                INSERT OR REPLACE INTO config (key, value, description, type, encrypted) 
+                VALUES (?, ?, ?, ?, ?)
+            `;
+            const result = await this.runQuery(sql, [key, stringValue, description, type, encryptedInt]);
             this.logger.debug(`✅ setStmt executed successfully, changes: ${result.changes}`);
             
             this.logger.debug(`⚙️ Config set: ${key} = ${encrypted ? '***ENCRYPTED***' : stringValue}`);
@@ -170,9 +164,10 @@ class ConfigModel {
     /**
      * Get all configuration
      */
-    getAll(includeEncrypted = false) {
+    async getAll(includeEncrypted = false) {
         try {
-            const configs = this.getAllStmt.all();
+            const sql = 'SELECT * FROM config ORDER BY key';
+            const configs = await this.query(sql);
             
             return configs.map(config => {
                 let value = config.value;
@@ -201,6 +196,47 @@ class ConfigModel {
         }
     }
 
+    /**
+     * Helper methods for database operations
+     */
+    async runQuery(sql, params = []) {
+        return new Promise((resolve, reject) => {
+            this.db.run(sql, params, function(err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve({
+                        lastID: this.lastID,
+                        changes: this.changes
+                    });
+                }
+            });
+        });
+    }
+
+    async getQuery(sql, params = []) {
+        return new Promise((resolve, reject) => {
+            this.db.get(sql, params, (err, row) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row);
+                }
+            });
+        });
+    }
+
+    async query(sql, params = []) {
+        return new Promise((resolve, reject) => {
+            this.db.all(sql, params, (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows);
+                }
+            });
+        });
+    }
     /**
      * Get configurations by type
      */
@@ -580,11 +616,11 @@ class ConfigModel {
     async healthCheck() {
         try {
             // Test database connection
-            const testConfig = this.getStmt.get('NONEXISTENT_KEY');
+            await this.getQuery('SELECT 1 as test');
             
             return {
                 healthy: true,
-                stats: this.getStats(),
+                stats: await this.getStats(),
                 encryptionEnabled: !!this.encryptionKey,
                 timestamp: new Date().toISOString()
             };
@@ -598,5 +634,29 @@ class ConfigModel {
         }
     }
 }
+    /**
+     * Get configuration statistics
+     */
+    async getStats() {
+        try {
+            const allConfigs = await this.query('SELECT * FROM config');
+            const stats = {
+                total: allConfigs.length,
+                encrypted: allConfigs.filter(c => c.encrypted).length,
+                byType: {}
+            };
+
+            // Count by type
+            for (const config of allConfigs) {
+                stats.byType[config.type] = (stats.byType[config.type] || 0) + 1;
+            }
+
+            return stats;
+
+        } catch (error) {
+            this.logger.error('❌ Failed to get config stats:', error);
+            throw new Error(`Failed to get configuration statistics: ${error.message}`);
+        }
+    }
 
 module.exports = ConfigModel;

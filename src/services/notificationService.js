@@ -13,11 +13,13 @@ const {
 const { validateToken, validateTopic } = require('../utils/validators');
 
 class NotificationService {
-    constructor(websocketService = null, models = null, queueService = null) {
+    constructor(dependencies = {}, options = {}) {
         this.logger = new AppLogger('NotificationService');
-        this.websocketService = websocketService;
-        this.models = models;
-        this.queueService = queueService;
+        
+        // Dependencies
+        this.websocketService = dependencies.websocketService;
+        this.database = dependencies.database;
+        this.queueService = dependencies.queueService;
         
         // Services that will be initialized
         this.firebaseService = null;
@@ -45,19 +47,12 @@ class NotificationService {
             this.logger.info('🔔 Initializing Notification service...');
             
             // Validate dependencies
-            if (!this.models) {
-                throw new Error('Models are required for NotificationService');
+            if (!this.database) {
+                throw new Error('Database is required for NotificationService');
             }
             
-            if (!this.models.Notification) {
-                throw new Error('Notification model is required');
-            }
-            
-            this.logger.info('✅ Models available:', {
-                Notification: !!this.models.Notification,
-                Response: !!this.models.Response,
-                Config: !!this.models.Config
-            });
+            this.models = this.database.getModels();
+            this.logger.info('✅ Database models available');
             
             // Initialize Firebase service if available
             try {
@@ -89,8 +84,8 @@ class NotificationService {
         try {
             this.logger.info('📤 Queuing notification...');
             
-            if (!this.models || !this.models.Notification) {
-                throw new Error('Notification model not available');
+            if (!this.database || !this.models) {
+                throw new Error('Database not available');
             }
             
             // Validate notification data
@@ -327,12 +322,8 @@ class NotificationService {
     async listNotifications(options = {}) {
         try {
             // Verify models are available
-            if (!this.models) {
-                throw new Error('Models not available - service not properly initialized');
-            }
-            
-            if (!this.models.Notification) {
-                throw new Error('Notification model not available');
+            if (!this.database || !this.models) {
+                throw new Error('Database not available - service not properly initialized');
             }
             
             this.logger.debug('📋 Listing notifications with options:', options);

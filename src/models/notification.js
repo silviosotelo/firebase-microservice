@@ -10,70 +10,12 @@ class NotificationModel {
     constructor(db) {
         this.db = db;
         this.logger = new AppLogger('NotificationModel');
-        
-        // Prepared statements for better performance
-        this.insertStmt = this.db.prepare(`
-            INSERT INTO notifications (
-                request_id, user_id, title, message, type, method,
-                target_data, extra_data, priority, status, scheduled_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `);
-
-        this.findByIdStmt = this.db.prepare('SELECT * FROM notifications WHERE id = ?');
-        this.findByRequestIdStmt = this.db.prepare('SELECT * FROM notifications WHERE request_id = ?');
-        
-        this.updateStatusStmt = this.db.prepare(`
-            UPDATE notifications 
-            SET status = ?, updated_at = CURRENT_TIMESTAMP 
-            WHERE id = ?
-        `);
-
-        this.updateResultStmt = this.db.prepare(`
-            UPDATE notifications SET
-                status = ?,
-                total_sent = ?,
-                successful = ?,
-                failed = ?,
-                success_rate = ?,
-                processing_time = ?,
-                firebase_response = ?,
-                error_message = ?,
-                started_at = ?,
-                completed_at = ?,
-                updated_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-        `);
-
-        this.findPendingStmt = this.db.prepare(`
-            SELECT * FROM notifications 
-            WHERE status IN ('queued', 'processing') 
-            ORDER BY created_at ASC
-        `);
-
-        this.findByUserStmt = this.db.prepare(`
-            SELECT * FROM notifications 
-            WHERE user_id = ? 
-            ORDER BY created_at DESC 
-            LIMIT ? OFFSET ?
-        `);
-
-        this.countByUserStmt = this.db.prepare(`
-            SELECT COUNT(*) as total FROM notifications WHERE user_id = ?
-        `);
-
-        this.findScheduledStmt = this.db.prepare(`
-            SELECT * FROM notifications 
-            WHERE scheduled_at IS NOT NULL 
-            AND scheduled_at <= ? 
-            AND status = 'queued'
-            ORDER BY scheduled_at ASC
-        `);
     }
 
     /**
      * Create new notification
      */
-    create(data) {
+    async create(data) {
         try {
             const {
                 request_id, user_id, title, message, type = NOTIFICATION_TYPES.GENERAL,
@@ -81,15 +23,22 @@ class NotificationModel {
                 status = NOTIFICATION_STATUS.QUEUED, scheduled_at = null
             } = data;
 
-            const result = this.insertStmt.run(
+            const sql = `
+                INSERT INTO notifications (
+                    request_id, user_id, title, message, type, method,
+                    target_data, extra_data, priority, status, scheduled_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `;
+
+            const result = await this.runQuery(sql, [
                 request_id, user_id, title, message, type, method,
                 JSON.stringify(target_data), JSON.stringify(extra_data),
                 priority, status, scheduled_at
-            );
+            ]);
 
-            this.logger.debug(`📋 Notification created: ${result.lastInsertRowid}`);
+            this.logger.debug(`📋 Notification created: ${result.lastID}`);
             
-            return this.findById(result.lastInsertRowid);
+            return this.findById(result.lastID);
 
         } catch (error) {
             this.logger.error('❌ Failed to create notification:', error);
@@ -100,9 +49,10 @@ class NotificationModel {
     /**
      * Find notification by ID
      */
-    findById(id) {
+    async findById(id) {
         try {
-            const notification = this.findByIdStmt.get(id);
+            const sql = 'SELECT * FROM notifications WHERE id = ?';
+            const notification = await this.getQuery(sql, [id]);
             
             if (!notification) {
                 return null;
@@ -119,9 +69,10 @@ class NotificationModel {
     /**
      * Find notification by request ID
      */
-    findByRequestId(requestId) {
+    async findByRequestId(requestId) {
         try {
-            const notification = this.findByRequestIdStmt.get(requestId);
+            const sql = 'SELECT * FROM notifications WHERE request_id = ?';
+            const notification = await this.getQuery(sql, [requestId]);
             
             if (!notification) {
                 return null;
@@ -138,10 +89,14 @@ class NotificationModel {
     /**
      * Update notification status
      */
-    updateStatus(id, status, additionalData = {}) {
+    async updateStatus(id, status, additionalData = {}) {
         try {
-            // First update the status
-            this.updateStatusStmt.run(status, id);
+            const sql = `
+                UPDATE notifications 
+                SET status = ?, updated_at = CURRENT_TIMESTAMP 
+                WHERE id = ?
+            `;
+            await this.runQuery(sql, [status, id]);
 
             // Update additional fields if provided
             if (Object.keys(additionalData).length > 0) {
@@ -151,12 +106,12 @@ class NotificationModel {
                 const values = Object.values(additionalData);
                 values.push(id);
 
-                const updateStmt = this.db.prepare(`
+                const updateSql = `
                     UPDATE notifications 
                     SET ${fields}, updated_at = CURRENT_TIMESTAMP 
                     WHERE id = ?
-                `);
-                updateStmt.run(...values);
+                `;
+                await this.runQuery(updateSql, values);
             }
 
             this.logger.debug(`🔄 Notification ${id} status updated to: ${status}`);
@@ -172,7 +127,7 @@ class NotificationModel {
     /**
      * Update notification with processing result
      */
-    updateWithResult(id, result) {
+    async updateWithResult(id, result) {
         try {
             const {
                 status = NOTIFICATION_STATUS.COMPLETED,
@@ -187,7 +142,23 @@ class NotificationModel {
                 completed_at = null
             } = result;
 
-            this.updateResultStmt.run(
+            const sql = `
+                UPDATE notifications SET
+                    status = ?,
+                    total_sent = ?,
+                    successful = ?,
+                    failed = ?,
+                    success_rate = ?,
+                    processing_time = ?,
+                    firebase_response = ?,
+                    error_message = ?,
+                    started_at = ?,
+                    completed_at = ?,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            `;
+
+            await this.runQuery(sql, [
                 status,
                 total_sent,
                 successful,
@@ -199,7 +170,7 @@ class NotificationModel {
                 started_at,
                 completed_at || new Date().toISOString(),
                 id
-            );
+            ]);
 
             this.logger.debug(`✅ Notification ${id} result updated: ${successful}/${total_sent} successful`);
             
@@ -214,7 +185,7 @@ class NotificationModel {
     /**
      * Find multiple notifications with filters and pagination
      */
-    findMany(options = {}) {
+    async findMany(options = {}) {
         try {
             const {
                 filters = {},
@@ -280,8 +251,7 @@ class NotificationModel {
             }
 
             // Get total count
-            const countStmt = this.db.prepare(countQuery);
-            const totalResult = countStmt.get(...params);
+            const totalResult = await this.getQuery(countQuery, params);
             const total = totalResult.total;
 
             // Add sorting and pagination
@@ -292,8 +262,7 @@ class NotificationModel {
             query += ` ORDER BY ${finalSortBy} ${finalSortOrder} LIMIT ? OFFSET ?`;
             params.push(limit, offset);
 
-            const stmt = this.db.prepare(query);
-            const notifications = stmt.all(...params);
+            const notifications = await this.query(query, params);
 
             // Parse notifications
             const parsedNotifications = notifications.map(n => this.parseNotification(n));
@@ -314,15 +283,60 @@ class NotificationModel {
     }
 
     /**
+     * Helper methods for database operations
+     */
+    async runQuery(sql, params = []) {
+        return new Promise((resolve, reject) => {
+            this.db.run(sql, params, function(err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve({
+                        lastID: this.lastID,
+                        changes: this.changes
+                    });
+                }
+            });
+        });
+    }
+
+    async getQuery(sql, params = []) {
+        return new Promise((resolve, reject) => {
+            this.db.get(sql, params, (err, row) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row);
+                }
+            });
+        });
+    }
+
+    async query(sql, params = []) {
+        return new Promise((resolve, reject) => {
+            this.db.all(sql, params, (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows);
+                }
+            });
+        });
+    }
+    /**
      * Get pending notifications (queued or processing)
      */
-    findPending(limit = 100) {
+    async findPending(limit = 100) {
         try {
-            const notifications = this.findPendingStmt.all();
+            const sql = `
+                SELECT * FROM notifications 
+                WHERE status IN ('queued', 'processing') 
+                ORDER BY created_at ASC
+                LIMIT ?
+            `;
+            const notifications = await this.query(sql, [limit]);
             
-            return notifications
-                .slice(0, limit)
-                .map(n => this.parseNotification(n));
+            return notifications.map(n => this.parseNotification(n));
 
         } catch (error) {
             this.logger.error('❌ Failed to find pending notifications:', error);
@@ -333,10 +347,18 @@ class NotificationModel {
     /**
      * Find notifications by user ID
      */
-    findByUser(userId, limit = 50, offset = 0) {
+    async findByUser(userId, limit = 50, offset = 0) {
         try {
-            const notifications = this.findByUserStmt.all(userId, limit, offset);
-            const countResult = this.countByUserStmt.get(userId);
+            const sql = `
+                SELECT * FROM notifications 
+                WHERE user_id = ? 
+                ORDER BY created_at DESC 
+                LIMIT ? OFFSET ?
+            `;
+            const countSql = 'SELECT COUNT(*) as total FROM notifications WHERE user_id = ?';
+            
+            const notifications = await this.query(sql, [userId, limit, offset]);
+            const countResult = await this.getQuery(countSql, [userId]);
             
             return {
                 data: notifications.map(n => this.parseNotification(n)),
@@ -369,7 +391,7 @@ class NotificationModel {
     /**
      * Get notification statistics
      */
-    getStats(options = {}) {
+    async getStats(options = {}) {
         try {
             const {
                 dateFrom,
@@ -429,8 +451,7 @@ class NotificationModel {
                 ${whereClause}
             `;
 
-            const overallStmt = this.db.prepare(overallQuery);
-            const overall = overallStmt.get(...params);
+            const overall = await this.getQuery(overallQuery, params);
 
             // Time series stats
             const dateFormat = this.getDateFormat(groupBy);
@@ -453,8 +474,7 @@ class NotificationModel {
                 ORDER BY period
             `;
 
-            const timeSeriesStmt = this.db.prepare(timeSeriesQuery);
-            const timeSeries = timeSeriesStmt.all(...params);
+            const timeSeries = await this.query(timeSeriesQuery, params);
 
             // Type distribution
             const typeQuery = `
@@ -468,8 +488,7 @@ class NotificationModel {
                 ORDER BY count DESC
             `;
 
-            const typeStmt = this.db.prepare(typeQuery);
-            const typeDistribution = typeStmt.all(...params);
+            const typeDistribution = await this.query(typeQuery, params);
 
             // Status distribution
             const statusQuery = `
@@ -483,8 +502,7 @@ class NotificationModel {
                 ORDER BY count DESC
             `;
 
-            const statusStmt = this.db.prepare(statusQuery);
-            const statusDistribution = statusStmt.all(...params);
+            const statusDistribution = await this.query(statusQuery, params);
 
             return {
                 overall,
@@ -543,18 +561,18 @@ class NotificationModel {
     /**
      * Clean up old notifications
      */
-    cleanup(retentionDays = 90) {
+    async cleanup(retentionDays = 90) {
         try {
             const cutoffDate = new Date();
             cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
             
-            const deleteStmt = this.db.prepare(`
+            const sql = `
                 DELETE FROM notifications 
                 WHERE created_at < ? 
                 AND status IN ('completed', 'failed', 'cancelled')
-            `);
+            `;
             
-            const result = deleteStmt.run(cutoffDate.toISOString());
+            const result = await this.runQuery(sql, [cutoffDate.toISOString()]);
             
             this.logger.info(`🧹 Cleaned up ${result.changes} old notifications`);
             
@@ -698,13 +716,14 @@ class NotificationModel {
     async healthCheck() {
         try {
             // Test basic operations
-            const recentCount = this.db.prepare(`
+            const recentSql = `
                 SELECT COUNT(*) as count 
                 FROM notifications 
                 WHERE created_at >= datetime('now', '-1 hour')
-            `).get();
+            `;
+            const recentCount = await this.getQuery(recentSql);
 
-            const totalCount = this.db.prepare('SELECT COUNT(*) as count FROM notifications').get();
+            const totalCount = await this.getQuery('SELECT COUNT(*) as count FROM notifications');
 
             return {
                 healthy: true,

@@ -1,6 +1,6 @@
 // ==========================================
-// FIREBASE MICROSERVICE - ENTRY POINT CORREGIDO
-// Arquitectura simplificada y robusta
+// FIREBASE MICROSERVICE - OPTIMIZED ENTRY POINT
+// Clean architecture with dependency injection
 // ==========================================
 
 require('dotenv').config();
@@ -13,8 +13,9 @@ const path = require('path');
 const http = require('http');
 const socketIo = require('socket.io');
 
-// Import configurations
-const database = require('./src/config/database');
+// Import core modules
+const DatabaseCore = require('./src/core/database');
+const ServiceManager = require('./src/core/serviceManager');
 
 // Import middleware  
 const errorHandler = require('./src/middleware/errorHandler');
@@ -23,6 +24,14 @@ const logger = require('./src/middleware/logger');
 // Import utils
 const AppLogger = require('./src/utils/logger');
 
+// Import services
+const QueueService = require('./src/services/queueService');
+const NotificationService = require('./src/services/notificationService');
+const WebSocketService = require('./src/services/websocketService');
+const StatsService = require('./src/services/statsService');
+
+// Import controllers
+const { NotificationController } = require('./src/controllers/notificationController');
 class FirebaseMicroservice {
     constructor() {
         this.app = express();
@@ -31,12 +40,9 @@ class FirebaseMicroservice {
         this.port = process.env.PORT || 3000;
         this.env = process.env.NODE_ENV || 'development';
         
-        // Services
-        this.websocketService = null;
-        this.queueService = null;
-        this.statsService = null;
-        this.notificationController = null;
-        this.models = null;
+        // Core components
+        this.database = DatabaseCore;
+        this.serviceManager = new ServiceManager();
         
         this.logger = new AppLogger('FirebaseMicroservice');
         this.initialized = false;
@@ -66,7 +72,7 @@ class FirebaseMicroservice {
             // 5. Initialize WebSockets
             this.initializeWebSockets();
             
-            // 6. Initialize services
+            // 6. Register and initialize services
             await this.initializeServices();
             
             // 7. Setup routes LAST
@@ -77,20 +83,19 @@ class FirebaseMicroservice {
             
         } catch (error) {
             this.logger.error('❌ Failed to initialize Firebase Microservice:', error);
-            // Don't exit process, just log and continue with limited functionality
             this.initialized = false;
+            throw error;
         }
     }
 
     async initializeDatabase() {
         try {
             this.logger.info('📊 Initializing database...');
-            this.models = await database.initialize();
+            await this.database.initialize();
             this.logger.info('✅ Database initialized successfully');
         } catch (error) {
             this.logger.error('❌ Database initialization failed:', error.message);
-            // Create minimal fallback
-            this.models = null;
+            throw error;
         }
     }
 
@@ -157,63 +162,38 @@ class FirebaseMicroservice {
     }
 
     async initializeServices() {
-        this.logger.info('⚙️ Initializing services...');
+        this.logger.info('⚙️ Registering and initializing services...');
         
         try {
-            // Initialize WebSocket service
-            try {
-                const WebSocketService = require('./src/services/websocketService');
-                this.websocketService = new WebSocketService(this.io);
-                await this.websocketService.initialize();
-                this.logger.info('✅ WebSocket service initialized');
-            } catch (error) {
-                this.logger.warn('⚠️ WebSocket service failed:', error.message);
-                this.websocketService = null;
-            }
+            // Register services with dependencies
+            this.serviceManager.register('websocket', WebSocketService, [], { io: this.io });
+            this.serviceManager.register('queue', QueueService, ['database'], { database: this.database });
+            this.serviceManager.register('notification', NotificationService, ['database', 'websocket', 'queue']);
+            this.serviceManager.register('stats', StatsService, ['database', 'websocket']);
             
-            // Initialize Queue service (SQLite-based)
-            try {
-                const SQLiteQueueService = require('./src/services/sqliteQueueService');
-                this.queueService = new SQLiteQueueService(this.websocketService, this.models);
-                await this.queueService.initialize();
-                this.queueService.startWorkers();
-                this.logger.info('✅ SQLite Queue service initialized');
-            } catch (error) {
-                this.logger.warn('⚠️ Queue service failed:', error.message);
-                this.queueService = null;
-            }
+            // Add database as a pseudo-service for dependency injection
+            this.serviceManager.services.set('database', {
+                name: 'database',
+                instance: this.database,
+                status: 'running',
+                dependencies: []
+            });
+
+            // Initialize all services
+            await this.serviceManager.initializeAll();
             
-            // Initialize Stats service
-            try {
-                const StatsService = require('./src/services/statsService');
-                this.statsService = new StatsService(this.websocketService);
-                await this.statsService.initialize();
-                this.statsService.startPeriodicUpdates();
-                this.logger.info('✅ Stats service initialized');
-            } catch (error) {
-                this.logger.warn('⚠️ Stats service failed:', error.message);
-                this.statsService = null;
-            }
+            // Create notification controller
+            this.notificationController = new NotificationController(
+                this.database.getModels(),
+                this.serviceManager.get('queue'),
+                this.serviceManager.get('websocket')
+            );
             
-            // Initialize Notification Controller
-            try {
-                const { NotificationController } = require('./src/controllers/notificationController');
-                this.notificationController = new NotificationController(
-                    this.models,
-                    this.queueService,
-                    this.websocketService
-                );
-                this.logger.info('✅ Notification controller initialized');
-            } catch (error) {
-                this.logger.error('❌ Notification controller failed:', error.message);
-                this.notificationController = null;
-            }
-            
-            this.logger.info('✅ Services initialization completed');
+            this.logger.info('✅ All services initialized successfully');
             
         } catch (error) {
             this.logger.error('❌ Services initialization failed:', error);
-            // Continue with limited functionality
+            throw error;
         }
     }
 
@@ -228,17 +208,18 @@ class FirebaseMicroservice {
                 version: process.env.npm_package_version || '1.0.0',
                 environment: this.env,
                 uptime: process.uptime(),
-                database: !!this.models,
+                database: this.database.initialized,
                 services: {
-                    websocket: !!this.websocketService,
-                    queue: !!this.queueService,
-                    stats: !!this.statsService,
+                    websocket: this.serviceManager.isRunning('websocket'),
+                    queue: this.serviceManager.isRunning('queue'),
+                    notification: this.serviceManager.isRunning('notification'),
+                    stats: this.serviceManager.isRunning('stats'),
                     notificationController: !!this.notificationController
                 }
             });
         });
 
-        // Load API routes with simplified auth
+        // Load API routes
         try {
             const apiRoutes = require('./src/routes/api-simple');
             
@@ -253,14 +234,6 @@ class FirebaseMicroservice {
             this.logger.error('❌ Failed to mount API routes:', error.message);
         }
 
-        // Load other routes with error handling
-        try {
-            const webhookRoutes = require('./src/routes/webhooks');
-            this.app.use('/webhooks', webhookRoutes);
-            this.logger.info('✅ Webhook routes mounted');
-        } catch (error) {
-            this.logger.warn('⚠️ Webhook routes not available:', error.message);
-        }
 
         // Default route
         this.app.get('/', (req, res) => {
@@ -270,15 +243,9 @@ class FirebaseMicroservice {
                 timestamp: new Date().toISOString(),
                 endpoints: {
                     health: '/health',
-                    api: '/api',
-                    webhooks: '/webhooks'
+                    api: '/api'
                 },
-                services: {
-                    websocket: !!this.websocketService,
-                    queue: !!this.queueService,
-                    stats: !!this.statsService,
-                    notificationController: !!this.notificationController
-                }
+                services: this.serviceManager.getAllStatus()
             });
         });
         
@@ -289,7 +256,7 @@ class FirebaseMicroservice {
                 error: 'Endpoint not found',
                 path: req.originalUrl,
                 method: req.method,
-                availableEndpoints: ['/health', '/api', '/webhooks']
+                availableEndpoints: ['/health', '/api']
             });
         });
         
@@ -338,20 +305,12 @@ class FirebaseMicroservice {
                 this.logger.info('🔌 WebSocket server closed');
             }
             
-            // Stop services
-            if (this.queueService) {
-                await this.queueService.stop();
-                this.logger.info('⏹️ Queue service stopped');
-            }
-            
-            if (this.statsService) {
-                await this.statsService.stop();
-                this.logger.info('📊 Stats service stopped');
-            }
+            // Stop all services
+            await this.serviceManager.stopAll();
             
             // Close database connections
-            if (database) {
-                await database.close();
+            if (this.database) {
+                await this.database.close();
                 this.logger.info('🗄️ Database connections closed');
             }
             
@@ -374,26 +333,24 @@ class FirebaseMicroservice {
                 this.logger.info(`🔗 API: http://localhost:${this.port}/api`);
                 this.logger.info(`🔧 Environment: ${this.env}`);
                 
-                this.logger.info('📋 Service Status:');
-                this.logger.info(`   🗄️ Database: ${this.models ? 'Available' : 'Unavailable'}`);
-                this.logger.info(`   🔌 WebSocket: ${this.websocketService ? 'Running' : 'Unavailable'}`);
-                this.logger.info(`   📦 Queue: ${this.queueService ? 'Running' : 'Unavailable'}`);
-                this.logger.info(`   📊 Stats: ${this.statsService ? 'Running' : 'Unavailable'}`);
-                this.logger.info(`   🎮 Controller: ${this.notificationController ? 'Available' : 'Unavailable'}`);
+                const serviceStatus = this.serviceManager.getAllStatus();
+                this.logger.info('📋 Service Status:', serviceStatus);
                 
                 resolve();
             });
         });
     }
 
-    // Getter methods
+    // Getter methods for backward compatibility
     getApp() { return this.app; }
     getServer() { return this.server; }
     getIO() { return this.io; }
-    getWebSocketService() { return this.websocketService; }
-    getQueueService() { return this.queueService; }
-    getStatsService() { return this.statsService; }
-    getModels() { return this.models; }
+    getDatabase() { return this.database; }
+    getServiceManager() { return this.serviceManager; }
+    getWebSocketService() { return this.serviceManager.get('websocket'); }
+    getQueueService() { return this.serviceManager.get('queue'); }
+    getNotificationService() { return this.serviceManager.get('notification'); }
+    getStatsService() { return this.serviceManager.get('stats'); }
     getNotificationController() { return this.notificationController; }
 }
 
@@ -402,7 +359,7 @@ if (require.main === module) {
     const microservice = new FirebaseMicroservice();
     microservice.start().catch((error) => {
         console.error('❌ Failed to start microservice:', error);
-        // Don't exit, keep trying
+        process.exit(1);
     });
 }
 

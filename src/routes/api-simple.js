@@ -1,11 +1,12 @@
 // ==========================================
-// API ROUTES - VERSIÓN SIMPLIFICADA SIN AUTENTICACIÓN COMPLEJA
-// Rutas básicas que funcionan sin problemas de auth
+// API ROUTES - OPTIMIZED VERSION
+// Clean routes with proper error handling and validation
 // ==========================================
 
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const AppLogger = require('../utils/logger');
+const { asyncHandler, createServiceError } = require('../middleware/errorHandler');
 
 const router = express.Router();
 const logger = new AppLogger('APIRoutes');
@@ -22,162 +23,141 @@ router.setController = (controller) => {
     logger.info('✅ Notification controller set');
 };
 
-// Middleware para verificar si el controlador está disponible
+// Enhanced middleware to check controller availability
 const checkController = (req, res, next) => {
     if (!notificationController) {
-        return res.status(503).json({
-            success: false,
-            error: 'Notification service temporarily unavailable',
-            code: 'CONTROLLER_UNAVAILABLE',
-            message: 'The service is starting up. Please try again in a few moments.',
-            timestamp: new Date().toISOString()
-        });
+        throw createServiceError('NotificationController', 'Controller not available');
     }
     next();
 };
 
 // ==========================================
-// RATE LIMITING SIMPLIFICADO
+// ENHANCED RATE LIMITING
 // ==========================================
 
-const simpleLimiter = rateLimit({
+const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutos
-    max: 1000, // Límite más alto
+    max: process.env.NODE_ENV === 'development' ? 10000 : 1000,
     message: {
         success: false,
         error: 'Too many requests, please try again later',
+        code: 'RATE_LIMIT_EXCEEDED',
         retryAfter: 900
     },
     standardHeaders: true,
     legacyHeaders: false,
     skip: (req) => {
-        // Skip rate limiting for health checks
         return req.path === '/health' || req.path === '/status';
+    },
+    keyGenerator: (req) => {
+        // Use API key if available, otherwise IP
+        return req.headers['x-api-key'] || req.ip;
     }
 });
 
-// Aplicar rate limiting suave
-router.use(simpleLimiter);
+// Apply rate limiting
+router.use(apiLimiter);
 
 // ==========================================
-// HEALTH & STATUS ENDPOINTS
+// ENHANCED HEALTH & STATUS ENDPOINTS
 // ==========================================
 
-router.get('/health', (req, res) => {
+router.get('/health', asyncHandler(async (req, res) => {
     try {
+        // Enhanced health check with controller status
+        const controllerHealth = notificationController ? 
+            await notificationController.healthCheck() : 
+            { status: 'unavailable' };
+
         res.json({
             status: 'healthy',
             timestamp: new Date().toISOString(),
             version: process.env.npm_package_version || '1.0.0',
             uptime: process.uptime(),
-            controllers: {
-                notification: !!notificationController
-            },
+            environment: process.env.NODE_ENV || 'development',
+            controller: controllerHealth,
             memory: {
                 used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
-                total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024)
+                total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
+                usage: Math.round((process.memoryUsage().heapUsed / process.memoryUsage().heapTotal) * 100)
             }
         });
     } catch (error) {
         res.status(503).json({
             status: 'unhealthy',
             timestamp: new Date().toISOString(),
-            error: error.message
+            error: error.message,
+            code: 'HEALTH_CHECK_FAILED'
         });
     }
-});
+}));
 
-router.get('/status', (req, res) => {
+router.get('/status', asyncHandler(async (req, res) => {
     res.json({
         service: 'Firebase Notification Microservice',
         status: 'running',
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'development',
-        controllers: {
-            notification: !!notificationController
+        components: {
+            controller: !!notificationController,
+            initialized: notificationController ? !!notificationController.notificationService : false
         }
     });
-});
+}));
 
 // ==========================================
-// NOTIFICATION ENDPOINTS
+// ENHANCED NOTIFICATION ENDPOINTS
 // ==========================================
 
-// Endpoint de prueba simple
-router.post('/test', (req, res) => {
+// Enhanced test endpoint
+router.post('/test', asyncHandler(async (req, res) => {
     logger.info('📤 Test endpoint called');
+    
+    // Simulate processing delay for testing
+    if (req.body.delay) {
+        await new Promise(resolve => setTimeout(resolve, parseInt(req.body.delay) || 100));
+    }
+    
     res.json({
         success: true,
         message: 'Test endpoint working',
         timestamp: new Date().toISOString(),
-        body: req.body,
-        controllerAvailable: !!notificationController
+        echo: req.body,
+        controller: {
+            available: !!notificationController,
+            serviceReady: notificationController ? !!notificationController.notificationService : false
+        },
+        system: {
+            uptime: process.uptime(),
+            memory: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+            environment: process.env.NODE_ENV
+        }
     });
-});
+}));
 
 // Send single notification
-router.post('/notifications/send', checkController, async (req, res) => {
-    try {
-        logger.info('📤 Send notification request received');
-        await notificationController.sendNotification(req, res);
-    } catch (error) {
-        logger.error('❌ Send notification error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Internal server error',
-            message: error.message,
-            timestamp: new Date().toISOString()
-        });
-    }
-});
+router.post('/notifications/send', checkController, asyncHandler(async (req, res) => {
+    logger.info('📤 Send notification request received');
+    await notificationController.sendNotification(req, res);
+}));
 
 // Send bulk notifications  
-router.post('/notifications/bulk', checkController, async (req, res) => {
-    try {
-        logger.info('📬 Bulk notification request received');
-        await notificationController.sendBulkNotifications(req, res);
-    } catch (error) {
-        logger.error('❌ Bulk notification error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Internal server error',
-            message: error.message,
-            timestamp: new Date().toISOString()
-        });
-    }
-});
+router.post('/notifications/bulk', checkController, asyncHandler(async (req, res) => {
+    logger.info('📬 Bulk notification request received');
+    await notificationController.sendBulkNotifications(req, res);
+}));
 
 // Send test notification
-router.post('/notifications/test', checkController, async (req, res) => {
-    try {
-        logger.info('🧪 Test notification request received');
-        await notificationController.testNotification(req, res);
-    } catch (error) {
-        logger.error('❌ Test notification error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Internal server error',
-            message: error.message,
-            timestamp: new Date().toISOString()
-        });
-    }
-});
+router.post('/notifications/test', checkController, asyncHandler(async (req, res) => {
+    logger.info('🧪 Test notification request received');
+    await notificationController.testNotification(req, res);
+}));
 
 // Get notification status
-router.get('/notifications/:id', checkController, async (req, res) => {
-    try {
-        logger.info(`📋 Get notification status: ${req.params.id}`);
-        await notificationController.getNotificationStatus(req, res);
-    } catch (error) {
-        logger.error('❌ Get notification status error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Internal server error',
-            message: error.message,
-            timestamp: new Date().toISOString()
-        });
-    }
-});
+router.get('/notifications/:id', checkController, asyncHandler(async (req, res) => {
+    logger.info(`📋 Get notification status: ${req.params.id}`);
+    await notificationController.getNotificationStatus(req, res);
+}));
 
 // Get notification details
 router.get('/notifications/:id/details', checkController, async (req, res) => {
@@ -196,20 +176,10 @@ router.get('/notifications/:id/details', checkController, async (req, res) => {
 });
 
 // List notifications
-router.get('/notifications', checkController, async (req, res) => {
-    try {
-        logger.info('📋 List notifications request received');
-        await notificationController.listNotifications(req, res);
-    } catch (error) {
-        logger.error('❌ List notifications error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Internal server error',
-            message: error.message,
-            timestamp: new Date().toISOString()
-        });
-    }
-});
+router.get('/notifications', checkController, asyncHandler(async (req, res) => {
+    logger.info('📋 List notifications request received');
+    await notificationController.listNotifications(req, res);
+}));
 
 // Cancel notification
 router.post('/notifications/:id/cancel', checkController, async (req, res) => {
@@ -263,119 +233,134 @@ router.post('/tokens/validate', checkController, async (req, res) => {
 });
 
 // ==========================================
-// STATISTICS ENDPOINTS
+// ENHANCED STATISTICS ENDPOINTS
 // ==========================================
 
-router.get('/stats', checkController, async (req, res) => {
-    try {
-        logger.info('📊 Stats request received');
-        await notificationController.getNotificationStats(req, res);
-    } catch (error) {
-        logger.error('❌ Stats error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Internal server error',
-            message: error.message,
-            timestamp: new Date().toISOString()
-        });
-    }
-});
+router.get('/stats', checkController, asyncHandler(async (req, res) => {
+    logger.info('📊 Stats request received');
+    await notificationController.getNotificationStats(req, res);
+}));
 
 // ==========================================
-// QUEUE MANAGEMENT ENDPOINTS
+// ENHANCED QUEUE MANAGEMENT ENDPOINTS
 // ==========================================
 
-router.get('/queue/status', checkController, async (req, res) => {
-    try {
-        logger.info('📦 Queue status request received');
-        await notificationController.getQueueStatus(req, res);
-    } catch (error) {
-        logger.error('❌ Queue status error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Internal server error',
-            message: error.message,
-            timestamp: new Date().toISOString()
-        });
-    }
-});
+router.get('/queue/status', checkController, asyncHandler(async (req, res) => {
+    logger.info('📦 Queue status request received');
+    await notificationController.getQueueStatus(req, res);
+}));
 
 // ==========================================
-// API DOCUMENTATION
+// ENHANCED API DOCUMENTATION
 // ==========================================
 
-router.get('/docs', (req, res) => {
+router.get('/docs', asyncHandler(async (req, res) => {
     res.json({
         service: 'Firebase Notification Microservice API',
         version: '1.0.0',
         description: 'REST API for Firebase push notification management',
+        documentation: 'https://github.com/your-org/firebase-microservice/docs',
         endpoints: {
             health: {
                 path: '/api/health',
                 method: 'GET',
-                description: 'Check service health'
+                description: 'Check service health',
+                auth: false
             },
             test: {
                 path: '/api/test',
                 method: 'POST',
-                description: 'Test endpoint'
+                description: 'Test endpoint with echo functionality',
+                auth: false
             },
             sendNotification: {
                 path: '/api/notifications/send',
                 method: 'POST',
-                description: 'Send a single notification'
+                description: 'Send a single notification',
+                auth: true,
+                rateLimit: '1000/15min'
             },
             bulkNotifications: {
                 path: '/api/notifications/bulk',
                 method: 'POST',
-                description: 'Send multiple notifications'
+                description: 'Send multiple notifications',
+                auth: true,
+                rateLimit: '10/hour'
             },
             listNotifications: {
                 path: '/api/notifications',
                 method: 'GET',
-                description: 'List notifications with pagination'
+                description: 'List notifications with pagination and filtering',
+                auth: true,
+                parameters: ['page', 'limit', 'status', 'type', 'userId']
             },
             getNotification: {
                 path: '/api/notifications/:id',
                 method: 'GET',
-                description: 'Get notification status'
+                description: 'Get notification status by ID',
+                auth: true
             },
             stats: {
                 path: '/api/stats',
                 method: 'GET',
-                description: 'Get service statistics'
+                description: 'Get service statistics and metrics',
+                auth: true,
+                parameters: ['period', 'groupBy', 'type', 'status']
             },
             queueStatus: {
                 path: '/api/queue/status',
                 method: 'GET',
-                description: 'Get queue status'
+                description: 'Get queue status and worker information',
+                auth: true
             }
+        },
+        authentication: {
+            type: 'API Key',
+            header: 'X-API-Key',
+            description: 'Include your API key in the X-API-Key header'
+        },
+        rateLimit: {
+            window: '15 minutes',
+            max: process.env.NODE_ENV === 'development' ? '10000' : '1000',
+            note: 'Rate limits are per API key or IP address'
         },
         timestamp: new Date().toISOString()
     });
-});
+}));
 
-// API root endpoint
-router.get('/', (req, res) => {
+// Enhanced API root endpoint
+router.get('/', asyncHandler(async (req, res) => {
+    const controllerStatus = notificationController ? 
+        await notificationController.healthCheck() : 
+        { status: 'unavailable' };
+
     res.json({
         service: 'Firebase Microservice API',
         version: '1.0.0',
         timestamp: new Date().toISOString(),
         status: 'running',
+        uptime: process.uptime(),
         endpoints: {
             health: '/api/health',
             test: '/api/test',
             notifications: '/api/notifications',
-            docs: '/api/docs'
+            docs: '/api/docs',
+            stats: '/api/stats',
+            queue: '/api/queue/status'
         },
-        controllerStatus: {
-            notification: !!notificationController
+        system: {
+            controller: controllerStatus,
+            memory: {
+                used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+                total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024)
+            },
+            environment: process.env.NODE_ENV || 'development'
         }
     });
-});
+}));
 
 // ==========================================
-// ERROR HANDLING
+// ENHANCED ERROR HANDLING
 // ==========================================
 
 // Handle 404 for API routes
@@ -383,14 +368,20 @@ router.use('*', (req, res) => {
     res.status(404).json({
         success: false,
         error: 'API endpoint not found',
+        code: 'ENDPOINT_NOT_FOUND',
         path: req.originalUrl,
         method: req.method,
         timestamp: new Date().toISOString(),
+        suggestion: 'Check the API documentation at /api/docs',
         availableEndpoints: [
             'GET /api/health',
+            'GET /api/status',
             'POST /api/test',
             'GET /api/notifications',
             'POST /api/notifications/send',
+            'POST /api/notifications/bulk',
+            'GET /api/stats',
+            'GET /api/queue/status',
             'GET /api/docs'
         ]
     });

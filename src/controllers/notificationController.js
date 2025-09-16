@@ -1,6 +1,6 @@
 // ==========================================
-// NOTIFICATION CONTROLLER - VERSIÓN CORREGIDA
-// Controlador simplificado y robusto sin problemas de contexto
+// NOTIFICATION CONTROLLER - OPTIMIZED VERSION
+// Clean controller with proper error handling
 // ==========================================
 
 const AppLogger = require('../utils/logger');
@@ -15,7 +15,11 @@ class NotificationController {
         this.notificationService = null;
         
         this.logger.info('✅ NotificationController initialized');
-        this.initializeService();
+        
+        // Initialize service asynchronously
+        this.initializeService().catch(error => {
+            this.logger.error('❌ Failed to initialize notification service:', error);
+        });
     }
 
     /**
@@ -23,17 +27,17 @@ class NotificationController {
      */
     async initializeService() {
         try {
-            if (!this.models) {
-                this.logger.warn('⚠️ No models provided, using fallback mode');
+            if (!this.models || !this.models.Notification) {
+                this.logger.warn('⚠️ Models not available, service will have limited functionality');
                 return;
             }
 
             const NotificationService = require('../services/notificationService');
-            this.notificationService = new NotificationService(
-                this.websocketService,
-                this.models,
-                this.queueService
-            );
+            this.notificationService = new NotificationService({
+                websocketService: this.websocketService,
+                database: { getModels: () => this.models },
+                queueService: this.queueService
+            });
             
             await this.notificationService.initialize();
             this.logger.info('✅ NotificationService initialized in controller');
@@ -45,36 +49,54 @@ class NotificationController {
     }
 
     /**
-     * Send notification endpoint
+     * Check if service is available and handle gracefully
+     */
+    checkServiceAvailability(res) {
+        if (!this.notificationService) {
+            res.status(503).json({
+                success: false,
+                error: 'Notification service temporarily unavailable',
+                code: 'SERVICE_UNAVAILABLE',
+                message: 'The service is starting up or experiencing issues. Please try again later.',
+                timestamp: new Date().toISOString()
+            });
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Send notification endpoint - Enhanced error handling
      */
     async sendNotification(req, res) {
         try {
             this.logger.info(`📤 Send notification request from ${req.ip}`);
             
-            if (!this.notificationService) {
-                return res.status(503).json({
-                    success: false,
-                    error: 'Notification service not available',
-                    code: 'SERVICE_UNAVAILABLE'
-                });
+            if (!this.checkServiceAvailability(res)) {
+                return;
             }
 
-            // Validación básica
-            const { title, message, tokens, topic, user_id } = req.body;
+            // Enhanced validation
+            const { title, message, tokens, topic, user_id, type, priority } = req.body;
             
-            if (!title || !message) {
-                return res.status(400).json({
-                    success: false,
-                    error: 'Title and message are required',
-                    code: 'VALIDATION_ERROR'
-                });
+            const validationErrors = [];
+            if (!title || title.trim().length === 0) {
+                validationErrors.push('Title is required and cannot be empty');
             }
-
+            if (!message || message.trim().length === 0) {
+                validationErrors.push('Message is required and cannot be empty');
+            }
             if (!tokens && !topic && !user_id) {
+                validationErrors.push('Either tokens, topic, or user_id must be provided');
+            }
+            
+            if (validationErrors.length > 0) {
                 return res.status(400).json({
                     success: false,
-                    error: 'Either tokens, topic, or user_id must be provided',
-                    code: 'VALIDATION_ERROR'
+                    error: 'Validation failed',
+                    code: 'VALIDATION_ERROR',
+                    details: validationErrors,
+                    timestamp: new Date().toISOString()
                 });
             }
 
@@ -103,7 +125,7 @@ class NotificationController {
             res.status(500).json({
                 success: false,
                 error: 'Internal server error',
-                message: error.message,
+                message: this.env === 'development' ? error.message : 'An error occurred while processing your request',
                 timestamp: new Date().toISOString()
             });
         }
@@ -265,31 +287,18 @@ class NotificationController {
     }
 
     /**
-     * List notifications with pagination
+     * List notifications with enhanced error handling
      */
     async listNotifications(req, res) {
         try {
             this.logger.info('📋 List notifications request...');
 
-            if (!this.notificationService) {
-                return res.status(503).json({
-                    success: false,
-                    error: 'Notification service not available'
-                });
+            if (!this.checkServiceAvailability(res)) {
+                return;
             }
 
-            // Prepare query options
-            const options = {
-                page: parseInt(req.query.page) || 1,
-                limit: Math.min(parseInt(req.query.limit) || 50, 1000),
-                status: req.query.status,
-                type: req.query.type,
-                userId: req.query.userId,
-                dateFrom: req.query.dateFrom,
-                dateTo: req.query.dateTo,
-                sortBy: req.query.sortBy || 'created_at',
-                sortOrder: req.query.sortOrder || 'DESC'
-            };
+            // Enhanced query parameter validation
+            const options = this.validateAndParseListOptions(req.query);
 
             // Call the service method
             const result = await this.notificationService.listNotifications(options);
@@ -313,10 +322,38 @@ class NotificationController {
             res.status(500).json({
                 success: false,
                 error: 'Internal server error',
-                message: error.message,
+                message: this.env === 'development' ? error.message : 'Failed to retrieve notifications',
                 timestamp: new Date().toISOString()
             });
         }
+    }
+
+    /**
+     * Validate and parse list options
+     */
+    validateAndParseListOptions(query) {
+        const options = {
+            page: Math.max(1, parseInt(query.page) || 1),
+            limit: Math.min(Math.max(1, parseInt(query.limit) || 50), 1000),
+            status: query.status,
+            type: query.type,
+            userId: query.userId,
+            dateFrom: query.dateFrom,
+            dateTo: query.dateTo,
+            sortBy: ['created_at', 'updated_at', 'priority', 'status'].includes(query.sortBy) 
+                ? query.sortBy : 'created_at',
+            sortOrder: ['ASC', 'DESC'].includes(query.sortOrder?.toUpperCase()) 
+                ? query.sortOrder.toUpperCase() : 'DESC'
+        };
+
+        // Remove undefined values
+        Object.keys(options).forEach(key => {
+            if (options[key] === undefined || options[key] === '') {
+                delete options[key];
+            }
+        });
+
+        return options;
     }
 
     /**
@@ -660,6 +697,43 @@ class NotificationController {
      */
     generateRequestId() {
         return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    /**
+     * Health check for controller
+     */
+    async healthCheck() {
+        try {
+            const serviceHealth = this.notificationService ? 
+                await this.notificationService.healthCheck() : 
+                { status: 'unavailable' };
+
+            return {
+                controller: 'NotificationController',
+                status: 'healthy',
+                initialized: !!this.notificationService,
+                models: {
+                    available: !!this.models,
+                    notification: !!this.models?.Notification,
+                    response: !!this.models?.Response,
+                    config: !!this.models?.Config
+                },
+                dependencies: {
+                    notificationService: serviceHealth,
+                    queueService: !!this.queueService,
+                    websocketService: !!this.websocketService
+                },
+                timestamp: new Date().toISOString()
+            };
+
+        } catch (error) {
+            return {
+                controller: 'NotificationController',
+                status: 'unhealthy',
+                error: error.message,
+                timestamp: new Date().toISOString()
+            };
+        }
     }
 }
 
