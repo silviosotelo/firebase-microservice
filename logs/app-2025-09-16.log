@@ -1924,3 +1924,7 @@ TypeError: Cannot read properties of null (reading 'projectId')
     at async FirebaseService.initialize (file:///home/project/src/services/firebaseService.js#cjs:39:13)
     at async NotificationService.initialize (file:///home/project/src/services/notificationService.js#cjs:61:17)
     at async NotificationController.initializeService (file:///home/project/src/controllers/notificationController.js#cjs:42:13)
+2025-09-16 16:41:25.598 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758051685597_upla838u4","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-16 16:41:25.654 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758051685597_upla838u4","method":"GET","url":"/","statusCode":200,"responseTime":"56ms","contentLength":29628}
+2025-09-16 16:41:26.953 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758051686952_qi3l6s3wf","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-16 16:41:26.957 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758051686952_qi3l6s3wf","method":"GET","url":"/","statusCode":200,"responseTime":"4ms","contentLength":29628}
