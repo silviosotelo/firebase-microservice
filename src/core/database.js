@@ -148,6 +148,22 @@ class DatabaseCore {
     }
 
     /**
+     * Configure database settings
+     */
+    configureDatabaseSettings() {
+        this.db.serialize(() => {
+            // Only use WAL mode for file databases
+            if (this.dbPath !== ':memory:') {
+                this.db.run('PRAGMA journal_mode = WAL');
+            }
+            this.db.run('PRAGMA synchronous = NORMAL');
+            this.db.run('PRAGMA cache_size = 10000');
+            this.db.run('PRAGMA foreign_keys = ON');
+            this.db.run('PRAGMA temp_store = memory');
+        });
+    }
+
+    /**
      * Initialize database schema
      */
     async initializeSchema() {
