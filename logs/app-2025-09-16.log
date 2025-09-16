@@ -1140,3 +1140,5 @@ TypeError: this.websocketService.broadcastStatsUpdate is not a function
     at Timeout.eval [as _onTimeout] (file:///home/project/src/services/statsService.js#cjs:87:43)
 2025-09-16 15:27:46.536 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758047266536_0pe16smax","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
 2025-09-16 15:27:46.538 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758047266536_0pe16smax","method":"GET","url":"/","statusCode":200,"responseTime":"2ms","contentLength":29628}
+2025-09-16 15:27:56.525 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758047276525_nglrshnfg","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-16 15:27:56.527 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758047276525_nglrshnfg","method":"GET","url":"/","statusCode":200,"responseTime":"2ms","contentLength":29628}
