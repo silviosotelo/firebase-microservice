@@ -1264,3 +1264,108 @@ Require stack:
     at Module._compile (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:16006)
     at Module._extensions..js (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:16726)
     at Module.load (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:15281)
+2025-09-16 16:10:56.273 [ERROR] [DatabaseCore] uncaughtException: Cannot find module 'better-sqlite3'
+Require stack:
+- /home/project/src/config/database.js
+- /home/project/src/services/statsService.js
+- /home/project/app.js
+Error: Cannot find module 'better-sqlite3'
+Require stack:
+- /home/project/src/config/database.js
+- /home/project/src/services/statsService.js
+- /home/project/app.js
+    at Module._resolveFilename (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:14795)
+    at Module._load (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:12287)
+    at Module.require (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:15469)
+    at require3 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:166:2696)
+    at _0x52ec33 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:868754)
+    at Object.eval (file:///home/project/src/config/database.js#cjs:6:18)
+    at Object._0x35ff06 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:868873)
+    at Module._compile (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:16006)
+    at Module._extensions..js (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:16726)
+    at Module.load (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:15281) {"error":{"code":"MODULE_NOT_FOUND","requireStack":["/home/project/src/config/database.js","/home/project/src/services/statsService.js","/home/project/app.js"]},"exception":true,"date":"Tue Sep 16 2025 16:10:56 GMT-0300 (hora estándar de Paraguay)","process":{"pid":16,"uid":1,"gid":1,"cwd":"/home/project","execPath":"/usr/local/bin/node","version":"v20.19.1","argv":["/usr/local/bin/node","/home/project/app.js"],"memoryUsage":{"rss":0,"heapTotal":0,"heapUsed":0,"external":0,"arrayBuffers":0}},"os":{"loadavg":[0,0,0],"uptime":5},"trace":[{"column":14795,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"Module._resolveFilename","line":148,"method":"_resolveFilename","native":false},{"column":12287,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"Module._load","line":148,"method":"_load","native":false},{"column":15469,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"Module.require","line":148,"method":"require","native":false},{"column":2696,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"require3","line":166,"method":null,"native":false},{"column":868754,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x52ec33","line":31,"method":null,"native":false},{"column":18,"file":"file:///home/project/src/config/database.js#cjs","function":"Object.eval","line":6,"method":"eval","native":false},{"column":868873,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"Object._0x35ff06","line":31,"method":"_0x35ff06","native":false},{"column":16006,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"Module._compile","line":148,"method":"_compile","native":false},{"column":16726,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"Module._extensions..js","line":148,"method":".js","native":false},{"column":15281,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"Module.load","line":148,"method":"load","native":false}]}
+Error: Cannot find module 'better-sqlite3'
+Require stack:
+- /home/project/src/config/database.js
+- /home/project/src/services/statsService.js
+- /home/project/app.js
+    at Module._resolveFilename (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:14795)
+    at Module._load (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:12287)
+    at Module.require (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:15469)
+    at require3 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:166:2696)
+    at _0x52ec33 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:868754)
+    at Object.eval (file:///home/project/src/config/database.js#cjs:6:18)
+    at Object._0x35ff06 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:868873)
+    at Module._compile (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:16006)
+    at Module._extensions..js (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:16726)
+    at Module.load (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:15281)
+2025-09-16 16:10:56.274 [ERROR] [ErrorHandler] uncaughtException: Cannot find module 'better-sqlite3'
+Require stack:
+- /home/project/src/config/database.js
+- /home/project/src/services/statsService.js
+- /home/project/app.js
+Error: Cannot find module 'better-sqlite3'
+Require stack:
+- /home/project/src/config/database.js
+- /home/project/src/services/statsService.js
+- /home/project/app.js
+    at Module._resolveFilename (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:14795)
+    at Module._load (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:12287)
+    at Module.require (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:15469)
+    at require3 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:166:2696)
+    at _0x52ec33 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:868754)
+    at Object.eval (file:///home/project/src/config/database.js#cjs:6:18)
+    at Object._0x35ff06 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:868873)
+    at Module._compile (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:16006)
+    at Module._extensions..js (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:16726)
+    at Module.load (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:15281) {"error":{"code":"MODULE_NOT_FOUND","requireStack":["/home/project/src/config/database.js","/home/project/src/services/statsService.js","/home/project/app.js"]},"exception":true,"date":"Tue Sep 16 2025 16:10:56 GMT-0300 (hora estándar de Paraguay)","process":{"pid":16,"uid":1,"gid":1,"cwd":"/home/project","execPath":"/usr/local/bin/node","version":"v20.19.1","argv":["/usr/local/bin/node","/home/project/app.js"],"memoryUsage":{"rss":0,"heapTotal":0,"heapUsed":0,"external":0,"arrayBuffers":0}},"os":{"loadavg":[0,0,0],"uptime":5},"trace":[{"column":14795,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"Module._resolveFilename","line":148,"method":"_resolveFilename","native":false},{"column":12287,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"Module._load","line":148,"method":"_load","native":false},{"column":15469,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"Module.require","line":148,"method":"require","native":false},{"column":2696,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"require3","line":166,"method":null,"native":false},{"column":868754,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x52ec33","line":31,"method":null,"native":false},{"column":18,"file":"file:///home/project/src/config/database.js#cjs","function":"Object.eval","line":6,"method":"eval","native":false},{"column":868873,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"Object._0x35ff06","line":31,"method":"_0x35ff06","native":false},{"column":16006,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"Module._compile","line":148,"method":"_compile","native":false},{"column":16726,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"Module._extensions..js","line":148,"method":".js","native":false},{"column":15281,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"Module.load","line":148,"method":"load","native":false}]}
+Error: Cannot find module 'better-sqlite3'
+Require stack:
+- /home/project/src/config/database.js
+- /home/project/src/services/statsService.js
+- /home/project/app.js
+    at Module._resolveFilename (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:14795)
+    at Module._load (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:12287)
+    at Module.require (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:15469)
+    at require3 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:166:2696)
+    at _0x52ec33 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:868754)
+    at Object.eval (file:///home/project/src/config/database.js#cjs:6:18)
+    at Object._0x35ff06 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:868873)
+    at Module._compile (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:16006)
+    at Module._extensions..js (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:16726)
+    at Module.load (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:15281)
+2025-09-16 16:10:56.274 [ERROR] [RequestLogger] uncaughtException: Cannot find module 'better-sqlite3'
+Require stack:
+- /home/project/src/config/database.js
+- /home/project/src/services/statsService.js
+- /home/project/app.js
+Error: Cannot find module 'better-sqlite3'
+Require stack:
+- /home/project/src/config/database.js
+- /home/project/src/services/statsService.js
+- /home/project/app.js
+    at Module._resolveFilename (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:14795)
+    at Module._load (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:12287)
+    at Module.require (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:15469)
+    at require3 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:166:2696)
+    at _0x52ec33 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:868754)
+    at Object.eval (file:///home/project/src/config/database.js#cjs:6:18)
+    at Object._0x35ff06 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:868873)
+    at Module._compile (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:16006)
+    at Module._extensions..js (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:16726)
+    at Module.load (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:15281) {"error":{"code":"MODULE_NOT_FOUND","requireStack":["/home/project/src/config/database.js","/home/project/src/services/statsService.js","/home/project/app.js"]},"exception":true,"date":"Tue Sep 16 2025 16:10:56 GMT-0300 (hora estándar de Paraguay)","process":{"pid":16,"uid":1,"gid":1,"cwd":"/home/project","execPath":"/usr/local/bin/node","version":"v20.19.1","argv":["/usr/local/bin/node","/home/project/app.js"],"memoryUsage":{"rss":0,"heapTotal":0,"heapUsed":0,"external":0,"arrayBuffers":0}},"os":{"loadavg":[0,0,0],"uptime":5},"trace":[{"column":14795,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"Module._resolveFilename","line":148,"method":"_resolveFilename","native":false},{"column":12287,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"Module._load","line":148,"method":"_load","native":false},{"column":15469,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"Module.require","line":148,"method":"require","native":false},{"column":2696,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"require3","line":166,"method":null,"native":false},{"column":868754,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x52ec33","line":31,"method":null,"native":false},{"column":18,"file":"file:///home/project/src/config/database.js#cjs","function":"Object.eval","line":6,"method":"eval","native":false},{"column":868873,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"Object._0x35ff06","line":31,"method":"_0x35ff06","native":false},{"column":16006,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"Module._compile","line":148,"method":"_compile","native":false},{"column":16726,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"Module._extensions..js","line":148,"method":".js","native":false},{"column":15281,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"Module.load","line":148,"method":"load","native":false}]}
+Error: Cannot find module 'better-sqlite3'
+Require stack:
+- /home/project/src/config/database.js
+- /home/project/src/services/statsService.js
+- /home/project/app.js
+    at Module._resolveFilename (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:14795)
+    at Module._load (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:12287)
+    at Module.require (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:15469)
+    at require3 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:166:2696)
+    at _0x52ec33 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:868754)
+    at Object.eval (file:///home/project/src/config/database.js#cjs:6:18)
+    at Object._0x35ff06 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:868873)
+    at Module._compile (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:16006)
+    at Module._extensions..js (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:16726)
+    at Module.load (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:15281)
