@@ -573,3 +573,18 @@ TypeError: this.websocketService.broadcastStatsUpdate is not a function
 2025-09-16 14:51:49.889 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758045109886_mg60wckcl","method":"GET","url":"/","statusCode":200,"responseTime":"2ms","contentLength":29628}
 2025-09-16 14:51:58.120 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758045118119_miy97i4i0","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
 2025-09-16 14:51:58.124 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758045118119_miy97i4i0","method":"GET","url":"/","statusCode":200,"responseTime":"4ms","contentLength":29628}
+2025-09-16 14:52:04.048 [ERROR] [App] ❌ Failed to get overall stats:
+TypeError: database.getDatabase is not a function
+    at StatsService.getOverallStats (file:///home/project/src/services/statsService.js#cjs:155:33)
+    at StatsService.updateRealtimeStats (file:///home/project/src/services/statsService.js#cjs:474:40)
+    at Timeout.eval [as _onTimeout] (file:///home/project/src/services/statsService.js#cjs:85:28)
+    at https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:253:4719
+2025-09-16 14:52:04.048 [ERROR] [App] ❌ Failed to update real-time stats:
+TypeError: database.getDatabase is not a function
+    at StatsService.getOverallStats (file:///home/project/src/services/statsService.js#cjs:155:33)
+    at StatsService.updateRealtimeStats (file:///home/project/src/services/statsService.js#cjs:474:40)
+    at Timeout.eval [as _onTimeout] (file:///home/project/src/services/statsService.js#cjs:85:28)
+    at https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:253:4719
+2025-09-16 14:52:04.049 [ERROR] [App] ❌ Failed to update real-time stats:
+TypeError: this.websocketService.broadcastStatsUpdate is not a function
+    at Timeout.eval [as _onTimeout] (file:///home/project/src/services/statsService.js#cjs:87:43)
