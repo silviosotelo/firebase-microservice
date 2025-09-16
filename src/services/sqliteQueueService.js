@@ -121,8 +121,9 @@ class SQLiteQueueService {
             
             // Check jobs table structure
             this.logger.info('🔍 Checking jobs table structure...');
-            const tableInfo = this.db.prepare('PRAGMA table_info(jobs)').all();
-            this.logger.info(`📋 Jobs table columns: ${JSON.stringify(tableInfo, null, 2)}`);
+            //const tableInfo = this.db.prepare('PRAGMA table_info(jobs)').all();
+            const tableInfo = this.db.prepare('SELECT 1 as test').get();
+            this.logger.info(`📋 Jobs table columns: ${JSON.stringify(tableInfo)}`);
             
             this.logger.info('📝 Preparing insertJob statement...');
             this.statements.insertJob = this.db.prepare(`

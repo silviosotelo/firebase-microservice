@@ -1,173 +1,9 @@
 // ==========================================
-// SYSTEM CONSTANTS - FIXED FOR FCM TOKENS
-// All constants used throughout the microservice
+// CONSTANTS - Constantes del Sistema
+// Definiciones centralizadas para el microservicio
 // ==========================================
 
-// ==========================================
-// NOTIFICATION CONSTANTS
-// ==========================================
-
-const NOTIFICATION_STATUS = {
-    QUEUED: 'queued',
-    PROCESSING: 'processing',
-    COMPLETED: 'completed',
-    FAILED: 'failed',
-    CANCELLED: 'cancelled'
-};
-
-const NOTIFICATION_TYPES = {
-    GENERAL: 'general',
-    APPOINTMENT: 'appointment',
-    RESULT: 'result',
-    EMERGENCY: 'emergency',
-    PROMOTION: 'promotion',
-    REMINDER: 'reminder',
-    TEST: 'test'
-};
-
-const PRIORITY_LEVELS = {
-    LOW: 'low',
-    NORMAL: 'normal',
-    HIGH: 'high'
-};
-
-// ==========================================
-// QUEUE CONSTANTS
-// ==========================================
-
-const QUEUE_PRIORITIES = {
-    LOW: 1,
-    NORMAL: 5,
-    HIGH: 10
-};
-
-const QUEUE_EVENTS = {
-    JOB_COMPLETED: 'job_completed',
-    JOB_FAILED: 'job_failed',
-    JOB_PROGRESS: 'job_progress',
-    QUEUE_PAUSED: 'queue_paused',
-    QUEUE_RESUMED: 'queue_resumed'
-};
-
-const MAX_RETRIES = 3;
-const RETRY_DELAYS = [1000, 5000, 15000]; // milliseconds
-
-const MAX_BATCH_SIZE = 1000;
-const DEFAULT_BATCH_SIZE = 100;
-
-// ==========================================
-// WEBSOCKET CONSTANTS
-// ==========================================
-
-const WEBSOCKET_EVENTS = {
-    // Connection events
-    CONNECTED: 'connected',
-    DISCONNECTED: 'disconnected',
-    
-    // Subscription events
-    SUBSCRIBE_NOTIFICATION: 'subscribe_notification',
-    UNSUBSCRIBE_NOTIFICATION: 'unsubscribe_notification',
-    SUBSCRIBE_STATS: 'subscribe_stats',
-    SUBSCRIBE_LOGS: 'subscribe_logs',
-    
-    // Notification events
-    NOTIFICATION_UPDATE: 'notification_update',
-    NOTIFICATION_PROGRESS: 'notification_progress',
-    NOTIFICATION_STATUS: 'notification_status',
-    
-    // Stats events
-    STATS_UPDATE: 'stats_update',
-    
-    // System events
-    SYSTEM_ALERT: 'system_alert',
-    LOG_MESSAGE: 'log_message',
-    
-    // User events
-    USER_CONNECTED: 'user_connected',
-    USER_DISCONNECTED: 'user_disconnected',
-    
-    // Generic events
-    ERROR: 'error',
-    SUBSCRIBED: 'subscribed'
-};
-
-const USER_ROLES = {
-    VIEWER: 'viewer',
-    ADMIN: 'admin',
-    SUPER_ADMIN: 'super_admin'
-};
-
-// ==========================================
-// FIREBASE CONSTANTS
-// ==========================================
-
-const FIREBASE_SCOPES = [
-    'https://www.googleapis.com/auth/firebase.messaging'
-];
-
-const FCM_ENDPOINTS = {
-    SEND: 'https://fcm.googleapis.com/v1/projects/{projectId}/messages:send',
-    LEGACY: 'https://fcm.googleapis.com/fcm/send'
-};
-
-const FIREBASE_ERROR_CODES = {
-    INVALID_REGISTRATION_TOKEN: 'messaging/invalid-registration-token',
-    REGISTRATION_TOKEN_NOT_REGISTERED: 'messaging/registration-token-not-registered',
-    INVALID_PACKAGE_NAME: 'messaging/invalid-package-name',
-    MESSAGE_RATE_EXCEEDED: 'messaging/message-rate-exceeded',
-    DEVICE_MESSAGE_RATE_EXCEEDED: 'messaging/device-message-rate-exceeded',
-    TOPICS_MESSAGE_RATE_EXCEEDED: 'messaging/topics-message-rate-exceeded',
-    INVALID_APNS_CREDENTIALS: 'messaging/invalid-apns-credentials',
-    TOO_MANY_TOPICS: 'messaging/too-many-topics',
-    INVALID_ARGUMENT: 'messaging/invalid-argument',
-    THIRD_PARTY_AUTH_ERROR: 'messaging/third-party-auth-error',
-    QUOTA_EXCEEDED: 'messaging/quota-exceeded',
-    UNAVAILABLE: 'messaging/unavailable',
-    INTERNAL_ERROR: 'messaging/internal-error'
-};
-
-// ==========================================
-// VALIDATION CONSTANTS - FIXED FOR FCM
-// ==========================================
-
-const VALIDATION_RULES = {
-    TITLE_MAX_LENGTH: 100,
-    MESSAGE_MAX_LENGTH: 4000,
-    
-    // FCM Token validation - FIXED for real FCM tokens
-    TOKEN_MIN_LENGTH: 50,        // Allow shorter tokens for testing
-    TOKEN_MAX_LENGTH: 4096,      // FCM tokens can be up to 4KB
-    
-    // Multiple patterns for FCM token validation
-    // Pattern 1: Specific FCM format (most restrictive)
-    FCM_TOKEN_PATTERN: /^[A-Za-z0-9_-]{10,50}:APA91b[A-Za-z0-9_-]{130,200}$/,
-    
-    // Pattern 2: General FCM format (medium restrictive)
-    TOKEN_PATTERN: /^[A-Za-z0-9_-]+:[A-Za-z0-9_-]+$/,
-    
-    // Pattern 3: Very permissive for any token-like string
-    PERMISSIVE_TOKEN_PATTERN: /^[A-Za-z0-9_:-]{50,4096}$/,
-    
-    // Other validation patterns
-    TOPIC_MAX_LENGTH: 900,
-    TOPIC_PATTERN: /^[a-zA-Z0-9-_.~%]{1,900}$/,
-    
-    USER_ID_MAX_LENGTH: 50,
-    USER_ID_PATTERN: /^[a-zA-Z0-9_.-]{1,50}$/,
-    
-    BULK_MAX_SIZE: 1000,
-    EXTRA_DATA_MAX_SIZE: 8192, // 8KB
-    
-    // Rate limits
-    REQUESTS_PER_MINUTE: 1000,
-    REQUESTS_PER_HOUR: 10000,
-    BULK_REQUESTS_PER_HOUR: 100
-};
-
-// ==========================================
-// HTTP STATUS CODES
-// ==========================================
-
+// HTTP Status Codes
 const HTTP_STATUS = {
     OK: 200,
     CREATED: 201,
@@ -187,28 +23,185 @@ const HTTP_STATUS = {
     GATEWAY_TIMEOUT: 504
 };
 
-// ==========================================
-// ERROR TYPES
-// ==========================================
-
-const ERROR_TYPES = {
-    VALIDATION_ERROR: 'VALIDATION_ERROR',
-    AUTHENTICATION_ERROR: 'AUTHENTICATION_ERROR',
-    AUTHORIZATION_ERROR: 'AUTHORIZATION_ERROR',
-    NOT_FOUND_ERROR: 'NOT_FOUND_ERROR',
-    CONFLICT_ERROR: 'CONFLICT_ERROR',
-    RATE_LIMIT_ERROR: 'RATE_LIMIT_ERROR',
-    FIREBASE_ERROR: 'FIREBASE_ERROR',
-    DATABASE_ERROR: 'DATABASE_ERROR',
-    QUEUE_ERROR: 'QUEUE_ERROR',
-    NETWORK_ERROR: 'NETWORK_ERROR',
-    INTERNAL_ERROR: 'INTERNAL_ERROR'
+// Notification Status
+const NOTIFICATION_STATUS = {
+    QUEUED: 'queued',
+    PROCESSING: 'processing',
+    COMPLETED: 'completed',
+    FAILED: 'failed',
+    CANCELLED: 'cancelled',
+    SCHEDULED: 'scheduled'
 };
 
-// ==========================================
-// LOG LEVELS
-// ==========================================
+// Notification Types
+const NOTIFICATION_TYPES = {
+    GENERAL: 'general',
+    EMERGENCY: 'emergency',
+    APPOINTMENT: 'appointment',
+    RESULT: 'result',
+    PROMOTION: 'promotion',
+    REMINDER: 'reminder',
+    UPDATE: 'update',
+    ALERT: 'alert',
+    INFO: 'info',
+    WARNING: 'warning'
+};
 
+// Priority Levels
+const PRIORITY_LEVELS = {
+    LOW: 'low',
+    NORMAL: 'normal',
+    HIGH: 'high',
+    URGENT: 'urgent'
+};
+
+// User Roles
+const USER_ROLES = {
+    VIEWER: 'viewer',
+    USER: 'user',
+    ADMIN: 'admin',
+    SUPER_ADMIN: 'super_admin'
+};
+
+// Queue Priorities (numeric for sorting)
+const QUEUE_PRIORITIES = {
+    LOW: 1,
+    NORMAL: 5,
+    HIGH: 8,
+    URGENT: 10
+};
+
+// WebSocket Events
+const WEBSOCKET_EVENTS = {
+    // Connection events
+    CONNECTED: 'connected',
+    DISCONNECTED: 'disconnected',
+    ERROR: 'error',
+    
+    // Notification events
+    NOTIFICATION_UPDATE: 'notification:update',
+    NOTIFICATION_PROGRESS: 'notification:progress',
+    NOTIFICATION_STATUS: 'notification:status',
+    
+    // Subscription events
+    SUBSCRIBE_NOTIFICATION: 'subscribe:notification',
+    UNSUBSCRIBE_NOTIFICATION: 'unsubscribe:notification',
+    SUBSCRIBE_STATS: 'subscribe:stats',
+    SUBSCRIBE_LOGS: 'subscribe:logs',
+    SUBSCRIBED: 'subscribed',
+    
+    // Stats events
+    STATS_UPDATE: 'stats:update',
+    
+    // System events
+    SYSTEM_ALERT: 'system:alert',
+    LOG_MESSAGE: 'log:message',
+    
+    // User events
+    USER_CONNECTED: 'user:connected',
+    USER_DISCONNECTED: 'user:disconnected',
+    
+    // Queue events
+    JOB_COMPLETED: 'job:completed',
+    JOB_FAILED: 'job:failed',
+    
+    // Request/Response
+    GET_NOTIFICATION_STATUS: 'get:notification:status'
+};
+
+// Queue Events
+const QUEUE_EVENTS = {
+    JOB_WAITING: 'waiting',
+    JOB_ACTIVE: 'active',
+    JOB_COMPLETED: 'completed',
+    JOB_FAILED: 'failed',
+    JOB_DELAYED: 'delayed',
+    JOB_STALLED: 'stalled',
+    JOB_PROGRESS: 'progress'
+};
+
+// Firebase Scopes
+const FIREBASE_SCOPES = [
+    'https://www.googleapis.com/auth/firebase.messaging'
+];
+
+// Rate Limiting Configuration
+const RATE_LIMITS = {
+    API: {
+        windowMs: 15 * 60 * 1000, // 15 minutes
+        max: process.env.NODE_ENV === 'development' ? 10000 : 1000,
+        message: 'Too many API requests'
+    },
+    BULK: {
+        windowMs: 60 * 60 * 1000, // 1 hour
+        max: process.env.NODE_ENV === 'development' ? 100 : 10,
+        message: 'Too many bulk requests'
+    },
+    TEST: {
+        windowMs: 5 * 60 * 1000, // 5 minutes
+        max: process.env.NODE_ENV === 'development' ? 200 : 20,
+        message: 'Too many test requests'
+    }
+};
+
+// Validation Rules
+const VALIDATION_RULES = {
+    NOTIFICATION: {
+        TITLE_MAX_LENGTH: 100,
+        MESSAGE_MAX_LENGTH: 4000,
+        MAX_TOKENS_PER_REQUEST: 1000,
+        MAX_NOTIFICATIONS_PER_BULK: 1000
+    },
+    TOKEN: {
+        MIN_LENGTH: 50,
+        MAX_LENGTH: 500,
+        PATTERN: /^[A-Za-z0-9_-]+$/
+    },
+    TOPIC: {
+        MIN_LENGTH: 1,
+        MAX_LENGTH: 900,
+        PATTERN: /^[a-zA-Z0-9-_.~%]+$/
+    },
+    USER_ID: {
+        MIN_LENGTH: 1,
+        MAX_LENGTH: 100,
+        PATTERN: /^[a-zA-Z0-9_-]+$/
+    }
+};
+
+// Cache TTL (Time To Live)
+const CACHE_TTL = {
+    SHORT: 5 * 60, // 5 minutes
+    MEDIUM: 30 * 60, // 30 minutes
+    LONG: 2 * 60 * 60, // 2 hours
+    VERY_LONG: 24 * 60 * 60 // 24 hours
+};
+
+// Retry Configuration
+const MAX_RETRIES = 3;
+const RETRY_DELAYS = [1000, 5000, 15000]; // 1s, 5s, 15s
+
+// Batch Configuration
+const MAX_BATCH_SIZE = 500;
+const DEFAULT_BATCH_SIZE = 100;
+
+// Database Configuration
+const DB_CONFIG = {
+    RETENTION_DAYS: parseInt(process.env.DB_RETENTION_DAYS) || 90,
+    BACKUP_INTERVAL_HOURS: 24,
+    VACUUM_INTERVAL_HOURS: 168, // 1 week
+    MAX_CONNECTIONS: 10
+};
+
+// Environment Types
+const ENVIRONMENTS = {
+    DEVELOPMENT: 'development',
+    TESTING: 'test',
+    STAGING: 'staging',
+    PRODUCTION: 'production'
+};
+
+// Log Levels
 const LOG_LEVELS = {
     ERROR: 'error',
     WARN: 'warn',
@@ -217,195 +210,101 @@ const LOG_LEVELS = {
     VERBOSE: 'verbose'
 };
 
-// ==========================================
-// CACHE CONSTANTS
-// ==========================================
+// Firebase Configuration Keys
+const FIREBASE_CONFIG_KEYS = [
+    'FIREBASE_PROJECT_ID',
+    'FIREBASE_PRIVATE_KEY',
+    'FIREBASE_CLIENT_EMAIL',
+    'FIREBASE_CLIENT_ID',
+    'FIREBASE_AUTH_URI',
+    'FIREBASE_TOKEN_URI',
+    'FIREBASE_AUTH_PROVIDER_X509_CERT_URL',
+    'FIREBASE_CLIENT_X509_CERT_URL'
+];
 
-const CACHE_TTL = {
-    SHORT: 300, // 5 minutes
-    MEDIUM: 1800, // 30 minutes
-    LONG: 3600, // 1 hour
-    VERY_LONG: 86400 // 24 hours
-};
-
-const CACHE_KEYS = {
-    USER_TOKENS: 'user_tokens:',
-    FIREBASE_CONFIG: 'firebase_config',
-    STATS: 'stats:',
-    QUEUE_STATUS: 'queue_status',
-    SYSTEM_HEALTH: 'system_health'
-};
-
-// ==========================================
-// RATE LIMITING
-// ==========================================
-
-const RATE_LIMITS = {
-    API: {
-        windowMs: 15 * 60 * 1000, // 15 minutes
-        max: 1000, // requests per window
-        message: 'Too many API requests'
-    },
-    BULK: {
-        windowMs: 60 * 60 * 1000, // 1 hour
-        max: 100, // requests per window
-        message: 'Too many bulk requests'
-    },
-    TEST: {
-        windowMs: 60 * 1000, // 1 minute
-        max: 10, // requests per window
-        message: 'Too many test requests'
-    },
-    ADMIN: {
-        windowMs: 15 * 60 * 1000, // 15 minutes
-        max: 5000, // requests per window
-        message: 'Too many admin requests'
-    }
-};
-
-// ==========================================
-// WEBHOOK CONSTANTS
-// ==========================================
-
-const WEBHOOK_EVENTS = {
-    NOTIFICATION_SENT: 'notification.sent',
-    NOTIFICATION_DELIVERED: 'notification.delivered',
-    NOTIFICATION_FAILED: 'notification.failed',
-    NOTIFICATION_OPENED: 'notification.opened',
-    TOKEN_REFRESH: 'token.refresh',
-    TOPIC_SUBSCRIBED: 'topic.subscribed',
-    TOPIC_UNSUBSCRIBED: 'topic.unsubscribed'
-};
-
-// ==========================================
-// ENVIRONMENT CONSTANTS
-// ==========================================
-
-const ENVIRONMENTS = {
-    DEVELOPMENT: 'development',
-    STAGING: 'staging',
-    PRODUCTION: 'production',
-    TEST: 'test'
-};
-
-// ==========================================
-// DATABASE CONSTANTS
-// ==========================================
-
-const DB_TABLES = {
-    NOTIFICATIONS: 'notifications',
-    RESPONSES: 'firebase_responses',
-    CONFIG: 'config',
-    TOKENS: 'access_tokens'
-};
-
-// ==========================================
-// MONITORING CONSTANTS
-// ==========================================
-
-const METRICS = {
-    NOTIFICATIONS_SENT: 'notifications_sent_total',
-    NOTIFICATIONS_SUCCESS: 'notifications_success_total',
-    NOTIFICATIONS_FAILED: 'notifications_failed_total',
-    QUEUE_SIZE: 'queue_size',
-    PROCESSING_TIME: 'notification_processing_seconds',
-    FIREBASE_REQUESTS: 'firebase_requests_total',
-    WEBSOCKET_CONNECTIONS: 'websocket_connections_active',
-    MEMORY_USAGE: 'process_memory_usage_bytes',
-    CPU_USAGE: 'process_cpu_usage_percent'
-};
-
-// ==========================================
-// TIME CONSTANTS
-// ==========================================
-
-const TIME = {
-    SECOND: 1000,
-    MINUTE: 60 * 1000,
-    HOUR: 60 * 60 * 1000,
-    DAY: 24 * 60 * 60 * 1000,
-    WEEK: 7 * 24 * 60 * 60 * 1000,
-    MONTH: 30 * 24 * 60 * 60 * 1000
-};
-
-// ==========================================
-// SECURITY CONSTANTS
-// ==========================================
-
-const SECURITY = {
-    JWT_EXPIRY: '24h',
-    API_KEY_LENGTH: 32,
-    WEBHOOK_SECRET_LENGTH: 64,
-    PASSWORD_MIN_LENGTH: 8,
-    SESSION_TIMEOUT: 30 * 60 * 1000, // 30 minutes
+// Error Codes
+const ERROR_CODES = {
+    // General
+    VALIDATION_ERROR: 'VALIDATION_ERROR',
+    AUTHENTICATION_ERROR: 'AUTHENTICATION_ERROR',
+    AUTHORIZATION_ERROR: 'AUTHORIZATION_ERROR',
+    NOT_FOUND: 'NOT_FOUND',
+    INTERNAL_ERROR: 'INTERNAL_ERROR',
     
-    CORS_ORIGINS: [
-        'http://localhost:3000',
-        'http://localhost:8080',
-        'https://admin.firebase-microservice.com'
-    ],
+    // Service specific
+    SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
+    CONTROLLER_UNAVAILABLE: 'CONTROLLER_UNAVAILABLE',
+    DATABASE_ERROR: 'DATABASE_ERROR',
+    FIREBASE_ERROR: 'FIREBASE_ERROR',
+    QUEUE_ERROR: 'QUEUE_ERROR',
     
-    ALLOWED_HOSTS: [
-        'localhost',
-        'firebase-microservice.com',
-        '*.firebase-microservice.com'
-    ]
+    // Notification specific
+    INVALID_TOKEN: 'INVALID_TOKEN',
+    INVALID_TOPIC: 'INVALID_TOPIC',
+    NOTIFICATION_NOT_FOUND: 'NOTIFICATION_NOT_FOUND',
+    NOTIFICATION_ALREADY_PROCESSED: 'NOTIFICATION_ALREADY_PROCESSED',
+    
+    // Rate limiting
+    RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
+    
+    // External services
+    FIREBASE_UNAVAILABLE: 'FIREBASE_UNAVAILABLE',
+    REDIS_UNAVAILABLE: 'REDIS_UNAVAILABLE'
 };
 
-// ==========================================
-// FEATURE FLAGS
-// ==========================================
-
-const FEATURES = {
-    WEBHOOKS_ENABLED: process.env.ENABLE_WEBHOOKS === 'true',
-    METRICS_ENABLED: process.env.ENABLE_METRICS === 'true',
-    DEBUG_MODE: process.env.NODE_ENV !== 'production',
-    RATE_LIMITING: process.env.ENABLE_RATE_LIMITING !== 'false',
-    WEBSOCKETS: process.env.ENABLE_WEBSOCKETS !== 'false',
-    BULK_OPERATIONS: process.env.ENABLE_BULK_OPERATIONS !== 'false',
-    ADMIN_PANEL: process.env.ENABLE_ADMIN_PANEL !== 'false'
+// Success Messages
+const SUCCESS_MESSAGES = {
+    NOTIFICATION_QUEUED: 'Notification queued successfully',
+    NOTIFICATION_SENT: 'Notification sent successfully',
+    NOTIFICATION_CANCELLED: 'Notification cancelled successfully',
+    BULK_QUEUED: 'Bulk notifications queued successfully',
+    SERVICE_HEALTHY: 'Service is healthy',
+    OPERATION_COMPLETED: 'Operation completed successfully'
 };
 
+// Default Configuration Values
+const DEFAULTS = {
+    NOTIFICATION_TYPE: NOTIFICATION_TYPES.GENERAL,
+    PRIORITY: PRIORITY_LEVELS.NORMAL,
+    RETRY_ATTEMPTS: 3,
+    BATCH_SIZE: 100,
+    PAGE_SIZE: 50,
+    RATE_LIMIT_DELAY: 100, // milliseconds
+    TOKEN_CACHE_TTL: 300, // seconds
+    WORKER_CONCURRENCY: 5
+};
+
+// API Versioning
+const API_VERSION = {
+    CURRENT: 'v1',
+    SUPPORTED: ['v1'],
+    DEPRECATED: []
+};
+
+// Export all constants
 module.exports = {
-    // Notification constants
+    HTTP_STATUS,
     NOTIFICATION_STATUS,
     NOTIFICATION_TYPES,
     PRIORITY_LEVELS,
-    
-    // Queue constants
+    USER_ROLES,
     QUEUE_PRIORITIES,
+    WEBSOCKET_EVENTS,
     QUEUE_EVENTS,
+    FIREBASE_SCOPES,
+    RATE_LIMITS,
+    VALIDATION_RULES,
+    CACHE_TTL,
     MAX_RETRIES,
     RETRY_DELAYS,
     MAX_BATCH_SIZE,
     DEFAULT_BATCH_SIZE,
-    
-    // WebSocket constants
-    WEBSOCKET_EVENTS,
-    USER_ROLES,
-    
-    // Firebase constants
-    FIREBASE_SCOPES,
-    FCM_ENDPOINTS,
-    FIREBASE_ERROR_CODES,
-    
-    // Validation constants
-    VALIDATION_RULES,
-    
-    // HTTP constants
-    HTTP_STATUS,
-    ERROR_TYPES,
-    
-    // System constants
-    LOG_LEVELS,
-    CACHE_TTL,
-    CACHE_KEYS,
-    RATE_LIMITS,
-    WEBHOOK_EVENTS,
+    DB_CONFIG,
     ENVIRONMENTS,
-    DB_TABLES,
-    METRICS,
-    TIME,
-    SECURITY,
-    FEATURES
+    LOG_LEVELS,
+    FIREBASE_CONFIG_KEYS,
+    ERROR_CODES,
+    SUCCESS_MESSAGES,
+    DEFAULTS,
+    API_VERSION
 };
