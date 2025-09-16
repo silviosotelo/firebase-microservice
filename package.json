@@ -60,9 +60,9 @@
     "lodash": "^4.17.21",
     "node-cron": "^4.2.1",
     "socket.io": "^4.7.4",
-    "sqlite3": "^5.1.7",
     "uuid": "^9.0.1",
-    "winston-daily-rotate-file": "^5.0.0"
+    "winston-daily-rotate-file": "^5.0.0",
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "nodemon": "^3.0.2",
