@@ -1,524 +1,321 @@
 // ==========================================
-// ERROR HANDLER MIDDLEWARE
-// Global error handling and response formatting
+// ERROR HANDLER MIDDLEWARE - VERSIÓN MEJORADA
+// Manejo robusto de errores que no para el servicio
 // ==========================================
 
 const AppLogger = require('../utils/logger');
-const { 
-    HTTP_STATUS, 
-    ERROR_TYPES,
-    FIREBASE_ERROR_CODES 
-} = require('../utils/constants');
 
-class ErrorHandler {
-    constructor() {
-        this.logger = new AppLogger('ErrorHandler');
-    }
+const logger = new AppLogger('ErrorHandler');
 
-    /**
-     * Global error handler middleware
-     */
-    globalErrorHandler = (error, req, res, next) => {
-        try {
-            // Log the error
-            this.logError(error, req);
-
-            // Determine error type and status
-            const errorInfo = this.parseError(error);
-
-            // Send error response
-            res.status(errorInfo.status).json({
-                success: false,
-                error: errorInfo.message,
-                code: errorInfo.code,
-                details: errorInfo.details,
-                timestamp: new Date().toISOString(),
-                requestId: req.headers['x-request-id'],
-                path: req.path,
-                method: req.method
-            });
-
-        } catch (handlerError) {
-            // Fallback error handling
-            this.logger.error('❌ Error in error handler:', handlerError);
-            
-            res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-                success: false,
-                error: 'Internal server error',
-                code: ERROR_TYPES.INTERNAL_ERROR,
-                timestamp: new Date().toISOString()
-            });
-        }
-    };
-
-    /**
-     * Async error wrapper
-     */
-    asyncHandler = (fn) => {
-        return (req, res, next) => {
-            Promise.resolve(fn(req, res, next)).catch(next);
-        };
-    };
-
-    /**
-     * 404 handler
-     */
-    notFoundHandler = (req, res, next) => {
-        const error = new Error(`Route not found: ${req.method} ${req.path}`);
-        error.statusCode = HTTP_STATUS.NOT_FOUND;
-        error.code = ERROR_TYPES.NOT_FOUND_ERROR;
-        next(error);
-    };
-
-    /**
-     * Validation error handler
-     */
-    validationErrorHandler = (error, req, res, next) => {
-        if (error.name === 'ValidationError' || error.isJoi) {
-            const validationError = this.formatValidationError(error);
-            
-            return res.status(HTTP_STATUS.BAD_REQUEST).json({
-                success: false,
-                error: 'Validation failed',
-                code: ERROR_TYPES.VALIDATION_ERROR,
-                details: validationError.details,
-                timestamp: new Date().toISOString()
-            });
-        }
-        
-        next(error);
-    };
-
-    /**
-     * Authentication error handler
-     */
-    authErrorHandler = (error, req, res, next) => {
-        if (error.name === 'UnauthorizedError' || error.code === 'CREDENTIALS_REQUIRED') {
-            return res.status(HTTP_STATUS.UNAUTHORIZED).json({
-                success: false,
-                error: 'Authentication required',
-                code: ERROR_TYPES.AUTHENTICATION_ERROR,
-                timestamp: new Date().toISOString()
-            });
-        }
-
-        if (error.name === 'JsonWebTokenError') {
-            return res.status(HTTP_STATUS.UNAUTHORIZED).json({
-                success: false,
-                error: 'Invalid token',
-                code: ERROR_TYPES.AUTHENTICATION_ERROR,
-                timestamp: new Date().toISOString()
-            });
-        }
-
-        if (error.name === 'TokenExpiredError') {
-            return res.status(HTTP_STATUS.UNAUTHORIZED).json({
-                success: false,
-                error: 'Token expired',
-                code: ERROR_TYPES.AUTHENTICATION_ERROR,
-                timestamp: new Date().toISOString()
-            });
-        }
-
-        next(error);
-    };
-
-    /**
-     * Rate limit error handler
-     */
-    rateLimitErrorHandler = (error, req, res, next) => {
-        if (error.name === 'TooManyRequestsError' || error.type === 'rate-limit') {
-            return res.status(HTTP_STATUS.TOO_MANY_REQUESTS).json({
-                success: false,
-                error: 'Rate limit exceeded',
-                code: ERROR_TYPES.RATE_LIMIT_ERROR,
-                retryAfter: error.retryAfter,
-                limit: error.limit,
-                remaining: error.remaining,
-                timestamp: new Date().toISOString()
-            });
-        }
-
-        next(error);
-    };
-
-    /**
-     * Database error handler
-     */
-    databaseErrorHandler = (error, req, res, next) => {
-        if (error.name === 'DatabaseError' || error.code === 'SQLITE_ERROR') {
-            this.logger.error('Database error:', error);
-            
-            return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-                success: false,
-                error: 'Database operation failed',
-                code: ERROR_TYPES.DATABASE_ERROR,
-                timestamp: new Date().toISOString()
-            });
-        }
-
-        next(error);
-    };
-
-    /**
-     * Firebase error handler
-     */
-    firebaseErrorHandler = (error, req, res, next) => {
-        if (error.errorInfo && error.errorInfo.code) {
-            const firebaseError = this.parseFirebaseError(error);
-            
-            return res.status(firebaseError.status).json({
-                success: false,
-                error: firebaseError.message,
-                code: ERROR_TYPES.FIREBASE_ERROR,
-                firebaseCode: firebaseError.firebaseCode,
-                details: firebaseError.details,
-                timestamp: new Date().toISOString()
-            });
-        }
-
-        next(error);
-    };
-
-    /**
-     * Network error handler
-     */
-    networkErrorHandler = (error, req, res, next) => {
-        if (error.code === 'ECONNREFUSED' || 
-            error.code === 'ENOTFOUND' || 
-            error.code === 'ETIMEDOUT' ||
-            error.name === 'NetworkError') {
-            
-            return res.status(HTTP_STATUS.BAD_GATEWAY).json({
-                success: false,
-                error: 'External service unavailable',
-                code: ERROR_TYPES.NETWORK_ERROR,
-                details: process.env.NODE_ENV === 'development' ? error.message : undefined,
-                timestamp: new Date().toISOString()
-            });
-        }
-
-        next(error);
-    };
-
-    /**
-     * Parse error and determine response
-     */
-    parseError(error) {
-        // Default error info
-        let errorInfo = {
-            status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
-            message: 'Internal server error',
-            code: ERROR_TYPES.INTERNAL_ERROR,
-            details: undefined
-        };
-
-        // Check for custom status code
-        if (error.statusCode || error.status) {
-            errorInfo.status = error.statusCode || error.status;
-        }
-
-        // Check for custom error code
-        if (error.code) {
-            errorInfo.code = error.code;
-        }
-
-        // Parse based on error type
-        switch (error.name) {
-            case 'ValidationError':
-                errorInfo = {
-                    status: HTTP_STATUS.BAD_REQUEST,
-                    message: 'Validation failed',
-                    code: ERROR_TYPES.VALIDATION_ERROR,
-                    details: this.formatValidationError(error).details
-                };
-                break;
-
-            case 'UnauthorizedError':
-            case 'JsonWebTokenError':
-            case 'TokenExpiredError':
-                errorInfo = {
-                    status: HTTP_STATUS.UNAUTHORIZED,
-                    message: error.message || 'Authentication failed',
-                    code: ERROR_TYPES.AUTHENTICATION_ERROR
-                };
-                break;
-
-            case 'ForbiddenError':
-                errorInfo = {
-                    status: HTTP_STATUS.FORBIDDEN,
-                    message: 'Access denied',
-                    code: ERROR_TYPES.AUTHORIZATION_ERROR
-                };
-                break;
-
-            case 'NotFoundError':
-                errorInfo = {
-                    status: HTTP_STATUS.NOT_FOUND,
-                    message: error.message || 'Resource not found',
-                    code: ERROR_TYPES.NOT_FOUND_ERROR
-                };
-                break;
-
-            case 'ConflictError':
-                errorInfo = {
-                    status: HTTP_STATUS.CONFLICT,
-                    message: error.message || 'Resource conflict',
-                    code: ERROR_TYPES.CONFLICT_ERROR
-                };
-                break;
-
-            case 'TooManyRequestsError':
-                errorInfo = {
-                    status: HTTP_STATUS.TOO_MANY_REQUESTS,
-                    message: 'Rate limit exceeded',
-                    code: ERROR_TYPES.RATE_LIMIT_ERROR
-                };
-                break;
-
-            default:
-                // Use custom message if available
-                if (error.message && process.env.NODE_ENV === 'development') {
-                    errorInfo.message = error.message;
-                }
-        }
-
-        return errorInfo;
-    }
-
-    /**
-     * Parse Firebase errors
-     */
-    parseFirebaseError(error) {
-        const firebaseCode = error.errorInfo?.code;
-        const message = error.errorInfo?.message || error.message;
-
-        let status = HTTP_STATUS.INTERNAL_SERVER_ERROR;
-        let userMessage = 'Firebase service error';
-
-        switch (firebaseCode) {
-            case FIREBASE_ERROR_CODES.INVALID_REGISTRATION_TOKEN:
-            case FIREBASE_ERROR_CODES.REGISTRATION_TOKEN_NOT_REGISTERED:
-                status = HTTP_STATUS.BAD_REQUEST;
-                userMessage = 'Invalid or expired FCM token';
-                break;
-
-            case FIREBASE_ERROR_CODES.INVALID_PACKAGE_NAME:
-                status = HTTP_STATUS.BAD_REQUEST;
-                userMessage = 'Invalid package name';
-                break;
-
-            case FIREBASE_ERROR_CODES.MESSAGE_RATE_EXCEEDED:
-            case FIREBASE_ERROR_CODES.DEVICE_MESSAGE_RATE_EXCEEDED:
-            case FIREBASE_ERROR_CODES.TOPICS_MESSAGE_RATE_EXCEEDED:
-                status = HTTP_STATUS.TOO_MANY_REQUESTS;
-                userMessage = 'Firebase rate limit exceeded';
-                break;
-
-            case FIREBASE_ERROR_CODES.INVALID_APNS_CREDENTIALS:
-                status = HTTP_STATUS.BAD_REQUEST;
-                userMessage = 'Invalid APNS credentials';
-                break;
-
-            case FIREBASE_ERROR_CODES.TOO_MANY_TOPICS:
-                status = HTTP_STATUS.BAD_REQUEST;
-                userMessage = 'Too many topics in condition';
-                break;
-
-            case FIREBASE_ERROR_CODES.INVALID_ARGUMENT:
-                status = HTTP_STATUS.BAD_REQUEST;
-                userMessage = 'Invalid request parameters';
-                break;
-
-            case FIREBASE_ERROR_CODES.THIRD_PARTY_AUTH_ERROR:
-                status = HTTP_STATUS.UNAUTHORIZED;
-                userMessage = 'Firebase authentication error';
-                break;
-
-            case FIREBASE_ERROR_CODES.QUOTA_EXCEEDED:
-                status = HTTP_STATUS.TOO_MANY_REQUESTS;
-                userMessage = 'Firebase quota exceeded';
-                break;
-
-            case FIREBASE_ERROR_CODES.UNAVAILABLE:
-                status = HTTP_STATUS.SERVICE_UNAVAILABLE;
-                userMessage = 'Firebase service temporarily unavailable';
-                break;
-
-            case FIREBASE_ERROR_CODES.INTERNAL_ERROR:
-            default:
-                status = HTTP_STATUS.INTERNAL_SERVER_ERROR;
-                userMessage = 'Firebase internal error';
-                break;
-        }
-
-        return {
-            status,
-            message: userMessage,
-            firebaseCode,
-            details: process.env.NODE_ENV === 'development' ? message : undefined
-        };
-    }
-
-    /**
-     * Format validation errors
-     */
-    formatValidationError(error) {
-        let details = [];
-
-        if (error.details) {
-            // Joi validation error
-            details = error.details.map(detail => ({
-                field: detail.path.join('.'),
-                message: detail.message,
-                value: detail.context?.value
-            }));
-        } else if (error.errors) {
-            // Mongoose validation error
-            details = Object.keys(error.errors).map(field => ({
-                field,
-                message: error.errors[field].message,
-                value: error.errors[field].value
-            }));
-        } else {
-            details = [{ message: error.message || 'Validation failed' }];
-        }
-
-        return {
-            type: 'validation',
-            details
-        };
-    }
-
-    /**
-     * Log error with context
-     */
-    logError(error, req) {
-        const errorContext = {
-            message: error.message,
+/**
+ * Middleware global de manejo de errores
+ */
+const globalErrorHandler = (error, req, res, next) => {
+    try {
+        // Log del error
+        logger.error('❌ Global error caught:', {
+            error: error.message,
             stack: error.stack,
-            name: error.name,
-            code: error.code,
-            status: error.statusCode || error.status,
-            url: req?.url,
-            method: req?.method,
-            ip: req?.ip,
-            userAgent: req?.get('User-Agent'),
-            requestId: req?.headers['x-request-id'],
-            userId: req?.user?.id,
-            timestamp: new Date().toISOString()
-        };
+            url: req.originalUrl,
+            method: req.method,
+            ip: req.ip,
+            userAgent: req.headers['user-agent']
+        });
 
-        // Log based on error severity
-        if (this.isClientError(error)) {
-            this.logger.warn('Client error:', errorContext);
-        } else {
-            this.logger.error('Server error:', errorContext);
+        // Si la respuesta ya fue enviada, delegar al error handler por defecto de Express
+        if (res.headersSent) {
+            return next(error);
         }
-    }
 
-    /**
-     * Check if error is client-side (4xx)
-     */
-    isClientError(error) {
-        const status = error.statusCode || error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR;
-        return status >= 400 && status < 500;
-    }
+        // Determinar el código de estado
+        let statusCode = 500;
+        let errorType = 'INTERNAL_SERVER_ERROR';
+        let userMessage = 'An internal server error occurred';
 
-    /**
-     * Create error response
-     */
-    createErrorResponse(message, code = ERROR_TYPES.INTERNAL_ERROR, status = HTTP_STATUS.INTERNAL_SERVER_ERROR, details = null) {
-        return {
+        // Manejar tipos específicos de errores
+        if (error.name === 'ValidationError') {
+            statusCode = 400;
+            errorType = 'VALIDATION_ERROR';
+            userMessage = 'Validation failed';
+        } else if (error.name === 'UnauthorizedError') {
+            statusCode = 401;
+            errorType = 'UNAUTHORIZED';
+            userMessage = 'Authentication required';
+        } else if (error.name === 'ForbiddenError') {
+            statusCode = 403;
+            errorType = 'FORBIDDEN';
+            userMessage = 'Access denied';
+        } else if (error.name === 'NotFoundError') {
+            statusCode = 404;
+            errorType = 'NOT_FOUND';
+            userMessage = 'Resource not found';
+        } else if (error.code === 'ECONNREFUSED') {
+            statusCode = 503;
+            errorType = 'SERVICE_UNAVAILABLE';
+            userMessage = 'External service unavailable';
+        } else if (error.code === 'SQLITE_BUSY' || error.code === 'SQLITE_LOCKED') {
+            statusCode = 503;
+            errorType = 'DATABASE_BUSY';
+            userMessage = 'Database temporarily unavailable';
+        }
+
+        // Preparar respuesta de error
+        const errorResponse = {
             success: false,
-            error: message,
-            code,
-            details,
-            timestamp: new Date().toISOString()
+            error: userMessage,
+            type: errorType,
+            timestamp: new Date().toISOString(),
+            requestId: req.headers['x-request-id'] || `req_${Date.now()}`
         };
-    }
 
-    /**
-     * Create custom error
-     */
-    createError(message, code = ERROR_TYPES.INTERNAL_ERROR, status = HTTP_STATUS.INTERNAL_SERVER_ERROR) {
-        const error = new Error(message);
-        error.code = code;
-        error.statusCode = status;
-        return error;
-    }
-
-    /**
-     * Handle uncaught exceptions
-     */
-    handleUncaughtException = (error) => {
-        this.logger.error('Uncaught Exception:', {
-            message: error.message,
-            stack: error.stack,
-            timestamp: new Date().toISOString()
-        });
-
-        // In production, exit gracefully
-        if (process.env.NODE_ENV === 'production') {
-            process.exit(1);
+        // En desarrollo, incluir más detalles
+        if (process.env.NODE_ENV === 'development') {
+            errorResponse.details = {
+                message: error.message,
+                name: error.name,
+                code: error.code,
+                stack: error.stack?.split('\n').slice(0, 5) // Solo las primeras 5 líneas del stack
+            };
         }
-    };
 
-    /**
-     * Handle unhandled promise rejections
-     */
-    handleUnhandledRejection = (reason, promise) => {
-        this.logger.error('Unhandled Promise Rejection:', {
-            reason: reason?.message || reason,
-            stack: reason?.stack,
-            promise: promise.toString(),
-            timestamp: new Date().toISOString()
-        });
+        // Enviar respuesta
+        res.status(statusCode).json(errorResponse);
 
-        // In production, exit gracefully
-        if (process.env.NODE_ENV === 'production') {
-            process.exit(1);
-        }
-    };
-
-    /**
-     * Setup global error handlers
-     */
-    setupGlobalHandlers() {
-        process.on('uncaughtException', this.handleUncaughtException);
-        process.on('unhandledRejection', this.handleUnhandledRejection);
+        // No relanzar el error para evitar que el proceso se cierre
         
-        this.logger.info('🛡️ Global error handlers configured');
+    } catch (handlerError) {
+        // Si hay un error en el error handler, usar respuesta mínima
+        logger.error('❌ Error in error handler:', handlerError);
+        
+        if (!res.headersSent) {
+            res.status(500).json({
+                success: false,
+                error: 'Critical server error',
+                timestamp: new Date().toISOString()
+            });
+        }
     }
+};
 
-    /**
-     * Health check
-     */
-    async healthCheck() {
-        return {
-            healthy: true,
-            errorHandlingActive: true,
+/**
+ * Middleware para manejar rutas no encontradas (404)
+ */
+const notFoundHandler = (req, res, next) => {
+    const error = new Error(`Route not found: ${req.method} ${req.originalUrl}`);
+    error.name = 'NotFoundError';
+    error.statusCode = 404;
+    
+    logger.warn(`🔍 Route not found: ${req.method} ${req.originalUrl}`);
+    
+    res.status(404).json({
+        success: false,
+        error: 'Route not found',
+        path: req.originalUrl,
+        method: req.method,
+        timestamp: new Date().toISOString(),
+        suggestion: 'Check the API documentation for available endpoints'
+    });
+};
+
+/**
+ * Wrapper para async route handlers
+ */
+const asyncHandler = (fn) => {
+    return (req, res, next) => {
+        Promise.resolve(fn(req, res, next)).catch(next);
+    };
+};
+
+/**
+ * Middleware para validar JSON
+ */
+const validateJson = (error, req, res, next) => {
+    if (error instanceof SyntaxError && error.status === 400 && 'body' in error) {
+        logger.warn('❌ Invalid JSON received:', error.message);
+        
+        return res.status(400).json({
+            success: false,
+            error: 'Invalid JSON in request body',
+            type: 'JSON_PARSE_ERROR',
+            message: 'Please check your JSON syntax',
             timestamp: new Date().toISOString()
-        };
+        });
+    }
+    
+    next(error);
+};
+
+/**
+ * Middleware para timeout de requests
+ */
+const requestTimeout = (timeout = 30000) => {
+    return (req, res, next) => {
+        // Set timeout
+        const timer = setTimeout(() => {
+            if (!res.headersSent) {
+                logger.warn(`⏰ Request timeout: ${req.method} ${req.originalUrl}`);
+                
+                res.status(408).json({
+                    success: false,
+                    error: 'Request timeout',
+                    type: 'REQUEST_TIMEOUT',
+                    timeout: timeout,
+                    timestamp: new Date().toISOString()
+                });
+            }
+        }, timeout);
+
+        // Clear timeout when response finishes
+        res.on('finish', () => {
+            clearTimeout(timer);
+        });
+
+        next();
+    };
+};
+
+/**
+ * Middleware para sanitizar errores de base de datos
+ */
+const sanitizeDatabaseError = (error, req, res, next) => {
+    if (error.code && error.code.startsWith('SQLITE_')) {
+        logger.error('❌ Database error:', error);
+        
+        const sanitizedError = new Error('Database operation failed');
+        sanitizedError.name = 'DatabaseError';
+        sanitizedError.statusCode = 503;
+        
+        return next(sanitizedError);
+    }
+    
+    next(error);
+};
+
+/**
+ * Crear error personalizado
+ */
+class AppError extends Error {
+    constructor(message, statusCode = 500, type = 'APP_ERROR') {
+        super(message);
+        this.name = 'AppError';
+        this.statusCode = statusCode;
+        this.type = type;
+        this.timestamp = new Date().toISOString();
+        
+        Error.captureStackTrace(this, this.constructor);
     }
 }
 
-// Create singleton instance
-const errorHandler = new ErrorHandler();
+/**
+ * Crear error de validación
+ */
+class ValidationError extends AppError {
+    constructor(message, details = []) {
+        super(message, 400, 'VALIDATION_ERROR');
+        this.name = 'ValidationError';
+        this.details = details;
+    }
+}
 
+/**
+ * Crear error de autorización
+ */
+class UnauthorizedError extends AppError {
+    constructor(message = 'Authentication required') {
+        super(message, 401, 'UNAUTHORIZED');
+        this.name = 'UnauthorizedError';
+    }
+}
+
+/**
+ * Crear error de permisos
+ */
+class ForbiddenError extends AppError {
+    constructor(message = 'Access denied') {
+        super(message, 403, 'FORBIDDEN');
+        this.name = 'ForbiddenError';
+    }
+}
+
+/**
+ * Crear error de recurso no encontrado
+ */
+class NotFoundError extends AppError {
+    constructor(message = 'Resource not found') {
+        super(message, 404, 'NOT_FOUND');
+        this.name = 'NotFoundError';
+    }
+}
+
+/**
+ * Middleware para logging de errores críticos
+ */
+const logCriticalError = (error, req, res, next) => {
+    // Errores que requieren atención inmediata
+    const criticalErrors = [
+        'DATABASE_CONNECTION_FAILED',
+        'REDIS_CONNECTION_FAILED',
+        'OUT_OF_MEMORY',
+        'ENOSPC' // No space left on device
+    ];
+
+    if (criticalErrors.some(critical => 
+        error.message.includes(critical) || 
+        error.code === critical ||
+        error.type === critical
+    )) {
+        logger.error('🚨 CRITICAL ERROR detected:', {
+            error: error.message,
+            type: error.type || error.code,
+            stack: error.stack,
+            memory: process.memoryUsage(),
+            uptime: process.uptime(),
+            timestamp: new Date().toISOString()
+        });
+
+        // Aquí podrías enviar alertas a sistemas de monitoreo
+        // sendAlertToMonitoring(error);
+    }
+
+    next(error);
+};
+
+/**
+ * Health check para el error handler
+ */
+const errorHandlerHealthCheck = () => {
+    return {
+        healthy: true,
+        handlers: {
+            global: 'active',
+            notFound: 'active',
+            validation: 'active',
+            timeout: 'active'
+        },
+        timestamp: new Date().toISOString()
+    };
+};
+
+// Exportar todas las funciones
 module.exports = {
-    globalErrorHandler: errorHandler.globalErrorHandler,
-    asyncHandler: errorHandler.asyncHandler,
-    notFoundHandler: errorHandler.notFoundHandler,
-    validationErrorHandler: errorHandler.validationErrorHandler,
-    authErrorHandler: errorHandler.authErrorHandler,
-    rateLimitErrorHandler: errorHandler.rateLimitErrorHandler,
-    databaseErrorHandler: errorHandler.databaseErrorHandler,
-    firebaseErrorHandler: errorHandler.firebaseErrorHandler,
-    networkErrorHandler: errorHandler.networkErrorHandler,
-    createError: errorHandler.createError.bind(errorHandler),
-    createErrorResponse: errorHandler.createErrorResponse.bind(errorHandler),
-    setupGlobalHandlers: errorHandler.setupGlobalHandlers.bind(errorHandler),
-    healthCheck: errorHandler.healthCheck.bind(errorHandler),
-    errorHandler
+    // Handlers principales
+    globalErrorHandler,
+    notFoundHandler,
+    
+    // Middlewares utilitarios
+    asyncHandler,
+    validateJson,
+    requestTimeout,
+    sanitizeDatabaseError,
+    logCriticalError,
+    
+    // Clases de error
+    AppError,
+    ValidationError,
+    UnauthorizedError,
+    ForbiddenError,
+    NotFoundError,
+    
+    // Utilities
+    errorHandlerHealthCheck
 };
