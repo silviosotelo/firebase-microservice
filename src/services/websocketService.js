@@ -7,8 +7,8 @@ const AppLogger = require('../utils/logger');
 const { WEBSOCKET_EVENTS, USER_ROLES } = require('../utils/constants');
 
 class WebSocketService {
-    constructor(io) {
-        this.io = io;
+    constructor(dependencies = {}, options = {}) {
+        this.io = options.io;
         this.logger = new AppLogger('WebSocketService');
         this.connections = new Map(); // userId -> socket mapping
         this.rooms = new Set(); // Active rooms
