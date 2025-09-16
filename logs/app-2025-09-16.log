@@ -1947,3 +1947,133 @@ Error: SQLITE_BUSY: unable to close due to unfinalized statements or unfinished 
     at new Promise (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:27849)
     at DatabaseCore.close (/home/project/src/core/database.js:447:16)
     at FirebaseMicroservice.gracefulShutdown (/home/project/app.js:313:37)
+2025-09-16 19:32:29.272 [INFO ] [DatabaseCore] 🗄️ Initializing database...
+2025-09-16 19:32:29.272 [INFO ] [DatabaseCore] 📍 Database path: /tmp/firebase_logs.db
+2025-09-16 19:32:29.278 [INFO ] [DatabaseCore] ✅ SQLite file database connected
+2025-09-16 19:32:29.325 [INFO ] [DatabaseCore] ✅ Database schema initialized
+2025-09-16 19:32:29.325 [INFO ] [DatabaseCore] ✅ Default configuration inserted
+2025-09-16 19:32:29.352 [INFO ] [DatabaseCore] ✅ Models initialized
+2025-09-16 19:32:29.352 [INFO ] [DatabaseCore] ✅ Database initialized successfully
+2025-09-16 19:32:29.355 [INFO ] [ServiceManager] 📦 Registering service: websocket
+2025-09-16 19:32:29.355 [INFO ] [ServiceManager] ✅ Service registered: websocket (deps: none)
+2025-09-16 19:32:29.355 [INFO ] [ServiceManager] 📦 Registering service: queue
+2025-09-16 19:32:29.355 [INFO ] [ServiceManager] ✅ Service registered: queue (deps: database)
+2025-09-16 19:32:29.355 [INFO ] [ServiceManager] 📦 Registering service: notification
+2025-09-16 19:32:29.356 [INFO ] [ServiceManager] ✅ Service registered: notification (deps: database, websocket, queue)
+2025-09-16 19:32:29.356 [INFO ] [ServiceManager] 📦 Registering service: stats
+2025-09-16 19:32:29.356 [INFO ] [ServiceManager] ✅ Service registered: stats (deps: database, websocket)
+2025-09-16 19:32:29.356 [INFO ] [ServiceManager] 🚀 Initializing all services...
+2025-09-16 19:32:29.356 [WARN ] [ServiceManager] ⚠️ Service database already initialized
+2025-09-16 19:32:29.357 [INFO ] [ServiceManager] 🔧 Initializing service: websocket
+2025-09-16 19:32:29.363 [INFO ] [ServiceManager] ✅ Service initialized: websocket
+2025-09-16 19:32:29.363 [INFO ] [ServiceManager] 🔧 Initializing service: queue
+2025-09-16 19:32:29.386 [INFO ] [ServiceManager] ✅ Service initialized: queue
+2025-09-16 19:32:29.386 [INFO ] [ServiceManager] 🔧 Initializing service: notification
+2025-09-16 19:32:29.501 [INFO ] [ServiceManager] ✅ Service initialized: notification
+2025-09-16 19:32:29.501 [INFO ] [ServiceManager] 🔧 Initializing service: stats
+2025-09-16 19:32:29.508 [INFO ] [ServiceManager] ✅ Service initialized: stats
+2025-09-16 19:32:29.508 [INFO ] [ServiceManager] ✅ All services initialized successfully
+2025-09-16 19:32:29.269 [INFO ] [FirebaseMicroservice] 🚀 Initializing Firebase Microservice...
+2025-09-16 19:32:29.270 [INFO ] [FirebaseMicroservice] 🛡️ Setting up global error handling...
+2025-09-16 19:32:29.270 [INFO ] [FirebaseMicroservice] 🔧 Setting up middleware...
+2025-09-16 19:32:29.272 [INFO ] [FirebaseMicroservice] ✅ Middleware configured
+2025-09-16 19:32:29.272 [INFO ] [FirebaseMicroservice] 📊 Initializing database...
+2025-09-16 19:32:29.353 [INFO ] [FirebaseMicroservice] ✅ Database initialized successfully
+2025-09-16 19:32:29.353 [INFO ] [FirebaseMicroservice] 🌐 HTTP server created
+2025-09-16 19:32:29.353 [INFO ] [FirebaseMicroservice] 🔌 Initializing WebSockets...
+2025-09-16 19:32:29.354 [INFO ] [FirebaseMicroservice] ✅ WebSockets initialized
+2025-09-16 19:32:29.355 [INFO ] [FirebaseMicroservice] ⚙️ Registering and initializing services...
+2025-09-16 19:32:29.514 [INFO ] [FirebaseMicroservice] ✅ All services initialized successfully
+2025-09-16 19:32:29.515 [INFO ] [FirebaseMicroservice] 🛣️ Setting up routes...
+2025-09-16 19:32:29.517 [ERROR] [FirebaseMicroservice] ❌ Failed to mount API routes: {"0":"C","1":"a","2":"n","3":"n","4":"o","5":"t","6":" ","7":"f","8":"i","9":"n","10":"d","11":" ","12":"m","13":"o","14":"d","15":"u","16":"l","17":"e","18":" ","19":"'","20":"e","21":"x","22":"p","23":"r","24":"e","25":"s","26":"s","27":"-","28":"r","29":"a","30":"t","31":"e","32":"-","33":"l","34":"i","35":"m","36":"i","37":"t","38":"'","39":"\n","40":"R","41":"e","42":"q","43":"u","44":"i","45":"r","46":"e","47":" ","48":"s","49":"t","50":"a","51":"c","52":"k","53":":","54":"\n","55":"-","56":" ","57":"/","58":"h","59":"o","60":"m","61":"e","62":"/","63":"p","64":"r","65":"o","66":"j","67":"e","68":"c","69":"t","70":"/","71":"s","72":"r","73":"c","74":"/","75":"r","76":"o","77":"u","78":"t","79":"e","80":"s","81":"/","82":"a","83":"p","84":"i","85":"-","86":"s","87":"i","88":"m","89":"p","90":"l","91":"e","92":".","93":"j","94":"s","95":"\n","96":"-","97":" ","98":"/","99":"h","100":"o","101":"m","102":"e","103":"/","104":"p","105":"r","106":"o","107":"j","108":"e","109":"c","110":"t","111":"/","112":"a","113":"p","114":"p","115":".","116":"j","117":"s"}
+Error
+    at AppLogger.error (/home/project/src/utils/logger.js:246:39)
+    at FirebaseMicroservice.setupRoutes (/home/project/app.js:234:25)
+    at FirebaseMicroservice.initialize (/home/project/app.js:79:18)
+    at async FirebaseMicroservice.start (/home/project/app.js:327:9)
+2025-09-16 19:32:29.518 [INFO ] [FirebaseMicroservice] ✅ Routes configured
+2025-09-16 19:32:29.518 [INFO ] [FirebaseMicroservice] ✅ Firebase Microservice initialized successfully
+2025-09-16 19:32:29.363 [INFO ] [WebSocketService] 🔌 Initializing WebSocket service...
+2025-09-16 19:32:29.363 [INFO ] [WebSocketService] ✅ WebSocket service initialized successfully
+2025-09-16 19:32:29.367 [INFO ] [QueueService] 📦 Initializing Queue service...
+2025-09-16 19:32:29.386 [INFO ] [QueueService] ✅ Queue service initialized
+2025-09-16 19:32:29.523 [INFO ] [FirebaseMicroservice] 🚀 Firebase Microservice running on port 3000
+2025-09-16 19:32:29.523 [INFO ] [FirebaseMicroservice] 📊 Dashboard: http://localhost:3000
+2025-09-16 19:32:29.523 [INFO ] [FirebaseMicroservice] 🔗 API: http://localhost:3000/api
+2025-09-16 19:32:29.523 [INFO ] [FirebaseMicroservice] 🔧 Environment: development
+2025-09-16 19:32:29.523 [INFO ] [FirebaseMicroservice] 📋 Service Status: {"services":{"database":{"status":"running","hasInstance":true,"dependencies":[]},"websocket":{"status":"running","startedAt":"2025-09-16T22:32:29.363Z","error":null,"hasInstance":true,"dependencies":[]},"queue":{"status":"running","startedAt":"2025-09-16T22:32:29.386Z","error":null,"hasInstance":true,"dependencies":["database"]},"notification":{"status":"running","startedAt":"2025-09-16T22:32:29.501Z","error":null,"hasInstance":true,"dependencies":["database","websocket","queue"]},"stats":{"status":"running","startedAt":"2025-09-16T22:32:29.508Z","error":null,"hasInstance":true,"dependencies":["database","websocket"]}},"initialized":true,"startOrder":["database","websocket","queue","notification","stats"]}
+2025-09-16 19:32:29.390 [INFO ] [NotificationService] 🔔 Initializing Notification service...
+2025-09-16 19:32:29.390 [INFO ] [NotificationService] ✅ Database models available
+2025-09-16 19:32:29.501 [WARN ] [NotificationService] ⚠️ Firebase service not available: {"0":"C","1":"a","2":"n","3":"n","4":"o","5":"t","6":" ","7":"r","8":"e","9":"a","10":"d","11":" ","12":"p","13":"r","14":"o","15":"p","16":"e","17":"r","18":"t","19":"i","20":"e","21":"s","22":" ","23":"o","24":"f","25":" ","26":"n","27":"u","28":"l","29":"l","30":" ","31":"(","32":"r","33":"e","34":"a","35":"d","36":"i","37":"n","38":"g","39":" ","40":"'","41":"p","42":"r","43":"o","44":"j","45":"e","46":"c","47":"t","48":"I","49":"d","50":"'","51":")"}
+2025-09-16 19:32:29.501 [INFO ] [NotificationService] ✅ Notification service initialized successfully
+2025-09-16 19:32:29.499 [INFO ] [FirebaseService] 🔥 Initializing Firebase service...
+2025-09-16 19:32:29.500 [INFO ] [FirebaseService] 📋 Loading Firebase configuration...
+2025-09-16 19:32:29.500 [INFO ] [FirebaseService] 📄 firebase-service-account.json not found
+2025-09-16 19:32:29.500 [INFO ] [FirebaseService] 📋 Incomplete Firebase config in environment
+2025-09-16 19:32:29.501 [ERROR] [FirebaseService] ❌ Failed to load Firebase configuration:
+TypeError: Cannot read properties of null (reading 'projectId')
+    at FirebaseService.loadConfiguration (file:///home/project/src/services/firebaseService.js#cjs:71:26)
+    at async FirebaseService.initialize (file:///home/project/src/services/firebaseService.js#cjs:39:13)
+    at async NotificationService.initialize (file:///home/project/src/services/notificationService.js#cjs:61:17)
+    at async ServiceManager.initializeService (file:///home/project/src/core/serviceManager.js#cjs:145:17)
+    at async ServiceManager.initializeAll (file:///home/project/src/core/serviceManager.js#cjs:96:17)
+    at async FirebaseMicroservice.initializeServices (file:///home/project/app.js#cjs:183:13)
+    at async FirebaseMicroservice.initialize (file:///home/project/app.js#cjs:76:13)
+    at async FirebaseMicroservice.start (file:///home/project/app.js#cjs:327:9)
+2025-09-16 19:32:29.501 [ERROR] [FirebaseService] ❌ Firebase service initialization failed:
+TypeError: Cannot read properties of null (reading 'projectId')
+    at FirebaseService.loadConfiguration (file:///home/project/src/services/firebaseService.js#cjs:71:26)
+    at async FirebaseService.initialize (file:///home/project/src/services/firebaseService.js#cjs:39:13)
+    at async NotificationService.initialize (file:///home/project/src/services/notificationService.js#cjs:61:17)
+    at async ServiceManager.initializeService (file:///home/project/src/core/serviceManager.js#cjs:145:17)
+    at async ServiceManager.initializeAll (file:///home/project/src/core/serviceManager.js#cjs:96:17)
+    at async FirebaseMicroservice.initializeServices (file:///home/project/app.js#cjs:183:13)
+    at async FirebaseMicroservice.initialize (file:///home/project/app.js#cjs:76:13)
+    at async FirebaseMicroservice.start (file:///home/project/app.js#cjs:327:9)
+2025-09-16 19:32:29.504 [INFO ] [App] 📊 Initializing Stats Service...
+2025-09-16 19:32:29.508 [INFO ] [App] ✅ Scheduled tasks initialized
+2025-09-16 19:32:29.508 [INFO ] [App] ✅ Stats Service initialized
+2025-09-16 19:32:29.510 [INFO ] [NotificationController] ✅ NotificationController initialized
+2025-09-16 19:32:29.519 [INFO ] [NotificationController] ✅ NotificationService initialized in controller
+2025-09-16 19:32:29.512 [INFO ] [NotificationService] 🔔 Initializing Notification service...
+2025-09-16 19:32:29.513 [INFO ] [NotificationService] ✅ Database models available
+2025-09-16 19:32:29.519 [WARN ] [NotificationService] ⚠️ Firebase service not available: {"0":"C","1":"a","2":"n","3":"n","4":"o","5":"t","6":" ","7":"r","8":"e","9":"a","10":"d","11":" ","12":"p","13":"r","14":"o","15":"p","16":"e","17":"r","18":"t","19":"i","20":"e","21":"s","22":" ","23":"o","24":"f","25":" ","26":"n","27":"u","28":"l","29":"l","30":" ","31":"(","32":"r","33":"e","34":"a","35":"d","36":"i","37":"n","38":"g","39":" ","40":"'","41":"p","42":"r","43":"o","44":"j","45":"e","46":"c","47":"t","48":"I","49":"d","50":"'","51":")"}
+2025-09-16 19:32:29.519 [INFO ] [NotificationService] ✅ Notification service initialized successfully
+2025-09-16 19:32:29.514 [INFO ] [FirebaseService] 🔥 Initializing Firebase service...
+2025-09-16 19:32:29.514 [INFO ] [FirebaseService] 📋 Loading Firebase configuration...
+2025-09-16 19:32:29.514 [INFO ] [FirebaseService] 📄 firebase-service-account.json not found
+2025-09-16 19:32:29.515 [INFO ] [FirebaseService] 📋 Incomplete Firebase config in environment
+2025-09-16 19:32:29.515 [ERROR] [FirebaseService] ❌ Failed to load Firebase configuration:
+TypeError: Cannot read properties of null (reading 'projectId')
+    at FirebaseService.loadConfiguration (file:///home/project/src/services/firebaseService.js#cjs:71:26)
+    at async FirebaseService.initialize (file:///home/project/src/services/firebaseService.js#cjs:39:13)
+    at async NotificationService.initialize (file:///home/project/src/services/notificationService.js#cjs:61:17)
+    at async NotificationController.initializeService (file:///home/project/src/controllers/notificationController.js#cjs:42:13)
+2025-09-16 19:32:29.518 [ERROR] [FirebaseService] ❌ Firebase service initialization failed:
+TypeError: Cannot read properties of null (reading 'projectId')
+    at FirebaseService.loadConfiguration (file:///home/project/src/services/firebaseService.js#cjs:71:26)
+    at async FirebaseService.initialize (file:///home/project/src/services/firebaseService.js#cjs:39:13)
+    at async NotificationService.initialize (file:///home/project/src/services/notificationService.js#cjs:61:17)
+    at async NotificationController.initializeService (file:///home/project/src/controllers/notificationController.js#cjs:42:13)
+2025-09-16 19:32:30.453 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758061950452_fqmwd87qi","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-16 19:32:30.460 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758061950452_fqmwd87qi","method":"GET","url":"/","statusCode":200,"responseTime":"8ms","contentLength":29628}
+2025-09-16 19:32:31.368 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758061951368_40i6igxin","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-16 19:32:31.371 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758061951368_40i6igxin","method":"GET","url":"/","statusCode":200,"responseTime":"3ms","contentLength":29628}
+2025-09-16 19:32:39.572 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758061959572_5rm83vfj3","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-16 19:32:39.575 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758061959572_5rm83vfj3","method":"GET","url":"/","statusCode":200,"responseTime":"3ms","contentLength":29628}
+2025-09-16 19:32:47.775 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758061967774_sxd18floi","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-16 19:32:47.780 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758061967774_sxd18floi","method":"GET","url":"/","statusCode":200,"responseTime":"6ms","contentLength":29628}
+2025-09-16 19:32:55.978 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758061975978_415b7lkb5","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-16 19:32:55.981 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758061975978_415b7lkb5","method":"GET","url":"/","statusCode":200,"responseTime":"3ms","contentLength":29628}
+2025-09-16 19:33:04.183 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758061984182_dk4vvvh4q","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-16 19:33:04.185 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758061984182_dk4vvvh4q","method":"GET","url":"/","statusCode":200,"responseTime":"3ms","contentLength":29628}
+2025-09-16 19:33:12.386 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758061992386_kqiegmhhp","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-16 19:33:12.388 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758061992386_kqiegmhhp","method":"GET","url":"/","statusCode":200,"responseTime":"2ms","contentLength":29628}
+2025-09-16 19:33:20.589 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758062000588_mx9qfdm00","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-16 19:33:20.590 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758062000588_mx9qfdm00","method":"GET","url":"/","statusCode":200,"responseTime":"2ms","contentLength":29628}
+2025-09-16 19:33:28.794 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758062008793_jxa8mrnut","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-16 19:33:28.796 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758062008793_jxa8mrnut","method":"GET","url":"/","statusCode":200,"responseTime":"3ms","contentLength":29628}
+2025-09-16 19:33:36.999 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758062016999_2ltqms5e7","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-16 19:33:37.001 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758062016999_2ltqms5e7","method":"GET","url":"/","statusCode":200,"responseTime":"2ms","contentLength":29628}
+2025-09-16 19:33:45.202 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758062025202_et9pfffeu","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-16 19:33:45.204 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758062025202_et9pfffeu","method":"GET","url":"/","statusCode":200,"responseTime":"2ms","contentLength":29628}

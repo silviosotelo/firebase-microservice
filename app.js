@@ -221,7 +221,7 @@ class FirebaseMicroservice {
 
         // Load API routes
         try {
-            const apiRoutes = require('./src/routes/api-simple');
+            const apiRoutes = require('./src/routes/api');
             
             // Inject controller if available
             if (this.notificationController) {
