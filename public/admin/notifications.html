@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Notificaciones - Firebase Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #38a169;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #2f855a;
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c53030;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        .controls-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .form-input {
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-select {
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            background: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .notifications-table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .notifications-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .notifications-table th,
+        .notifications-table td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .notifications-table th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .notifications-table tr:hover {
+            background: #f7fafc;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.queued { background: #fef5e7; color: #d69e2e; }
+        .status-badge.processing { background: #e6fffa; color: #319795; }
+        .status-badge.completed { background: #f0fff4; color: #38a169; }
+        .status-badge.failed { background: #fed7d7; color: #e53e3e; }
+        .status-badge.cancelled { background: #e2e8f0; color: #4a5568; }
+
+        .type-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: #ebf4ff;
+            color: #3182ce;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .priority-badge.low { background: #f0fff4; color: #38a169; }
+        .priority-badge.normal { background: #fefcbf; color: #744210; }
+        .priority-badge.high { background: #fed7d7; color: #742a2a; }
+
+        .progress-bar {
+            width: 60px;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .pagination-info {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #a0aec0;
+            padding: 0.5rem;
+        }
+
+        .modal-close:hover {
+            color: #4a5568;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+            font-weight: 500;
+        }
+
+        .alert.success {
+            background: #f0fff4;
+            border-color: #38a169;
+            color: #22543d;
+        }
+
+        .alert.error {
+            background: #fed7d7;
+            border-color: #e53e3e;
+            color: #742a2a;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #a0aec0;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            
+            .bulk-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .notifications-table {
+                font-size: 0.8rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <i class="fas fa-bell me-2"></i>
+                Gestión de Notificaciones
+            </h1>
+            <div style="display: flex; gap: 1rem;">
+                <a href="/admin" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Volver al Dashboard
+                </a>
+                <button class="btn btn-primary" onclick="openSendModal()">
+                    <i class="fas fa-plus"></i>
+                    Nueva Notificación
+                </button>
+            </div>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="controls-section">
+            <div class="controls-grid">
+                <div class="form-group">
+                    <label class="form-label">Buscar</label>
+                    <input type="text" class="form-input" id="searchInput" placeholder="Título, mensaje o ID...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Estado</label>
+                    <select class="form-select" id="statusFilter">
+                        <option value="">Todos los estados</option>
+                        <option value="queued">En Cola</option>
+                        <option value="processing">Procesando</option>
+                        <option value="completed">Completado</option>
+                        <option value="failed">Fallido</option>
+                        <option value="cancelled">Cancelado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tipo</label>
+                    <select class="form-select" id="typeFilter">
+                        <option value="">Todos los tipos</option>
+                        <option value="general">General</option>
+                        <option value="appointment">Cita</option>
+                        <option value="result">Resultado</option>
+                        <option value="emergency">Emergencia</option>
+                        <option value="promotion">Promoción</option>
+                        <option value="reminder">Recordatorio</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Prioridad</label>
+                    <select class="form-select" id="priorityFilter">
+                        <option value="">Todas las prioridades</option>
+                        <option value="low">Baja</option>
+                        <option value="normal">Normal</option>
+                        <option value="high">Alta</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Fecha Desde</label>
+                    <input type="datetime-local" class="form-input" id="dateFromFilter">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Fecha Hasta</label>
+                    <input type="datetime-local" class="form-input" id="dateToFilter">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">&nbsp;</label>
+                    <button class="btn btn-primary" onclick="applyFilters()">
+                        <i class="fas fa-search"></i>
+                        Buscar
+                    </button>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">&nbsp;</label>
+                    <button class="btn btn-secondary" onclick="clearFilters()">
+                        <i class="fas fa-times"></i>
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications Table -->
+        <div class="notifications-table-container">
+            <div class="table-header">
+                <h3 class="table-title">Lista de Notificaciones</h3>
+                <div class="bulk-actions">
+                    <button class="btn btn-danger btn-sm" onclick="bulkCancel()" id="bulkCancelBtn" disabled>
+                        <i class="fas fa-ban"></i>
+                        Cancelar Seleccionadas
+                    </button>
+                    <button class="btn btn-success btn-sm" onclick="bulkRetry()" id="bulkRetryBtn" disabled>
+                        <i class="fas fa-redo"></i>
+                        Reintentar Seleccionadas
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="refreshTable()">
+                        <i class="fas fa-sync-alt"></i>
+                        Actualizar
+                    </button>
+                </div>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="notifications-table" id="notificationsTable">
+                    <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" class="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                            </th>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Prioridad</th>
+                            <th>Estado</th>
+                            <th>Enviado</th>
+                            <th>Éxito</th>
+                            <th>Tasa de Éxito</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="notificationsTableBody">
+                        <tr>
+                            <td colspan="11" class="empty-state">
+                                <div class="loading"></div>
+                                <div style="margin-top: 1rem;">Cargando notificaciones...</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination" id="paginationContainer">
+                <div class="pagination-info" id="paginationInfo">
+                    Mostrando 0 - 0 de 0 notificaciones
+                </div>
+                <div class="pagination-controls" id="paginationControls">
+                    <!-- Pagination buttons will be added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Send Notification Modal -->
+    <div class="modal" id="sendModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Enviar Nueva Notificación</h3>
+                <button class="modal-close" onclick="closeSendModal()">&times;</button>
+            </div>
+            <div id="sendModalContent">
+                <form id="sendNotificationForm">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Tipo de Envío</label>
+                            <select class="form-select" id="sendType" onchange="toggleSendOptions()">
+                                <option value="tokens">Tokens FCM</option>
+                                <option value="topic">Tema/Topic</option>
+                                <option value="user">Usuario Específico</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tipo de Notificación</label>
+                            <select class="form-select" id="notificationType">
+                                <option value="general">General</option>
+                                <option value="appointment">Cita</option>
+                                <option value="result">Resultado</option>
+                                <option value="emergency">Emergencia</option>
+                                <option value="promotion">Promoción</option>
+                                <option value="reminder">Recordatorio</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label class="form-label">Título</label>
+                        <input type="text" class="form-input" id="notificationTitle" maxlength="100" required>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label class="form-label">Mensaje</label>
+                        <textarea class="form-input" id="notificationMessage" rows="3" maxlength="4000" required></textarea>
+                    </div>
+
+                    <div id="tokensSection" class="form-group" style="margin-bottom: 1rem;">
+                        <label class="form-label">Tokens FCM (uno por línea)</label>
+                        <textarea class="form-input" id="fcmTokens" rows="3" placeholder="Pega aquí los tokens FCM, uno por línea"></textarea>
+                    </div>
+
+                    <div id="topicSection" class="form-group" style="margin-bottom: 1rem; display: none;">
+                        <label class="form-label">Nombre del Tema</label>
+                        <input type="text" class="form-input" id="topicName" placeholder="ej: general_announcements">
+                    </div>
+
+                    <div id="userSection" class="form-group" style="margin-bottom: 1rem; display: none;">
+                        <label class="form-label">ID de Usuario</label>
+                        <input type="text" class="form-input" id="userId" placeholder="ID del usuario">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Prioridad</label>
+                            <select class="form-select" id="notificationPriority">
+                                <option value="low">Baja</option>
+                                <option value="normal" selected>Normal</option>
+                                <option value="high">Alta</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sonido</label>
+                            <input type="text" class="form-input" id="notificationSound" value="default">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label class="form-label">Ruta de Deep Link (opcional)</label>
+                        <input type="text" class="form-input" id="notificationRoute" placeholder="/notifications/1">
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                        <button type="button" class="btn btn-secondary" onclick="closeSendModal()">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                            Enviar Notificación
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Details Modal -->
+    <div class="modal" id="detailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Detalles de la Notificación</h3>
+                <button class="modal-close" onclick="closeDetailsModal()">&times;</button>
+            </div>
+            <div id="detailsModalContent">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // NOTIFICATIONS MANAGEMENT
+        // ==========================================
+
+        class NotificationsManager {
+            constructor() {
+                this.notifications = [];
+                this.selectedIds = new Set();
+                this.currentPage = 1;
+                this.pageSize = 50;
+                this.totalNotifications = 0;
+                this.filters = {};
+                
+                this.init();
+            }
+            async apiFetch(url, options = {}) {
+                const apiKey = 'xhspZyxghuV5NLIo5ygbEHaBMHDxlmf5'; // o leer de window.config, localStorage, etc.
+
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': apiKey,
+                        ...(options.headers || {})
+                    }
+                });
+
+                return response;
+            }
+            init() {
+                this.setupEventListeners();
+                this.loadNotifications();
+            }
+
+            setupEventListeners() {
+                // Search input
+                document.getElementById('searchInput').addEventListener('keyup', (e) => {
+                    if (e.key === 'Enter') {
+                        this.applyFilters();
+                    }
+                });
+
+                // Send notification form
+                document.getElementById('sendNotificationForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.sendNotification();
+                });
+            }
+
+            async loadNotifications() {
+                try {
+                    const params = new URLSearchParams({
+                        page: this.currentPage,
+                        limit: this.pageSize,
+                        ...this.filters
+                    });
+
+                    const response = await this.apiFetch(`/api/notifications?${params}`);
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.notifications = data.data.notifications;
+                        this.totalNotifications = data.data.pagination.total;
+                        this.updateTable();
+                        this.updatePagination(data.data.pagination);
+                    } else {
+                        this.showError('Error al cargar notificaciones: ' + data.error);
+                    }
+
+                } catch (error) {
+                    console.error('Error loading notifications:', error);
+                    this.showError('Error de conexión al cargar notificaciones');
+                }
+            }
+
+            updateTable() {
+                const tbody = document.getElementById('notificationsTableBody');
+                
+                if (this.notifications.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="11" class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <div>No se encontraron notificaciones</div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tbody.innerHTML = this.notifications.map(notification => `
+                    <tr data-id="${notification.id}">
+                        <td>
+                            <input type="checkbox" class="checkbox notification-checkbox" 
+                                   value="${notification.id}" onchange="notificationsManager.toggleSelection(${notification.id})">
+                        </td>
+                        <td>#${notification.id}</td>
+                        <td>
+                            <div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" 
+                                 title="${notification.title}">
+                                ${notification.title}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="type-badge">${notification.type}</span>
+                        </td>
+                        <td>
+                            <span class="priority-badge ${notification.priority}">${notification.priority}</span>
+                        </td>
+                        <td>
+                            <span class="status-badge ${notification.status}">${notification.status}</span>
+                        </td>
+                        <td>${notification.totalSent || 0}</td>
+                        <td>${notification.successful || 0}</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${notification.successRate || 0}%"></div>
+                            </div>
+                            <small>${Math.round(notification.successRate || 0)}%</small>
+                        </td>
+                        <td>
+                            <small>${this.formatRelativeTime(notification.createdAt)}</small>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-secondary btn-sm" onclick="notificationsManager.viewDetails(${notification.id})" title="Ver detalles">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                ${notification.status === 'failed' ? `
+                                    <button class="btn btn-success btn-sm" onclick="notificationsManager.retryNotification(${notification.id})" title="Reintentar">
+                                        <i class="fas fa-redo"></i>
+                                    </button>
+                                ` : ''}
+                                ${notification.status === 'queued' || notification.status === 'processing' ? `
+                                    <button class="btn btn-danger btn-sm" onclick="notificationsManager.cancelNotification(${notification.id})" title="Cancelar">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            updatePagination(pagination) {
+                const info = document.getElementById('paginationInfo');
+                const controls = document.getElementById('paginationControls');
+
+                const start = (pagination.page - 1) * pagination.limit + 1;
+                const end = Math.min(pagination.page * pagination.limit, pagination.total);
+
+                info.textContent = `Mostrando ${start} - ${end} de ${pagination.total} notificaciones`;
+
+                // Pagination buttons
+                const buttons = [];
+                
+                // Previous button
+                if (pagination.hasPreviousPage) {
+                    buttons.push(`<button class="btn btn-secondary btn-sm" onclick="notificationsManager.goToPage(${pagination.page - 1})">Anterior</button>`);
+                }
+
+                // Page numbers
+                const startPage = Math.max(1, pagination.page - 2);
+                const endPage = Math.min(pagination.totalPages, pagination.page + 2);
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const active = i === pagination.page ? 'btn-primary' : 'btn-secondary';
+                    buttons.push(`<button class="btn ${active} btn-sm" onclick="notificationsManager.goToPage(${i})">${i}</button>`);
+                }
+
+                // Next button
+                if (pagination.hasNextPage) {
+                    buttons.push(`<button class="btn btn-secondary btn-sm" onclick="notificationsManager.goToPage(${pagination.page + 1})">Siguiente</button>`);
+                }
+
+                controls.innerHTML = buttons.join('');
+            }
+
+            goToPage(page) {
+                this.currentPage = page;
+                this.loadNotifications();
+            }
+
+            applyFilters() {
+                this.filters = {
+                    search: document.getElementById('searchInput').value.trim(),
+                    status: document.getElementById('statusFilter').value,
+                    type: document.getElementById('typeFilter').value,
+                    priority: document.getElementById('priorityFilter').value,
+                    date_from: document.getElementById('dateFromFilter').value,
+                    date_to: document.getElementById('dateToFilter').value
+                };
+
+                // Remove empty filters
+                Object.keys(this.filters).forEach(key => {
+                    if (!this.filters[key]) {
+                        delete this.filters[key];
+                    }
+                });
+
+                this.currentPage = 1;
+                this.loadNotifications();
+            }
+
+            clearFilters() {
+                document.getElementById('searchInput').value = '';
+                document.getElementById('statusFilter').value = '';
+                document.getElementById('typeFilter').value = '';
+                document.getElementById('priorityFilter').value = '';
+                document.getElementById('dateFromFilter').value = '';
+                document.getElementById('dateToFilter').value = '';
+                
+                this.filters = {};
+                this.currentPage = 1;
+                this.loadNotifications();
+            }
+
+            async sendNotification() {
+                try {
+                    const formData = {
+                        title: document.getElementById('notificationTitle').value.trim(),
+                        message: document.getElementById('notificationMessage').value.trim(),
+                        type: document.getElementById('notificationType').value,
+                        priority: document.getElementById('notificationPriority').value,
+                        sound: document.getElementById('notificationSound').value.trim(),
+                        route: document.getElementById('notificationRoute').value.trim()
+                    };
+
+                    const sendType = document.getElementById('sendType').value;
+
+                    if (sendType === 'tokens') {
+                        const tokensText = document.getElementById('fcmTokens').value.trim();
+                        if (!tokensText) {
+                            this.showError('Debe proporcionar al menos un token FCM');
+                            return;
+                        }
+                        formData.tokens = tokensText.split('\n').map(t => t.trim()).filter(t => t);
+                    } else if (sendType === 'topic') {
+                        const topic = document.getElementById('topicName').value.trim();
+                        if (!topic) {
+                            this.showError('Debe proporcionar un nombre de tema');
+                            return;
+                        }
+                        formData.topic = topic;
+                    } else if (sendType === 'user') {
+                        const userId = document.getElementById('userId').value.trim();
+                        if (!userId) {
+                            this.showError('Debe proporcionar un ID de usuario');
+                            return;
+                        }
+                        formData.user_id = userId;
+                    }
+
+                    const endpoint = formData.tokens && formData.tokens.length > 1 ? '/api/notifications/bulk' : '/api/notifications/send';
+                    const response = await this.apiFetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-API-Key': 'admin-key-here' // You'll need to implement proper auth
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.showSuccess('Notificación enviada correctamente');
+                        this.closeSendModal();
+                        this.loadNotifications();
+                    } else {
+                        this.showError('Error al enviar notificación: ' + data.error);
+                    }
+
+                } catch (error) {
+                    console.error('Error sending notification:', error);
+                    this.showError('Error de conexión al enviar notificación');
+                }
+            }
+
+            async viewDetails(id) {
+                try {
+                    const response = await this.apiFetch(`/api/notifications/${id}/details`);
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.showDetailsModal(data.data);
+                    } else {
+                        this.showError('Error al cargar detalles: ' + data.error);
+                    }
+
+                } catch (error) {
+                    console.error('Error loading details:', error);
+                    this.showError('Error de conexión al cargar detalles');
+                }
+            }
+
+            showDetailsModal(data) {
+                const modal = document.getElementById('detailsModal');
+                const content = document.getElementById('detailsModalContent');
+
+                const notification = data.notification;
+                const responses = data.responses || [];
+
+                content.innerHTML = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                        <div>
+                            <h4>Información General</h4>
+                            <p><strong>ID:</strong> ${notification.id}</p>
+                            <p><strong>Request ID:</strong> ${notification.requestId}</p>
+                            <p><strong>Título:</strong> ${notification.title}</p>
+                            <p><strong>Tipo:</strong> <span class="type-badge">${notification.type}</span></p>
+                            <p><strong>Prioridad:</strong> <span class="priority-badge ${notification.priority}">${notification.priority}</span></p>
+                            <p><strong>Estado:</strong> <span class="status-badge ${notification.status}">${notification.status}</span></p>
+                            <p><strong>Creado:</strong> ${this.formatDateTime(notification.createdAt)}</p>
+                        </div>
+                        <div>
+                            <h4>Estadísticas de Entrega</h4>
+                            <p><strong>Total Enviado:</strong> ${notification.totalSent || 0}</p>
+                            <p><strong>Exitosos:</strong> ${notification.successful || 0}</p>
+                            <p><strong>Fallidos:</strong> ${notification.failed || 0}</p>
+                            <p><strong>Tasa de Éxito:</strong> ${Math.round(notification.successRate || 0)}%</p>
+                            ${notification.processingTime ? `<p><strong>Tiempo de Procesamiento:</strong> ${notification.processingTime}s</p>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 2rem;">
+                        <h4>Contenido del Mensaje</h4>
+                        <div style="background: #f7fafc; padding: 1rem; border-radius: 6px; border-left: 4px solid #667eea;">
+                            <p><strong>Mensaje:</strong> ${notification.message}</p>
+                            ${notification.route ? `<p><strong>Ruta:</strong> ${notification.route}</p>` : ''}
+                        </div>
+                    </div>
+                    
+                    ${responses.length > 0 ? `
+                        <div>
+                            <h4>Respuestas Individuales (${responses.length})</h4>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr style="background: #f7fafc;">
+                                            <th style="padding: 0.5rem; text-align: left;">Token</th>
+                                            <th style="padding: 0.5rem; text-align: left;">Estado</th>
+                                            <th style="padding: 0.5rem; text-align: left;">Error</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${responses.map(response => `
+                                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                                                <td style="padding: 0.5rem; font-family: monospace; font-size: 0.8rem;">
+                                                    ${response.token ? response.token.substring(0, 20) + '...' : 'N/A'}
+                                                </td>
+                                                <td style="padding: 0.5rem;">
+                                                    <span class="status-badge ${response.success ? 'completed' : 'failed'}">
+                                                        ${response.success ? 'Éxito' : 'Fallo'}
+                                                    </span>
+                                                </td>
+                                                <td style="padding: 0.5rem; font-size: 0.8rem;">
+                                                    ${response.errorMessage || response.errorCode || '--'}
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    ` : ''}
+                `;
+
+                modal.style.display = 'block';
+            }
+
+            async cancelNotification(id) {
+                if (!confirm('¿Está seguro de que desea cancelar esta notificación?')) {
+                    return;
+                }
+
+                try {
+                    const response = await this.apiFetch(`/api/notifications/${id}/cancel`, {
+                        method: 'POST',
+                        headers: {
+                            'X-API-Key': 'admin-key-here' // You'll need to implement proper auth
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.showSuccess('Notificación cancelada correctamente');
+                        this.loadNotifications();
+                    } else {
+                        this.showError('Error al cancelar notificación: ' + data.error);
+                    }
+
+                } catch (error) {
+                    console.error('Error cancelling notification:', error);
+                    this.showError('Error de conexión al cancelar notificación');
+                }
+            }
+
+            async retryNotification(id) {
+                if (!confirm('¿Está seguro de que desea reintentar esta notificación?')) {
+                    return;
+                }
+
+                try {
+                    const response = await this.apiFetch(`/api/notifications/${id}/retry`, {
+                        method: 'POST',
+                        headers: {
+                            'X-API-Key': 'admin-key-here' // You'll need to implement proper auth
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.showSuccess('Notificación programada para reintento');
+                        this.loadNotifications();
+                    } else {
+                        this.showError('Error al reintentar notificación: ' + data.error);
+                    }
+
+                } catch (error) {
+                    console.error('Error retrying notification:', error);
+                    this.showError('Error de conexión al reintentar notificación');
+                }
+            }
+
+            toggleSelection(id) {
+                if (this.selectedIds.has(id)) {
+                    this.selectedIds.delete(id);
+                } else {
+                    this.selectedIds.add(id);
+                }
+                this.updateBulkActions();
+            }
+
+            toggleSelectAll() {
+                const selectAll = document.getElementById('selectAll');
+                const checkboxes = document.querySelectorAll('.notification-checkbox');
+                
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = selectAll.checked;
+                    const id = parseInt(checkbox.value);
+                    if (selectAll.checked) {
+                        this.selectedIds.add(id);
+                    } else {
+                        this.selectedIds.delete(id);
+                    }
+                });
+
+                this.updateBulkActions();
+            }
+
+            updateBulkActions() {
+                const bulkCancelBtn = document.getElementById('bulkCancelBtn');
+                const bulkRetryBtn = document.getElementById('bulkRetryBtn');
+                
+                const hasSelection = this.selectedIds.size > 0;
+                bulkCancelBtn.disabled = !hasSelection;
+                bulkRetryBtn.disabled = !hasSelection;
+            }
+
+            // Utility methods
+            formatRelativeTime(dateString) {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diff = now - date;
+                
+                const seconds = Math.floor(diff / 1000);
+                const minutes = Math.floor(seconds / 60);
+                const hours = Math.floor(minutes / 60);
+                const days = Math.floor(hours / 24);
+                
+                if (days > 0) return `${days}d`;
+                if (hours > 0) return `${hours}h`;
+                if (minutes > 0) return `${minutes}m`;
+                return `${seconds}s`;
+            }
+
+            formatDateTime(dateString) {
+                return new Date(dateString).toLocaleString('es-ES');
+            }
+
+            showSuccess(message) {
+                const alert = document.createElement('div');
+                alert.className = 'alert success';
+                alert.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+                document.body.appendChild(alert);
+                setTimeout(() => alert.remove(), 5000);
+            }
+
+            showError(message) {
+                const alert = document.createElement('div');
+                alert.className = 'alert error';
+                alert.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+                document.body.appendChild(alert);
+                setTimeout(() => alert.remove(), 5000);
+            }
+
+            openSendModal() {
+                document.getElementById('sendModal').style.display = 'block';
+            }
+
+            closeSendModal() {
+                document.getElementById('sendModal').style.display = 'none';
+                document.getElementById('sendNotificationForm').reset();
+            }
+
+            closeDetailsModal() {
+                document.getElementById('detailsModal').style.display = 'none';
+            }
+        }
+
+        // Global functions
+        function toggleSendOptions() {
+            const sendType = document.getElementById('sendType').value;
+            const tokensSection = document.getElementById('tokensSection');
+            const topicSection = document.getElementById('topicSection');
+            const userSection = document.getElementById('userSection');
+
+            tokensSection.style.display = sendType === 'tokens' ? 'block' : 'none';
+            topicSection.style.display = sendType === 'topic' ? 'block' : 'none';
+            userSection.style.display = sendType === 'user' ? 'block' : 'none';
+        }
+
+        function openSendModal() {
+            notificationsManager.openSendModal();
+        }
+
+        function closeSendModal() {
+            notificationsManager.closeSendModal();
+        }
+
+        function closeDetailsModal() {
+            notificationsManager.closeDetailsModal();
+        }
+
+        function applyFilters() {
+            notificationsManager.applyFilters();
+        }
+
+        function clearFilters() {
+            notificationsManager.clearFilters();
+        }
+
+        function refreshTable() {
+            notificationsManager.loadNotifications();
+        }
+
+        function toggleSelectAll() {
+            notificationsManager.toggleSelectAll();
+        }
+
+        function bulkCancel() {
+            // Implementation for bulk cancel
+            console.log('Bulk cancel:', Array.from(notificationsManager.selectedIds));
+        }
+
+        function bulkRetry() {
+            // Implementation for bulk retry
+            console.log('Bulk retry:', Array.from(notificationsManager.selectedIds));
+        }
+
+        // Initialize
+        let notificationsManager;
+        document.addEventListener('DOMContentLoaded', () => {
+            notificationsManager = new NotificationsManager();
+        });
+
+        // Modal close on outside click
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

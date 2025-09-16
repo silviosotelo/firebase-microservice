@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Notification Dashboard</title>
+    <!--script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.js"></script-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+            background: #f8fafc;
+        }
+
+        .sidebar {
+            background: #2d3748;
+            color: white;
+            padding: 2rem 0;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid #4a5568;
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .nav-item {
+            padding: 1rem 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: #4a5568;
+            border-left-color: #667eea;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            padding: 2rem;
+            overflow-y: auto;
+            background: #f8fafc;
+        }
+
+        .header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h2 {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .connection-status.connected {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .connection-status.disconnected {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .connection-status.connecting {
+            background: #fefcbf;
+            color: #744210;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.pending {
+            background: #fef5e7;
+            color: #d69e2e;
+        }
+
+        .stat-icon.processing {
+            background: #e6fffa;
+            color: #319795;
+        }
+
+        .stat-icon.completed {
+            background: #f0fff4;
+            color: #38a169;
+        }
+
+        .stat-icon.failed {
+            background: #fed7d7;
+            color: #e53e3e;
+        }
+
+        .stat-icon.total {
+            background: #ebf4ff;
+            color: #3182ce;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-change {
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        .stat-change.positive {
+            color: #38a169;
+        }
+
+        .stat-change.negative {
+            color: #e53e3e;
+        }
+
+        .chart-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .time-selector {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .time-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e2e8f0;
+            background: white;
+            color: #4a5568;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .time-btn.active,
+        .time-btn:hover {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .notifications-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 2rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            width: 250px;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .notifications-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .notifications-table th,
+        .notifications-table td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .notifications-table th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .notifications-table tr:hover {
+            background: #f7fafc;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.queued {
+            background: #fef5e7;
+            color: #d69e2e;
+        }
+
+        .status-badge.processing {
+            background: #e6fffa;
+            color: #319795;
+        }
+
+        .status-badge.completed {
+            background: #f0fff4;
+            color: #38a169;
+        }
+
+        .status-badge.failed {
+            background: #fed7d7;
+            color: #e53e3e;
+        }
+
+        .status-badge.cancelled {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #a0aec0;
+            padding: 0.5rem;
+        }
+
+        .modal-close:hover {
+            color: #4a5568;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+            font-weight: 500;
+        }
+
+        .alert.success {
+            background: #f0fff4;
+            border-color: #38a169;
+            color: #22543d;
+        }
+
+        .alert.error {
+            background: #fed7d7;
+            border-color: #e53e3e;
+            color: #742a2a;
+        }
+
+        .alert.info {
+            background: #ebf8ff;
+            border-color: #3182ce;
+            color: #2a4365;
+        }
+
+        .alert.warning {
+            background: #fefcbf;
+            border-color: #d69e2e;
+            color: #744210;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2d3748;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+
+        .realtime-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: #4a5568;
+        }
+
+        .realtime-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #38a169;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                height: 100vh;
+                transition: left 0.3s;
+                z-index: 100;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .chart-section {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1>🚀 Firebase Dashboard</h1>
+            </div>
+            <nav>
+                <div class="nav-item active" data-section="overview">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Overview</span>
+                </div>
+                <div class="nav-item" data-section="notifications">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </div>
+                <div class="nav-item" data-section="queue">
+                    <i class="fas fa-list"></i>
+                    <span>Queue Status</span>
+                </div>
+                <div class="nav-item" data-section="analytics">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                </div>
+                <div class="nav-item" data-section="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </div>
+                <div class="nav-item" data-section="logs">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Live Logs</span>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h2 id="pageTitle">Dashboard Overview</h2>
+                <div class="connection-status connecting" id="connectionStatus">
+                    <div class="realtime-dot"></div>
+                    <span>Connecting...</span>
+                </div>
+            </div>
+
+            <!-- Overview Section -->
+            <div id="overviewSection" class="section active">
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon total">
+                                <i class="fas fa-paper-plane"></i>
+                            </div>
+                        </div>
+                        <div class="stat-number" id="totalNotifications">--</div>
+                        <div class="stat-label">Total Notifications</div>
+                        <div class="stat-change positive" id="totalChange">+0%</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon pending">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <div class="stat-number" id="pendingNotifications">--</div>
+                        <div class="stat-label">Pending</div>
+                        <div class="stat-change" id="pendingChange">--</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon processing">
+                                <i class="fas fa-spinner"></i>
+                            </div>
+                        </div>
+                        <div class="stat-number" id="processingNotifications">--</div>
+                        <div class="stat-label">Processing</div>
+                        <div class="stat-change" id="processingChange">--</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon completed">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <div class="stat-number" id="completedNotifications">--</div>
+                        <div class="stat-label">Completed</div>
+                        <div class="stat-change positive" id="completedChange">--</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon failed">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                        </div>
+                        <div class="stat-number" id="failedNotifications">--</div>
+                        <div class="stat-label">Failed</div>
+                        <div class="stat-change negative" id="failedChange">--</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon completed">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                        </div>
+                        <div class="stat-number" id="successRate">--%</div>
+                        <div class="stat-label">Success Rate</div>
+                        <div class="stat-change" id="successRateChange">--</div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="chart-section">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Notifications Over Time</h3>
+                            <div class="time-selector">
+                                <button class="time-btn active" data-period="1h">1H</button>
+                                <button class="time-btn" data-period="24h">24H</button>
+                                <button class="time-btn" data-period="7d">7D</button>
+                                <button class="time-btn" data-period="30d">30D</button>
+                            </div>
+                        </div>
+                        <canvas id="timeChart" width="400" height="200"></canvas>
+                    </div>
+
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Status Distribution</h3>
+                        </div>
+                        <canvas id="statusChart" width="300" height="300"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Notifications -->
+                <div class="notifications-section">
+                    <div class="section-header">
+                        <h3 class="section-title">Recent Notifications</h3>
+                        <div class="realtime-indicator">
+                            <div class="realtime-dot"></div>
+                            <span>Real-time updates</span>
+                        </div>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="notifications-table" id="recentNotificationsTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Sent</th>
+                                    <th>Success Rate</th>
+                                    <th>Time</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="8" style="text-align: center; padding: 2rem;">
+                                        <div class="loading"></div>
+                                        <div style="margin-top: 1rem;">Loading notifications...</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other sections (notifications, queue, etc.) would go here -->
+        </div>
+    </div>
+
+    <!-- Notification Details Modal -->
+    <div class="modal" id="notificationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Notification Details</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalContent">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+<!-- Asegurate de tener socket.io y Chart.js cargados antes de este script -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+
+<script>
+    /*
+      Dashboard completo - copia/pega reemplazando tu script actual.
+      Lee API key de window.__CONFIG__.API_KEY si existe, sino usa fallback.
+    */
+    class Dashboard {
+        constructor() {
+            // SOCKET / STATE
+            this.socket = null;
+            this.charts = {};
+            this.currentSection = 'overview';
+            this.stats = {};
+            this.notifications = [];
+            this.isConnected = false;
+    
+            // API key: prefer window.__CONFIG__ (inyectado desde backend), si no fallback temporal
+            this.apiKey = (window.__CONFIG__ && window.__CONFIG__.API_KEY) || 'xhspZyxghuV5NLIo5ygbEHaBMHDxlmf5';
+    
+            // Initialize
+            this.initializeApp();
+        }
+    
+        // ==========================================
+        // HTTP HELPER - siempre envía X-API-Key
+        // ==========================================
+        async apiFetch(url, options = {}) {
+            const opts = {
+                method: options.method || 'GET',
+                credentials: options.credentials || 'same-origin',
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-Key': this.apiKey,
+                    ...(options.headers || {})
+                }
+            };
+    
+            const res = await fetch(url, opts);
+            // Nota: devolvemos el Response para que el caller haga res.json() y maneje códigos
+            return res;
+        }
+    
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        initializeApp() {
+            console.log('🚀 Initializing Firebase Dashboard...');
+    
+            this.initializeWebSocket();
+            this.initializeEventListeners();
+            this.initializeCharts();
+            this.loadInitialData();
+    
+            console.log('✅ Dashboard initialized successfully');
+        }
+    
+        initializeWebSocket() {
+            console.log('🔌 Connecting to WebSocket...');
+    
+            // Construcción dinámica de URL para socket.io
+            // Si el servidor de socket está en el mismo origen, usar solo io() sin URL.
+            // Usamos location.host por compatibilidad.
+            let socketUrl;
+            try {
+                // Si quieres forzar otro puerto/canal, ajustalo aquí
+                socketUrl = window.location.hostname ? `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.hostname}:3000` : undefined;
+            } catch (e) {
+                socketUrl = undefined;
+            }
+    
+            // Si socketUrl no está definido, dejamos io() para conectar al mismo origen
+            const connectTarget = socketUrl ? socketUrl : undefined;
+    
+            const ioOpts = {
+                transports: ['websocket', 'polling'],
+                timeout: 5000,
+                forceNew: true,
+                // si tu servidor acepta query apiKey para autenticación via socket, podes descomentarlo
+                query: { apiKey: this.apiKey }
+            };
+    
+            this.socket = connectTarget ? io(connectTarget, ioOpts) : io(ioOpts);
+    
+            // Connection events
+            this.socket.on('connect', () => {
+                console.log('✅ WebSocket connected');
+                this.isConnected = true;
+                this.updateConnectionStatus('connected', 'Connected');
+                this.subscribeToEvents();
+            });
+    
+            this.socket.on('disconnect', (reason) => {
+                console.log('❌ WebSocket disconnected:', reason);
+                this.isConnected = false;
+                this.updateConnectionStatus('disconnected', 'Disconnected');
+            });
+    
+            this.socket.on('connect_error', (error) => {
+                console.error('❌ WebSocket connection error:', error);
+                this.updateConnectionStatus('disconnected', 'Connection Error');
+            });
+    
+            // Notification events
+            this.socket.on('notification_update', (data) => {
+                this.handleNotificationUpdate(data);
+            });
+    
+            this.socket.on('notification_progress', (data) => {
+                this.handleNotificationProgress(data);
+            });
+    
+            this.socket.on('stats_update', (data) => {
+                this.handleStatsUpdate(data);
+            });
+    
+            this.socket.on('system_alert', (data) => {
+                this.handleSystemAlert(data);
+            });
+    
+            // Optional: logs stream
+            this.socket.on('log_event', (data) => {
+                // agrega al log visual si existe
+                this.appendLog(data);
+            });
+        }
+    
+        // ==========================================
+        // UI & DOM event listeners
+        // ==========================================
+        initializeEventListeners() {
+            // Navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    const section = e.currentTarget.dataset.section;
+                    this.switchSection(section);
+                });
+            });
+    
+            // Time period selectors
+            document.querySelectorAll('.time-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+    
+                    const period = e.target.dataset.period;
+                    this.updateTimeChart(period);
+                });
+            });
+    
+            // Modal close on outside click (si existe)
+            const modal = document.getElementById('notificationModal');
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target.id === 'notificationModal') {
+                        this.closeModal();
+                    }
+                });
+            }
+    
+            // Auto-refresh data every 30 seconds
+            this._refreshInterval = setInterval(() => {
+                if (this.isConnected) {
+                    this.refreshData();
+                }
+            }, 30000);
+        }
+    
+        // ==========================================
+        // CHARTS INITIALIZATION (Chart.js required)
+        // ==========================================
+        initializeCharts() {
+            try {
+                // Time chart
+                const timeEl = document.getElementById('timeChart');
+                if (timeEl) {
+                    const timeCtx = timeEl.getContext('2d');
+                    this.charts.timeChart = new Chart(timeCtx, {
+                        type: 'line',
+                        data: {
+                            labels: [],
+                            datasets: [{
+                                label: 'Notifications Sent',
+                                data: [],
+                                borderColor: '#667eea',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4
+                            }, {
+                                label: 'Success Rate',
+                                data: [],
+                                borderColor: '#38a169',
+                                backgroundColor: 'rgba(56, 161, 105, 0.1)',
+                                borderWidth: 2,
+                                fill: false,
+                                yAxisID: 'y1'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: true, position: 'top' }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: { display: true, text: 'Notifications' }
+                                },
+                                y1: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'right',
+                                    min: 0,
+                                    max: 100,
+                                    title: { display: true, text: 'Success Rate (%)' },
+                                    grid: { drawOnChartArea: false }
+                                }
+                            },
+                            interaction: { intersect: false, mode: 'index' }
+                        }
+                    });
+                }
+    
+                // Status doughnut
+                const statusEl = document.getElementById('statusChart');
+                if (statusEl) {
+                    const statusCtx = statusEl.getContext('2d');
+                    this.charts.statusChart = new Chart(statusCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Completed', 'Failed', 'Processing', 'Queued'],
+                            datasets: [{
+                                data: [0, 0, 0, 0],
+                                backgroundColor: ['#38a169', '#e53e3e', '#319795', '#d69e2e'],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } }
+                            }
+                        }
+                    });
+                }
+            } catch (err) {
+                console.warn('⚠️ Chart initialization skipped (Chart.js missing?)', err);
+            }
+        }
+    
+        // ==========================================
+        // DATA LOADING
+        // ==========================================
+        async loadInitialData() {
+            try {
+                await Promise.all([
+                    this.loadStats(),
+                    this.loadRecentNotifications(),
+                    this.updateTimeChart('24h')
+                ]);
+            } catch (error) {
+                console.error('❌ Failed to load initial data:', error);
+                this.showAlert('error', 'Failed to load dashboard data');
+            }
+        }
+    
+        async loadStats() {
+            try {
+                const response = await this.apiFetch('/api/stats');
+                if (!response.ok) {
+                    console.warn('loadStats: response not ok', response.status);
+                    return;
+                }
+                const data = await response.json();
+    
+                if (data.success) {
+                    this.stats = data.stats;
+                    this.updateStatsDisplay();
+                    this.updateStatusChart();
+                }
+            } catch (error) {
+                console.error('❌ Failed to load stats:', error);
+            }
+        }
+    
+        async loadRecentNotifications() {
+            try {
+                const response = await this.apiFetch('/api/notifications?limit=10');
+                if (!response.ok) {
+                    console.warn('loadRecentNotifications: response not ok', response.status);
+                    return;
+                }
+                const data = await response.json();
+    
+                if (data.success) {
+                    this.notifications = data.notifications;
+                    this.updateNotificationsTable();
+                }
+            } catch (error) {
+                console.error('❌ Failed to load notifications:', error);
+            }
+        }
+    
+        async updateTimeChart(period = '24h') {
+            try {
+                const groupBy = this.getGroupByForPeriod(period);
+                const response = await this.apiFetch(`/api/stats?period=${period}&groupBy=${groupBy}`);
+                if (!response.ok) {
+                    console.warn('updateTimeChart: response not ok', response.status);
+                    return;
+                }
+                const data = await response.json();
+    
+                if (data.success && data.stats && data.stats.historical) {
+                    const timeSeries = data.stats.historical.timeSeries || [];
+    
+                    const labels = timeSeries.map(item => this.formatTimeLabel(item.period, period));
+                    const sentData = timeSeries.map(item => item.total_sent || 0);
+                    const successRateData = timeSeries.map(item => item.avg_success_rate || 0);
+    
+                    if (this.charts.timeChart) {
+                        this.charts.timeChart.data.labels = labels;
+                        this.charts.timeChart.data.datasets[0].data = sentData;
+                        this.charts.timeChart.data.datasets[1].data = successRateData;
+                        this.charts.timeChart.update();
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Failed to update time chart:', error);
+            }
+        }
+    
+        // ==========================================
+        // UI UPDATES
+        // ==========================================
+        updateStatsDisplay() {
+            const stats = this.stats;
+    
+            if (!stats) return;
+    
+            if (stats.overall) {
+                this.updateElement('totalNotifications', stats.overall.total || 0);
+                this.updateElement('pendingNotifications', stats.overall.queued || 0);
+                this.updateElement('processingNotifications', stats.overall.processing || 0);
+                this.updateElement('completedNotifications', stats.overall.completed || 0);
+                this.updateElement('failedNotifications', stats.overall.failed || 0);
+    
+                const successRate = stats.overall.avg_success_rate || 0;
+                this.updateElement('successRate', Math.round(successRate) + '%');
+            }
+    
+            if (stats.daily) {
+                this.updateElement('totalChange', '+' + (stats.daily.sent || 0));
+            }
+        }
+    
+        updateStatusChart() {
+            if (!this.stats || !this.stats.overall || !this.charts.statusChart) return;
+    
+            const data = [
+                this.stats.overall.completed || 0,
+                this.stats.overall.failed || 0,
+                this.stats.overall.processing || 0,
+                this.stats.overall.queued || 0
+            ];
+    
+            this.charts.statusChart.data.datasets[0].data = data;
+            this.charts.statusChart.update();
+        }
+    
+        updateNotificationsTable() {
+            const tbody = document.querySelector('#recentNotificationsTable tbody');
+            if (!tbody) return;
+    
+            if (this.notifications.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 2rem; color: #a0aec0;">
+                            <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                            No notifications found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+    
+            tbody.innerHTML = this.notifications.map(notification => `
+                <tr data-id="${notification.id}">
+                    <td>#${notification.id}</td>
+                    <td>
+                        <div class="tooltip" data-tooltip="${notification.title}">
+                            ${this.truncateText(notification.title, 30)}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-badge ${notification.type}">
+                            ${notification.type}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge ${notification.status}">
+                            ${notification.status}
+                        </span>
+                    </td>
+                    <td>${notification.total_sent || 0}</td>
+                    <td>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${notification.success_rate || 0}%"></div>
+                        </div>
+                        <small>${Math.round(notification.success_rate || 0)}%</small>
+                    </td>
+                    <td>
+                        <small>${this.formatRelativeTime(notification.created_at)}</small>
+                    </td>
+                    <td>
+                        <button class="btn btn-secondary btn-sm" onclick="dashboard.viewNotificationDetails(${notification.id})">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+    
+        updateConnectionStatus(status, text) {
+            const statusElement = document.getElementById('connectionStatus');
+            if (!statusElement) return;
+            statusElement.className = `connection-status ${status}`;
+            // si hay <span> dentro como en tu HTML original:
+            const span = statusElement.querySelector('span');
+            if (span) span.textContent = text;
+            else statusElement.textContent = text;
+        }
+    
+        updateElement(id, value) {
+            const element = document.getElementById(id);
+            if (element) element.textContent = value;
+        }
+    
+        // ==========================================
+        // WEBSOCKET HANDLERS
+        // ==========================================
+        subscribeToEvents() {
+            if (!this.socket) return;
+            this.socket.emit('subscribe_stats');
+            this.socket.emit('subscribe_logs');
+        }
+    
+        handleNotificationUpdate(data) {
+            console.log('📡 Notification update:', data);
+    
+            const index = this.notifications.findIndex(n => n.id === data.notificationId);
+            if (index !== -1) {
+                this.notifications[index] = { ...this.notifications[index], ...data.update };
+            } else {
+                // If it's a new notification, reload minimal list (or push)
+                this.loadRecentNotifications();
+            }
+    
+            this.updateNotificationsTable();
+            this.showUpdateIndicator();
+        }
+    
+        handleNotificationProgress(data) {
+            console.log('📊 Notification progress:', data);
+            const row = document.querySelector(`tr[data-id="${data.notificationId}"]`);
+            if (row) {
+                const progressFill = row.querySelector('.progress-fill');
+                if (progressFill) progressFill.style.width = `${data.progress.percent}%`;
+            }
+        }
+    
+        handleStatsUpdate(data) {
+            console.log('📈 Stats update:', data);
+            if (data.type === 'general' && data.stats) {
+                this.stats = { ...this.stats, ...data.stats };
+                this.updateStatsDisplay();
+                this.updateStatusChart();
+            }
+        }
+    
+        handleSystemAlert(data) {
+            console.log('🚨 System alert:', data);
+            this.showAlert(data.level || 'info', data.message);
+        }
+    
+        // ==========================================
+        // UI HELPERS
+        // ==========================================
+        async viewNotificationDetails(notificationId) {
+            try {
+                const response = await this.apiFetch(`/api/notifications/${notificationId}/details`);
+                if (!response.ok) {
+                    this.showAlert('error', `Failed to load details (${response.status})`);
+                    return;
+                }
+                const data = await response.json();
+    
+                if (data.success) {
+                    this.showNotificationModal(data.data);
+                } else {
+                    this.showAlert('error', 'Failed to load notification details');
+                }
+            } catch (error) {
+                console.error('❌ Failed to load notification details:', error);
+                this.showAlert('error', 'Failed to load notification details');
+            }
+        }
+    
+        showNotificationModal(data) {
+            const modal = document.getElementById('notificationModal');
+            const content = document.getElementById('modalContent');
+            if (!modal || !content) return;
+    
+            const notification = data.notification;
+            const responses = data.responses || [];
+    
+            content.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                    <div>
+                        <h4>Notification Info</h4>
+                        <p><strong>ID:</strong> ${notification.id}</p>
+                        <p><strong>Title:</strong> ${notification.title}</p>
+                        <p><strong>Type:</strong> <span class="status-badge ${notification.type}">${notification.type}</span></p>
+                        <p><strong>Status:</strong> <span class="status-badge ${notification.status}">${notification.status}</span></p>
+                        <p><strong>Created:</strong> ${this.formatDateTime(notification.created_at)}</p>
+                    </div>
+                    <div>
+                        <h4>Delivery Summary</h4>
+                        <p><strong>Total Sent:</strong> ${notification.total_sent || 0}</p>
+                        <p><strong>Successful:</strong> ${notification.successful || 0}</p>
+                        <p><strong>Failed:</strong> ${notification.failed || 0}</p>
+                        <p><strong>Success Rate:</strong> ${Math.round(notification.success_rate || 0)}%</p>
+                        <p><strong>Processing Time:</strong> ${notification.processing_time || 0}s</p>
+                    </div>
+                </div>
+    
+                <div style="margin-bottom: 2rem;">
+                    <h4>Message Content</h4>
+                    <div style="background: #f7fafc; padding: 1rem; border-radius: 6px; border-left: 4px solid #667eea;">
+                        <p><strong>Title:</strong> ${notification.title}</p>
+                        <p><strong>Message:</strong> ${notification.message}</p>
+                    </div>
+                </div>
+    
+                ${responses.length > 0 ? `
+                    <div>
+                        <h4>Individual Responses (${responses.length})</h4>
+                        <div style="max-height: 300px; overflow-y: auto;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background: #f7fafc;">
+                                        <th style="padding: 0.5rem; text-align: left;">Token</th>
+                                        <th style="padding: 0.5rem; text-align: left;">Success</th>
+                                        <th style="padding: 0.5rem; text-align: left;">Error</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${responses.map(response => `
+                                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                                            <td style="padding: 0.5rem; font-family: monospace; font-size: 0.8rem;">
+                                                ${response.token ? response.token.substring(0, 20) + '...' : 'N/A'}
+                                            </td>
+                                            <td style="padding: 0.5rem;">
+                                                <span class="status-badge ${response.success ? 'completed' : 'failed'}">
+                                                    ${response.success ? 'Success' : 'Failed'}
+                                                </span>
+                                            </td>
+                                            <td style="padding: 0.5rem; font-size: 0.8rem;">
+                                                ${response.error_message || response.error_code || '--'}
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+    
+            modal.style.display = 'block';
+        }
+    
+        closeModal() {
+            const modal = document.getElementById('notificationModal');
+            if (modal) modal.style.display = 'none';
+        }
+    
+        showAlert(type, message) {
+            const alert = document.createElement('div');
+            alert.className = `alert ${type}`;
+            alert.innerHTML = `<i class="fas fa-${this.getAlertIcon(type)}"></i><span>${message}</span>`;
+            const container = document.querySelector('.main-content') || document.body;
+            container.insertBefore(alert, container.firstChild);
+            setTimeout(() => {
+                if (alert.parentNode) alert.parentNode.removeChild(alert);
+            }, 5000);
+        }
+    
+        showUpdateIndicator() {
+            const indicators = document.querySelectorAll('.realtime-dot');
+            indicators.forEach(dot => {
+                dot.style.backgroundColor = '#667eea';
+                setTimeout(() => dot.style.backgroundColor = '#38a169', 1000);
+            });
+        }
+    
+        appendLog(log) {
+            const logsContainer = document.getElementById('liveLogs');
+            if (!logsContainer) return;
+            const row = document.createElement('div');
+            row.className = 'log-row';
+            row.textContent = `[${new Date().toLocaleTimeString()}] ${log.message || JSON.stringify(log)}`;
+            logsContainer.prepend(row);
+        }
+    
+        async refreshData() {
+            try {
+                await Promise.all([ this.loadStats(), this.loadRecentNotifications() ]);
+            } catch (error) {
+                console.error('❌ Failed to refresh data:', error);
+            }
+        }
+    
+        // ==========================================
+        // HELPERS
+        // ==========================================
+        getGroupByForPeriod(period) {
+            const groupByMap = { '1h': 'hour', '24h': 'hour', '7d': 'day', '30d': 'day' };
+            return groupByMap[period] || 'hour';
+        }
+    
+        formatTimeLabel(period, periodType) {
+            const date = new Date(period);
+            switch (periodType) {
+                case '1h':
+                case '24h':
+                    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                case '7d':
+                case '30d':
+                    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+                default:
+                    return period;
+            }
+        }
+    
+        formatRelativeTime(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            if (days > 0) return `${days}d ago`;
+            if (hours > 0) return `${hours}h ago`;
+            if (minutes > 0) return `${minutes}m ago`;
+            return `${seconds}s ago`;
+        }
+    
+        formatDateTime(dateString) {
+            if (!dateString) return 'N/A';
+            return new Date(dateString).toLocaleString();
+        }
+    
+        truncateText(text = '', maxLength = 30) {
+            if (!text) return '';
+            if (text.length <= maxLength) return text;
+            return text.substring(0, maxLength) + '...';
+        }
+    
+        getAlertIcon(type) {
+            const icons = { success: 'check-circle', error: 'times-circle', warning: 'exclamation-triangle', info: 'info-circle' };
+            return icons[type] || 'info-circle';
+        }
+    }
+    
+    // ==========================================
+    // INITIALIZE DASHBOARD
+    // ==========================================
+    let dashboard;
+    document.addEventListener('DOMContentLoaded', () => {
+        dashboard = new Dashboard();
+    });
+    
+    // expose helpers for onclick bindings
+    window.closeModal = () => dashboard && dashboard.closeModal();
+    window.dashboard = null; // temporary to avoid eslint errors
+    // re-assign dashboard global so onclicks like dashboard.viewNotificationDetails work
+    document.addEventListener('DOMContentLoaded', () => { window.dashboard = dashboard; });
+    </script>
+    
+</body>
+
+</html>

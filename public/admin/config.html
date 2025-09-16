@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración del Sistema - Firebase Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #38a169;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #2f855a;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c53030;
+        }
+
+        .config-sections {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .config-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f7fafc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-description {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .section-content {
+            padding: 2rem;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .config-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .config-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .config-label {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .config-description {
+            color: #718096;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .config-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: border-color 0.3s;
+        }
+
+        .config-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .config-input[type="password"] {
+            font-family: monospace;
+        }
+
+        .config-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            background: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .config-checkbox {
+            margin-right: 0.5rem;
+            transform: scale(1.2);
+        }
+
+        .config-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: monospace;
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .config-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-connected {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-disconnected {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .status-testing {
+            background: #fefcbf;
+            color: #744210;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+            font-weight: 500;
+        }
+
+        .alert.success {
+            background: #f0fff4;
+            border-color: #38a169;
+            color: #22543d;
+        }
+
+        .alert.error {
+            background: #fed7d7;
+            border-color: #e53e3e;
+            color: #742a2a;
+        }
+
+        .alert.warning {
+            background: #fefcbf;
+            border-color: #d69e2e;
+            color: #744210;
+        }
+
+        .alert.info {
+            background: #ebf8ff;
+            border-color: #3182ce;
+            color: #2a4365;
+        }
+
+        .test-section {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .test-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .form-input {
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .logs-container {
+            background: #1a202c;
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+
+        .log-entry {
+            margin-bottom: 0.25rem;
+            padding: 0.25rem;
+            border-radius: 4px;
+        }
+
+        .log-info { color: #63b3ed; }
+        .log-success { color: #68d391; }
+        .log-warning { color: #faf089; }
+        .log-error { color: #fc8181; }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .sensitive-field {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #718096;
+        }
+
+        .toggle-password:hover {
+            color: #4a5568;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .test-form {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>
+                    <i class="fas fa-cogs"></i>
+                    Configuración del Sistema
+                </h1>
+                <div class="section-description">
+                    Gestiona la configuración del microservicio Firebase
+                </div>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <a href="/admin" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Volver al Dashboard
+                </a>
+                <button class="btn btn-success" onclick="saveAllConfig()">
+                    <i class="fas fa-save"></i>
+                    Guardar Todo
+                </button>
+            </div>
+        </div>
+
+        <!-- Alert Container -->
+        <div id="alertContainer"></div>
+
+        <!-- Configuration Sections -->
+        <div class="config-sections">
+            <!-- Firebase Configuration -->
+            <div class="config-section">
+                <div class="section-header">
+                    <div>
+                        <h3 class="section-title">
+                            <i class="fab fa-google"></i>
+                            Configuración Firebase
+                        </h3>
+                        <div class="section-description">
+                            Configuración para Firebase Cloud Messaging
+                        </div>
+                    </div>
+                    <div class="status-indicator status-disconnected" id="firebaseStatus">
+                        <i class="fas fa-times-circle"></i>
+                        <span>Desconectado</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-project-diagram"></i>
+                                Project ID
+                            </div>
+                            <div class="config-description">
+                                ID del proyecto Firebase
+                            </div>
+                            <input type="text" class="config-input" id="firebaseProjectId" placeholder="mi-proyecto-firebase">
+                        </div>
+                        
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-file-code"></i>
+                                Service Account Path
+                            </div>
+                            <div class="config-description">
+                                Ruta al archivo JSON de credenciales
+                            </div>
+                            <input type="text" class="config-input" id="firebaseServiceAccountPath" placeholder="/path/to/service-account.json">
+                        </div>
+                        
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-envelope"></i>
+                                Client Email
+                            </div>
+                            <div class="config-description">
+                                Email del service account (alternativo)
+                            </div>
+                            <input type="email" class="config-input" id="firebaseClientEmail" placeholder="firebase@proyecto.iam.gserviceaccount.com">
+                        </div>
+                        
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-key"></i>
+                                Private Key
+                            </div>
+                            <div class="config-description">
+                                Clave privada del service account
+                            </div>
+                            <div class="sensitive-field">
+                                <textarea class="config-textarea" id="firebasePrivateKey" placeholder="-----BEGIN PRIVATE KEY-----"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="config-actions">
+                        <button class="btn btn-primary" onclick="testFirebaseConnection()">
+                            <i class="fas fa-plug"></i>
+                            Probar Conexión
+                        </button>
+                        <button class="btn btn-secondary" onclick="loadFirebaseConfig()">
+                            <i class="fas fa-sync-alt"></i>
+                            Recargar
+                        </button>
+                    </div>
+
+                    <!-- Test Section -->
+                    <div class="test-section">
+                        <h4>Prueba de Notificación</h4>
+                        <div class="test-form">
+                            <div class="form-group">
+                                <label class="form-label">Token FCM</label>
+                                <input type="text" class="form-input" id="testToken" placeholder="Token FCM para prueba">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Título</label>
+                                <input type="text" class="form-input" id="testTitle" value="Notificación de Prueba">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Mensaje</label>
+                                <input type="text" class="form-input" id="testMessage" value="Esta es una notificación de prueba del microservicio">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">&nbsp;</label>
+                                <button class="btn btn-success" onclick="sendTestNotification()">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Enviar Prueba
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rate Limiting Configuration -->
+            <div class="config-section">
+                <div class="section-header">
+                    <div>
+                        <h3 class="section-title">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Límites de Velocidad
+                        </h3>
+                        <div class="section-description">
+                            Configuración de rate limiting y límites de API
+                        </div>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-clock"></i>
+                                Ventana de Tiempo (API)
+                            </div>
+                            <div class="config-description">
+                                Ventana de tiempo para rate limiting en milisegundos
+                            </div>
+                            <input type="number" class="config-input" id="rateLimitWindow" value="900000">
+                        </div>
+                        
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-hashtag"></i>
+                                Máximo Requests (API)
+                            </div>
+                            <div class="config-description">
+                                Máximo número de requests por ventana
+                            </div>
+                            <input type="number" class="config-input" id="rateLimitMax" value="1000">
+                        </div>
+                        
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-layer-group"></i>
+                                Máximo Tokens por Request
+                            </div>
+                            <div class="config-description">
+                                Máximo número de tokens FCM por request
+                            </div>
+                            <input type="number" class="config-input" id="maxTokensPerRequest" value="1000">
+                        </div>
+                        
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-copy"></i>
+                                Máximo Bulk Notifications
+                            </div>
+                            <div class="config-description">
+                                Máximo número de notificaciones bulk por request
+                            </div>
+                            <input type="number" class="config-input" id="maxBulkNotifications" value="100">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Queue Configuration -->
+            <div class="config-section">
+                <div class="section-header">
+                    <div>
+                        <h3 class="section-title">
+                            <i class="fas fa-list"></i>
+                            Configuración de Cola
+                        </h3>
+                        <div class="section-description">
+                            Configuración del sistema de colas Redis/Bull
+                        </div>
+                    </div>
+                    <div class="status-indicator status-connected" id="queueStatus">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Conectado</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-server"></i>
+                                Redis Host
+                            </div>
+                            <div class="config-description">
+                                Dirección del servidor Redis
+                            </div>
+                            <input type="text" class="config-input" id="redisHost" value="localhost">
+                        </div>
+                        
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-plug"></i>
+                                Redis Port
+                            </div>
+                            <div class="config-description">
+                                Puerto del servidor Redis
+                            </div>
+                            <input type="number" class="config-input" id="redisPort" value="6379">
+                        </div>
+                        
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-users"></i>
+                                Concurrencia de Cola
+                            </div>
+                            <div class="config-description">
+                                Número de workers concurrentes
+                            </div>
+                            <input type="number" class="config-input" id="queueConcurrency" value="10">
+                        </div>
+                        
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-redo"></i>
+                                Máximo Reintentos
+                            </div>
+                            <div class="config-description">
+                                Máximo número de reintentos por job
+                            </div>
+                            <input type="number" class="config-input" id="queueMaxAttempts" value="3">
+                        </div>
+                    </div>
+                    
+                    <div class="config-actions">
+                        <button class="btn btn-primary" onclick="testQueueConnection()">
+                            <i class="fas fa-vial"></i>
+                            Probar Cola
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearFailedJobs()">
+                            <i class="fas fa-trash"></i>
+                            Limpiar Jobs Fallidos
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Configuration -->
+            <div class="config-section">
+                <div class="section-header">
+                    <div>
+                        <h3 class="section-title">
+                            <i class="fas fa-cog"></i>
+                            Configuración del Sistema
+                        </h3>
+                        <div class="section-description">
+                            Configuración general del microservicio
+                        </div>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-info-circle"></i>
+                                Nivel de Log
+                            </div>
+                            <div class="config-description">
+                                Nivel de logging del sistema
+                            </div>
+                            <select class="config-select" id="logLevel">
+                                <option value="error">Error</option>
+                                <option value="warn">Warning</option>
+                                <option value="info" selected>Info</option>
+                                <option value="debug">Debug</option>
+                            </select>
+                        </div>
+                        
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-database"></i>
+                                Retención de Datos (días)
+                            </div>
+                            <div class="config-description">
+                                Días de retención de notificaciones
+                            </div>
+                            <input type="number" class="config-input" id="dataRetentionDays" value="30">
+                        </div>
+                        
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-chart-line"></i>
+                                Habilitar Métricas
+                            </div>
+                            <div class="config-description">
+                                Habilitar recolección de métricas Prometheus
+                            </div>
+                            <label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
+                                <input type="checkbox" class="config-checkbox" id="enableMetrics" checked>
+                                <span>Recopilar métricas del sistema</span>
+                            </label>
+                        </div>
+                        
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-tools"></i>
+                                Modo Mantenimiento
+                            </div>
+                            <div class="config-description">
+                                Activar modo de mantenimiento
+                            </div>
+                            <label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
+                                <input type="checkbox" class="config-checkbox" id="maintenanceMode">
+                                <span>Sistema en mantenimiento</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backup and Maintenance -->
+            <div class="config-section">
+                <div class="section-header">
+                    <div>
+                        <h3 class="section-title">
+                            <i class="fas fa-shield-alt"></i>
+                            Backup y Mantenimiento
+                        </h3>
+                        <div class="section-description">
+                            Configuración de respaldos y mantenimiento automático
+                        </div>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="config-grid">
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-save"></i>
+                                Backup Automático
+                            </div>
+                            <div class="config-description">
+                                Habilitar backup automático de la base de datos
+                            </div>
+                            <label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
+                                <input type="checkbox" class="config-checkbox" id="enableBackup" checked>
+                                <span>Backup automático habilitado</span>
+                            </label>
+                        </div>
+                        
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-clock"></i>
+                                Intervalo de Backup (horas)
+                            </div>
+                            <div class="config-description">
+                                Intervalo entre backups automáticos
+                            </div>
+                            <input type="number" class="config-input" id="backupInterval" value="24">
+                        </div>
+                        
+                        <div class="config-item">
+                            <div class="config-label">
+                                <i class="fas fa-broom"></i>
+                                Limpieza Automática
+                            </div>
+                            <div class="config-description">
+                                Limpieza automática de datos antiguos
+                            </div>
+                            <label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
+                                <input type="checkbox" class="config-checkbox" id="enableCleanup" checked>
+                                <span>Limpieza automática habilitada</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="config-actions">
+                        <button class="btn btn-primary" onclick="createBackup()">
+                            <i class="fas fa-download"></i>
+                            Crear Backup Ahora
+                        </button>
+                        <button class="btn btn-secondary" onclick="runCleanup()">
+                            <i class="fas fa-trash-alt"></i>
+                            Ejecutar Limpieza
+                        </button>
+                        <button class="btn btn-danger" onclick="resetToDefaults()">
+                            <i class="fas fa-undo"></i>
+                            Restaurar Defaults
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logs Container -->
+        <div class="config-section">
+            <div class="section-header">
+                <div>
+                    <h3 class="section-title">
+                        <i class="fas fa-terminal"></i>
+                        Logs del Sistema
+                    </h3>
+                    <div class="section-description">
+                        Logs en tiempo real de las operaciones del sistema
+                    </div>
+                </div>
+                <button class="btn btn-secondary" onclick="clearLogs()">
+                    <i class="fas fa-eraser"></i>
+                    Limpiar Logs
+                </button>
+            </div>
+            <div class="section-content">
+                <div class="logs-container" id="logsContainer">
+                    <div class="log-entry log-info">[INFO] Sistema de configuración iniciado</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // CONFIGURATION MANAGER
+        // ==========================================
+
+        class ConfigManager {
+            constructor() {
+                this.config = {};
+                this.isLoading = false;
+                this.init();
+            }
+
+            init() {
+                this.loadAllConfig();
+                this.setupAutoSave();
+                this.addLog('info', 'Sistema de configuración iniciado');
+            }
+
+            async loadAllConfig() {
+                this.setLoading(true);
+                try {
+                    const response = await fetch('/admin/config');
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.config = data.data;
+                        this.populateFields();
+                        this.addLog('success', 'Configuración cargada correctamente');
+                    } else {
+                        this.addLog('error', 'Error al cargar configuración: ' + data.error);
+                    }
+                } catch (error) {
+                    this.addLog('error', 'Error de conexión al cargar configuración');
+                    console.error('Error loading config:', error);
+                } finally {
+                    this.setLoading(false);
+                }
+            }
+
+            populateFields() {
+                // Firebase Configuration
+                this.setFieldValue('firebaseProjectId', 'firebase_project_id');
+                this.setFieldValue('firebaseServiceAccountPath', 'firebase_service_account_path');
+                this.setFieldValue('firebaseClientEmail', 'firebase_client_email');
+                this.setFieldValue('firebasePrivateKey', 'firebase_private_key');
+
+                // Rate Limiting
+                this.setFieldValue('rateLimitWindow', 'rate_limit_window_ms');
+                this.setFieldValue('rateLimitMax', 'rate_limit_max_requests');
+                this.setFieldValue('maxTokensPerRequest', 'max_tokens_per_request');
+                this.setFieldValue('maxBulkNotifications', 'max_bulk_notifications');
+
+                // Queue Configuration
+                this.setFieldValue('redisHost', 'redis_host');
+                this.setFieldValue('redisPort', 'redis_port');
+                this.setFieldValue('queueConcurrency', 'queue_concurrency');
+                this.setFieldValue('queueMaxAttempts', 'queue_max_attempts');
+
+                // System Configuration
+                this.setFieldValue('logLevel', 'log_level');
+                this.setFieldValue('dataRetentionDays', 'cleanup_retention_days');
+                this.setCheckboxValue('enableMetrics', 'enable_metrics_collection');
+                this.setCheckboxValue('maintenanceMode', 'maintenance_mode');
+
+                // Backup Configuration
+                this.setCheckboxValue('enableBackup', 'database_backup_enabled');
+                this.setFieldValue('backupInterval', 'database_backup_interval');
+                this.setCheckboxValue('enableCleanup', 'schedule_cleanup');
+            }
+
+            setFieldValue(fieldId, configKey) {
+                const field = document.getElementById(fieldId);
+                const configValue = this.config[configKey];
+                
+                if (field && configValue) {
+                    field.value = configValue.value || '';
+                }
+            }
+
+            setCheckboxValue(fieldId, configKey) {
+                const field = document.getElementById(fieldId);
+                const configValue = this.config[configKey];
+                
+                if (field && configValue) {
+                    field.checked = configValue.value === 'true' || configValue.value === true;
+                }
+            }
+
+            async saveAllConfig() {
+                this.setLoading(true);
+                try {
+                    const configUpdates = this.gatherAllConfig();
+                    
+                    const response = await fetch('/admin/config', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(configUpdates)
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.showAlert('success', 'Configuración guardada correctamente');
+                        this.addLog('success', 'Configuración actualizada');
+                    } else {
+                        this.showAlert('error', 'Error al guardar configuración: ' + data.error);
+                        this.addLog('error', 'Error al guardar configuración');
+                    }
+                } catch (error) {
+                    this.showAlert('error', 'Error de conexión al guardar configuración');
+                    this.addLog('error', 'Error de conexión al guardar');
+                    console.error('Error saving config:', error);
+                } finally {
+                    this.setLoading(false);
+                }
+            }
+
+            gatherAllConfig() {
+                const updates = {};
+
+                // Firebase Configuration
+                updates.firebase_project_id = { value: document.getElementById('firebaseProjectId').value };
+                updates.firebase_service_account_path = { value: document.getElementById('firebaseServiceAccountPath').value };
+                updates.firebase_client_email = { value: document.getElementById('firebaseClientEmail').value };
+                updates.firebase_private_key = { value: document.getElementById('firebasePrivateKey').value };
+
+                // Rate Limiting
+                updates.rate_limit_window_ms = { value: document.getElementById('rateLimitWindow').value };
+                updates.rate_limit_max_requests = { value: document.getElementById('rateLimitMax').value };
+                updates.max_tokens_per_request = { value: document.getElementById('maxTokensPerRequest').value };
+                updates.max_bulk_notifications = { value: document.getElementById('maxBulkNotifications').value };
+
+                // Queue Configuration
+                updates.redis_host = { value: document.getElementById('redisHost').value };
+                updates.redis_port = { value: document.getElementById('redisPort').value };
+                updates.queue_concurrency = { value: document.getElementById('queueConcurrency').value };
+                updates.queue_max_attempts = { value: document.getElementById('queueMaxAttempts').value };
+
+                // System Configuration
+                updates.log_level = { value: document.getElementById('logLevel').value };
+                updates.cleanup_retention_days = { value: document.getElementById('dataRetentionDays').value };
+                updates.enable_metrics_collection = { value: document.getElementById('enableMetrics').checked.toString() };
+                updates.maintenance_mode = { value: document.getElementById('maintenanceMode').checked.toString() };
+
+                // Backup Configuration
+                updates.database_backup_enabled = { value: document.getElementById('enableBackup').checked.toString() };
+                updates.database_backup_interval = { value: document.getElementById('backupInterval').value };
+                updates.schedule_cleanup = { value: document.getElementById('enableCleanup').checked.toString() };
+
+                return updates;
+            }
+
+            async testFirebaseConnection() {
+                this.setStatus('firebaseStatus', 'testing', 'Probando...');
+                this.addLog('info', 'Probando conexión Firebase...');
+
+                try {
+                    const response = await fetch('/admin/config/firebase');
+                    const data = await response.json();
+
+                    if (data.success && data.connected) {
+                        this.setStatus('firebaseStatus', 'connected', 'Conectado');
+                        this.addLog('success', 'Conexión Firebase exitosa');
+                        this.showAlert('success', 'Conexión Firebase exitosa');
+                    } else {
+                        this.setStatus('firebaseStatus', 'disconnected', 'Error');
+                        this.addLog('error', 'Error en conexión Firebase');
+                        this.showAlert('error', 'Error en conexión Firebase');
+                    }
+                } catch (error) {
+                    this.setStatus('firebaseStatus', 'disconnected', 'Error');
+                    this.addLog('error', 'Error probando Firebase: ' + error.message);
+                    this.showAlert('error', 'Error probando conexión Firebase');
+                }
+            }
+
+            async sendTestNotification() {
+                const token = document.getElementById('testToken').value.trim();
+                const title = document.getElementById('testTitle').value.trim();
+                const message = document.getElementById('testMessage').value.trim();
+
+                if (!token) {
+                    this.showAlert('warning', 'Debe proporcionar un token FCM para la prueba');
+                    return;
+                }
+
+                this.addLog('info', 'Enviando notificación de prueba...');
+
+                try {
+                    const response = await fetch('/api/notifications/test', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            token: token,
+                            title: title,
+                            message: message,
+                            dryRun: false
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.addLog('success', 'Notificación de prueba enviada');
+                        this.showAlert('success', 'Notificación de prueba enviada correctamente');
+                    } else {
+                        this.addLog('error', 'Error enviando prueba: ' + data.error);
+                        this.showAlert('error', 'Error enviando notificación de prueba');
+                    }
+                } catch (error) {
+                    this.addLog('error', 'Error enviando notificación: ' + error.message);
+                    this.showAlert('error', 'Error de conexión enviando prueba');
+                }
+            }
+
+            async testQueueConnection() {
+                this.setStatus('queueStatus', 'testing', 'Probando...');
+                this.addLog('info', 'Probando conexión de cola...');
+
+                try {
+                    const response = await fetch('/api/queue/status');
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.setStatus('queueStatus', 'connected', 'Conectado');
+                        this.addLog('success', 'Conexión de cola exitosa');
+                        this.showAlert('success', 'Conexión de cola exitosa');
+                    } else {
+                        this.setStatus('queueStatus', 'disconnected', 'Error');
+                        this.addLog('error', 'Error en conexión de cola');
+                        this.showAlert('error', 'Error en conexión de cola');
+                    }
+                } catch (error) {
+                    this.setStatus('queueStatus', 'disconnected', 'Error');
+                    this.addLog('error', 'Error probando cola: ' + error.message);
+                    this.showAlert('error', 'Error probando conexión de cola');
+                }
+            }
+
+            async createBackup() {
+                this.addLog('info', 'Creando backup de base de datos...');
+
+                try {
+                    const response = await fetch('/admin/maintenance/backup', {
+                        method: 'POST'
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.addLog('success', 'Backup creado exitosamente');
+                        this.showAlert('success', 'Backup creado correctamente');
+                    } else {
+                        this.addLog('error', 'Error creando backup: ' + data.error);
+                        this.showAlert('error', 'Error creando backup');
+                    }
+                } catch (error) {
+                    this.addLog('error', 'Error creando backup: ' + error.message);
+                    this.showAlert('error', 'Error de conexión creando backup');
+                }
+            }
+
+            async runCleanup() {
+                if (!confirm('¿Está seguro de que desea ejecutar la limpieza de datos antiguos?')) {
+                    return;
+                }
+
+                this.addLog('info', 'Ejecutando limpieza de datos...');
+
+                try {
+                    const response = await fetch('/admin/maintenance/cleanup', {
+                        method: 'POST'
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.addLog('success', 'Limpieza ejecutada exitosamente');
+                        this.showAlert('success', 'Limpieza completada correctamente');
+                    } else {
+                        this.addLog('error', 'Error en limpieza: ' + data.error);
+                        this.showAlert('error', 'Error ejecutando limpieza');
+                    }
+                } catch (error) {
+                    this.addLog('error', 'Error en limpieza: ' + error.message);
+                    this.showAlert('error', 'Error de conexión ejecutando limpieza');
+                }
+            }
+
+            async clearFailedJobs() {
+                if (!confirm('¿Está seguro de que desea limpiar todos los jobs fallidos?')) {
+                    return;
+                }
+
+                this.addLog('info', 'Limpiando jobs fallidos...');
+
+                try {
+                    const response = await fetch('/api/queue/clear', {
+                        method: 'POST'
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.addLog('success', 'Jobs fallidos limpiados');
+                        this.showAlert('success', 'Jobs fallidos limpiados correctamente');
+                    } else {
+                        this.addLog('error', 'Error limpiando jobs: ' + data.error);
+                        this.showAlert('error', 'Error limpiando jobs fallidos');
+                    }
+                } catch (error) {
+                    this.addLog('error', 'Error limpiando jobs: ' + error.message);
+                    this.showAlert('error', 'Error de conexión limpiando jobs');
+                }
+            }
+
+            resetToDefaults() {
+                if (!confirm('¿Está seguro de que desea restaurar toda la configuración a los valores por defecto?')) {
+                    return;
+                }
+
+                // Reset to default values
+                document.getElementById('firebaseProjectId').value = '';
+                document.getElementById('firebaseServiceAccountPath').value = '';
+                document.getElementById('firebaseClientEmail').value = '';
+                document.getElementById('firebasePrivateKey').value = '';
+                
+                document.getElementById('rateLimitWindow').value = '900000';
+                document.getElementById('rateLimitMax').value = '1000';
+                document.getElementById('maxTokensPerRequest').value = '1000';
+                document.getElementById('maxBulkNotifications').value = '100';
+                
+                document.getElementById('redisHost').value = 'localhost';
+                document.getElementById('redisPort').value = '6379';
+                document.getElementById('queueConcurrency').value = '10';
+                document.getElementById('queueMaxAttempts').value = '3';
+                
+                document.getElementById('logLevel').value = 'info';
+                document.getElementById('dataRetentionDays').value = '30';
+                document.getElementById('enableMetrics').checked = true;
+                document.getElementById('maintenanceMode').checked = false;
+                
+                document.getElementById('enableBackup').checked = true;
+                document.getElementById('backupInterval').value = '24';
+                document.getElementById('enableCleanup').checked = true;
+
+                this.addLog('info', 'Configuración restaurada a valores por defecto');
+                this.showAlert('info', 'Configuración restaurada a valores por defecto');
+            }
+
+            // Utility methods
+            setStatus(elementId, status, text) {
+                const element = document.getElementById(elementId);
+                element.className = `status-indicator status-${status}`;
+                
+                const icon = status === 'connected' ? 'check-circle' : 
+                           status === 'testing' ? 'spinner fa-spin' : 'times-circle';
+                
+                element.innerHTML = `
+                    <i class="fas fa-${icon}"></i>
+                    <span>${text}</span>
+                `;
+            }
+
+            setLoading(loading) {
+                this.isLoading = loading;
+                // You could add a loading indicator here
+            }
+
+            setupAutoSave() {
+                // Auto-save configuration every 30 seconds if there are changes
+                setInterval(() => {
+                    // Implementation for auto-save detection
+                }, 30000);
+            }
+
+            addLog(type, message) {
+                const container = document.getElementById('logsContainer');
+                const entry = document.createElement('div');
+                entry.className = `log-entry log-${type}`;
+                entry.textContent = `[${new Date().toLocaleTimeString()}] [${type.toUpperCase()}] ${message}`;
+                
+                container.appendChild(entry);
+                container.scrollTop = container.scrollHeight;
+
+                // Keep only last 100 log entries
+                while (container.children.length > 100) {
+                    container.removeChild(container.firstChild);
+                }
+            }
+
+            clearLogs() {
+                document.getElementById('logsContainer').innerHTML = '';
+                this.addLog('info', 'Logs limpiados');
+            }
+
+            showAlert(type, message) {
+                const container = document.getElementById('alertContainer');
+                const alert = document.createElement('div');
+                alert.className = `alert ${type}`;
+                alert.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 
+                                     type === 'error' ? 'exclamation-circle' : 
+                                     type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                    ${message}
+                `;
+                
+                container.appendChild(alert);
+                
+                setTimeout(() => {
+                    if (alert.parentNode) {
+                        alert.parentNode.removeChild(alert);
+                    }
+                }, 5000);
+            }
+        }
+
+        // Global functions
+        function saveAllConfig() {
+            configManager.saveAllConfig();
+        }
+
+        function testFirebaseConnection() {
+            configManager.testFirebaseConnection();
+        }
+
+        function loadFirebaseConfig() {
+            configManager.loadAllConfig();
+        }
+
+        function sendTestNotification() {
+            configManager.sendTestNotification();
+        }
+
+        function testQueueConnection() {
+            configManager.testQueueConnection();
+        }
+
+        function createBackup() {
+            configManager.createBackup();
+        }
+
+        function runCleanup() {
+            configManager.runCleanup();
+        }
+
+        function clearFailedJobs() {
+            configManager.clearFailedJobs();
+        }
+
+        function resetToDefaults() {
+            configManager.resetToDefaults();
+        }
+
+        function clearLogs() {
+            configManager.clearLogs();
+        }
+
+        // Initialize
+        let configManager;
+        document.addEventListener('DOMContentLoaded', () => {
+            configManager = new ConfigManager();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Notification API - Documentación</title>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.min.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 0.5rem 0 0;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .nav-bar {
+            background: white;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 500;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links a:hover {
+            color: #667eea;
+        }
+
+        .nav-links a.active {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .version-badge {
+            background: #667eea;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .intro-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .intro-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .quick-start {
+            background: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .quick-start h3 {
+            margin: 0 0 1rem;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .code-block {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .endpoints-overview {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .endpoint-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .endpoint-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .endpoint-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .endpoint-method {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .method-post { background: #38a169; color: white; }
+        .method-get { background: #3182ce; color: white; }
+        .method-put { background: #d69e2e; color: white; }
+        .method-delete { background: #e53e3e; color: white; }
+
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        .endpoint-description {
+            color: #718096;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .auth-info {
+            background: #fef5e7;
+            border: 1px solid #d69e2e;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .auth-info h4 {
+            margin: 0 0 0.5rem;
+            color: #744210;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .swagger-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Custom Swagger UI styles */
+        .swagger-ui .topbar {
+            display: none;
+        }
+
+        .swagger-ui .info {
+            margin: 2rem 0;
+        }
+
+        .swagger-ui .info .title {
+            color: #2d3748;
+            font-size: 2rem;
+        }
+
+        .swagger-ui .scheme-container {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .intro-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .endpoint-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>
+            <i class="fas fa-fire"></i>
+            Firebase Notification API
+        </h1>
+        <p>Documentación completa de la API REST para el microservicio de notificaciones</p>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-bar">
+        <div class="nav-container">
+            <div class="nav-links">
+                <a href="#overview" class="active">
+                    <i class="fas fa-home"></i>
+                    Resumen
+                </a>
+                <a href="#authentication">
+                    <i class="fas fa-key"></i>
+                    Autenticación
+                </a>
+                <a href="#endpoints">
+                    <i class="fas fa-code"></i>
+                    Endpoints
+                </a>
+                <a href="#examples">
+                    <i class="fas fa-play-circle"></i>
+                    Ejemplos
+                </a>
+                <a href="/integration">
+                    <i class="fas fa-plug"></i>
+                    Integración
+                </a>
+                <a href="/admin">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Dashboard
+                </a>
+            </div>
+            <div class="version-badge">v1.0.0</div>
+        </div>
+    </div>
+
+    <div class="content">
+        <!-- Introduction Section -->
+        <div class="intro-section" id="overview">
+            <h2>Resumen de la API</h2>
+            <p>
+                La API de Firebase Notification Microservice proporciona endpoints REST para enviar notificaciones push 
+                a través de Firebase Cloud Messaging (FCM). La API está diseñada para ser simple, eficiente y escalable, 
+                con soporte para notificaciones individuales, masivas y en tiempo real.
+            </p>
+
+            <div class="intro-grid">
+                <div>
+                    <h3>Características Principales</h3>
+                    <ul>
+                        <li><strong>Notificaciones Individuales:</strong> Envío a tokens FCM específicos</li>
+                        <li><strong>Notificaciones Masivas:</strong> Envío a múltiples tokens simultáneamente</li>
+                        <li><strong>Temas/Topics:</strong> Suscripción y envío a temas</li>
+                        <li><strong>Prioridades:</strong> Soporte para prioridades (low, normal, high)</li>
+                        <li><strong>Tracking:</strong> Seguimiento completo del estado de entrega</li>
+                        <li><strong>Webhooks:</strong> Notificaciones de estado en tiempo real</li>
+                        <li><strong>Rate Limiting:</strong> Protección contra abuso</li>
+                        <li><strong>Analytics:</strong> Estadísticas detalladas de rendimiento</li>
+                    </ul>
+                </div>
+
+                <div class="quick-start">
+                    <h3>
+                        <i class="fas fa-rocket"></i>
+                        Inicio Rápido
+                    </h3>
+                    <p>Envía tu primera notificación en segundos:</p>
+                    <div class="code-block">
+curl -X POST http://localhost:3000/api/notifications/send \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your-api-key" \
+  -d '{
+    "token": "your-fcm-token",
+    "title": "¡Hola Mundo!",
+    "message": "Primera notificación desde la API"
+  }'
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Authentication Section -->
+        <div class="endpoints-overview" id="authentication">
+            <h2>Autenticación</h2>
+            <p>
+                Todos los endpoints de la API requieren autenticación mediante API Keys. 
+                Las claves deben incluirse en el header <code>X-API-Key</code> de cada request.
+            </p>
+
+            <div class="auth-info">
+                <h4>
+                    <i class="fas fa-shield-alt"></i>
+                    Tipos de API Keys
+                </h4>
+                <ul>
+                    <li><strong>User Key:</strong> Acceso básico para envío de notificaciones</li>
+                    <li><strong>Admin Key:</strong> Acceso completo incluyendo administración</li>
+                    <li><strong>Super Admin Key:</strong> Acceso total del sistema</li>
+                </ul>
+            </div>
+
+            <div class="code-block">
+# Ejemplo de autenticación
+curl -H "X-API-Key: your-api-key-here" \
+     -H "Content-Type: application/json" \
+     http://localhost:3000/api/notifications
+            </div>
+        </div>
+
+        <!-- Endpoints Overview -->
+        <div class="endpoints-overview" id="endpoints">
+            <h2>Endpoints Principales</h2>
+            <p>Resumen de los endpoints más importantes de la API:</p>
+
+            <div class="endpoint-grid">
+                <div class="endpoint-card">
+                    <div class="endpoint-method method-post">POST</div>
+                    <div class="endpoint-path">/api/notifications/send</div>
+                    <div class="endpoint-description">
+                        Envía una notificación individual a un token FCM específico o tema.
+                    </div>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-method method-post">POST</div>
+                    <div class="endpoint-path">/api/notifications/bulk</div>
+                    <div class="endpoint-description">
+                        Envía notificaciones masivas a múltiples tokens FCM simultáneamente.
+                    </div>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-method method-get">GET</div>
+                    <div class="endpoint-path">/api/notifications/{id}</div>
+                    <div class="endpoint-description">
+                        Obtiene el estado actual de una notificación específica.
+                    </div>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-method method-post">POST</div>
+                    <div class="endpoint-path">/api/notifications/test</div>
+                    <div class="endpoint-description">
+                        Envía una notificación de prueba para verificar la configuración.
+                    </div>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-method method-get">GET</div>
+                    <div class="endpoint-path">/api/stats</div>
+                    <div class="endpoint-description">
+                        Obtiene estadísticas y métricas del sistema de notificaciones.
+                    </div>
+                </div>
+
+                <div class="endpoint-card">
+                    <div class="endpoint-method method-get">GET</div>
+                    <div class="endpoint-path">/api/health</div>
+                    <div class="endpoint-description">
+                        Verifica el estado de salud del microservicio y sus dependencias.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Examples Section -->
+        <div class="endpoints-overview" id="examples">
+            <h2>Ejemplos de Uso</h2>
+            <p>Ejemplos prácticos de cómo usar la API:</p>
+
+            <h3>1. Notificación Individual</h3>
+            <div class="code-block">
+{
+  "token": "fcm-token-here",
+  "title": "Nueva Cita Médica",
+  "message": "Tiene una cita programada para mañana a las 10:00 AM",
+  "type": "appointment",
+  "priority": "high",
+  "route": "/appointments/123",
+  "extra_data": {
+    "appointment_id": "123",
+    "doctor_name": "Dr. Smith"
+  }
+}
+            </div>
+
+            <h3>2. Notificación Masiva</h3>
+            <div class="code-block">
+{
+  "tokens": [
+    "token1-here",
+    "token2-here", 
+    "token3-here"
+  ],
+  "title": "Mantenimiento Programado",
+  "message": "El sistema estará en mantenimiento hoy de 2:00 a 4:00 AM",
+  "type": "general",
+  "priority": "normal"
+}
+            </div>
+
+            <h3>3. Notificación por Tema</h3>
+            <div class="code-block">
+{
+  "topic": "general_announcements",
+  "title": "Nueva Funcionalidad",
+  "message": "¡Descubre las nuevas características de la aplicación!",
+  "type": "promotion",
+  "priority": "normal",
+  "image": "https://example.com/promo-image.jpg"
+}
+            </div>
+
+            <h3>4. Respuesta de la API</h3>
+            <div class="code-block">
+{
+  "success": true,
+  "message": "Notification queued for processing",
+  "data": {
+    "requestId": "req_1234567890",
+    "notificationId": "123",
+    "jobId": "job_987654321",
+    "queueName": "notifications",
+    "estimatedProcessingTime": 30,
+    "status": "queued"
+  }
+}
+            </div>
+        </div>
+
+        <!-- Swagger UI Container -->
+        <div class="swagger-container">
+            <div id="swagger-ui"></div>
+        </div>
+    </div>
+
+    <!-- Swagger UI -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-standalone-preset.js"></script>
+
+    <script>
+        // OpenAPI Specification
+        const spec = {
+            openapi: "3.0.0",
+            info: {
+                title: "Firebase Notification Microservice API",
+                description: "API REST para el microservicio de notificaciones Firebase con soporte para envío individual, masivo y análisis en tiempo real",
+                version: "1.0.0",
+                contact: {
+                    name: "Support Team",
+                    email: "support@example.com"
+                },
+                license: {
+                    name: "MIT",
+                    url: "https://opensource.org/licenses/MIT"
+                }
+            },
+            servers: [
+                {
+                    url: "http://localhost:3000",
+                    description: "Desarrollo Local"
+                },
+                {
+                    url: "https://api.example.com",
+                    description: "Producción"
+                }
+            ],
+            security: [
+                {
+                    ApiKeyAuth: []
+                }
+            ],
+            components: {
+                securitySchemes: {
+                    ApiKeyAuth: {
+                        type: "apiKey",
+                        in: "header",
+                        name: "X-API-Key",
+                        description: "API Key para autenticación. Formatos soportados: 'key' o 'Bearer key'"
+                    }
+                },
+                schemas: {
+                    NotificationRequest: {
+                        type: "object",
+                        required: ["title", "message"],
+                        properties: {
+                            token: {
+                                type: "string",
+                                description: "Token FCM del dispositivo destino",
+                                example: "eKX5_9:APA91bH..."
+                            },
+                            topic: {
+                                type: "string",
+                                description: "Nombre del tema FCM",
+                                example: "general_announcements"
+                            },
+                            user_id: {
+                                type: "string",
+                                description: "ID del usuario destinatario",
+                                example: "user_123"
+                            },
+                            title: {
+                                type: "string",
+                                maxLength: 100,
+                                description: "Título de la notificación",
+                                example: "Nueva Cita Médica"
+                            },
+                            message: {
+                                type: "string",
+                                maxLength: 4000,
+                                description: "Mensaje de la notificación",
+                                example: "Tiene una cita programada para mañana a las 10:00 AM"
+                            },
+                            type: {
+                                type: "string",
+                                enum: ["general", "appointment", "result", "emergency", "promotion", "reminder"],
+                                default: "general",
+                                description: "Tipo de notificación"
+                            },
+                            priority: {
+                                type: "string",
+                                enum: ["low", "normal", "high"],
+                                default: "normal",
+                                description: "Prioridad de la notificación"
+                            },
+                            route: {
+                                type: "string",
+                                description: "Ruta de deep link en la aplicación",
+                                example: "/appointments/123"
+                            },
+                            sound: {
+                                type: "string",
+                                default: "default",
+                                description: "Sonido de la notificación"
+                            },
+                            icon: {
+                                type: "string",
+                                format: "uri",
+                                description: "URL del icono de la notificación"
+                            },
+                            image: {
+                                type: "string",
+                                format: "uri",
+                                description: "URL de la imagen de la notificación"
+                            },
+                            extra_data: {
+                                type: "object",
+                                description: "Datos adicionales para la notificación",
+                                example: {
+                                    "appointment_id": "123",
+                                    "doctor_name": "Dr. Smith"
+                                }
+                            }
+                        }
+                    },
+                    BulkNotificationRequest: {
+                        allOf: [
+                            { $ref: "#/components/schemas/NotificationRequest" },
+                            {
+                                type: "object",
+                                required: ["tokens"],
+                                properties: {
+                                    tokens: {
+                                        type: "array",
+                                        items: { type: "string" },
+                                        maxItems: 1000,
+                                        description: "Array de tokens FCM destino",
+                                        example: ["token1", "token2", "token3"]
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    NotificationResponse: {
+                        type: "object",
+                        properties: {
+                            success: {
+                                type: "boolean",
+                                example: true
+                            },
+                            message: {
+                                type: "string",
+                                example: "Notification queued for processing"
+                            },
+                            data: {
+                                type: "object",
+                                properties: {
+                                    requestId: {
+                                        type: "string",
+                                        example: "req_1234567890"
+                                    },
+                                    notificationId: {
+                                        type: "string",
+                                        example: "123"
+                                    },
+                                    jobId: {
+                                        type: "string",
+                                        example: "job_987654321"
+                                    },
+                                    queueName: {
+                                        type: "string",
+                                        example: "notifications"
+                                    },
+                                    estimatedProcessingTime: {
+                                        type: "number",
+                                        example: 30
+                                    },
+                                    status: {
+                                        type: "string",
+                                        example: "queued"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    ErrorResponse: {
+                        type: "object",
+                        properties: {
+                            success: {
+                                type: "boolean",
+                                example: false
+                            },
+                            error: {
+                                type: "string",
+                                example: "Validation failed"
+                            },
+                            message: {
+                                type: "string",
+                                example: "Request validation failed"
+                            },
+                            details: {
+                                type: "array",
+                                items: { type: "string" },
+                                example: ["title is required", "message is required"]
+                            }
+                        }
+                    }
+                }
+            },
+            paths: {
+                "/health": {
+                    get: {
+                        tags: ["Health"],
+                        summary: "Health Check",
+                        description: "Verifica el estado de salud del microservicio",
+                        security: [],
+                        responses: {
+                            "200": {
+                                description: "Servicio saludable",
+                                content: {
+                                    "application/json": {
+                                        schema: {
+                                            type: "object",
+                                            properties: {
+                                                status: { type: "string", example: "healthy" },
+                                                timestamp: { type: "string", format: "date-time" },
+                                                version: { type: "string", example: "1.0.0" },
+                                                uptime: { type: "number", example: 3600 }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "/api/notifications/send": {
+                    post: {
+                        tags: ["Notifications"],
+                        summary: "Enviar Notificación Individual",
+                        description: "Envía una notificación a un token FCM específico o tema",
+                        requestBody: {
+                            required: true,
+                            content: {
+                                "application/json": {
+                                    schema: { $ref: "#/components/schemas/NotificationRequest" }
+                                }
+                            }
+                        },
+                        responses: {
+                            "202": {
+                                description: "Notificación encolada exitosamente",
+                                content: {
+                                    "application/json": {
+                                        schema: { $ref: "#/components/schemas/NotificationResponse" }
+                                    }
+                                }
+                            },
+                            "400": {
+                                description: "Error de validación",
+                                content: {
+                                    "application/json": {
+                                        schema: { $ref: "#/components/schemas/ErrorResponse" }
+                                    }
+                                }
+                            },
+                            "401": {
+                                description: "No autorizado - API key inválida o faltante"
+                            },
+                            "429": {
+                                description: "Límite de velocidad excedido"
+                            }
+                        }
+                    }
+                },
+                "/api/notifications/bulk": {
+                    post: {
+                        tags: ["Notifications"],
+                        summary: "Enviar Notificaciones Masivas",
+                        description: "Envía notificaciones a múltiples tokens FCM simultáneamente",
+                        requestBody: {
+                            required: true,
+                            content: {
+                                "application/json": {
+                                    schema: { $ref: "#/components/schemas/BulkNotificationRequest" }
+                                }
+                            }
+                        },
+                        responses: {
+                            "202": {
+                                description: "Notificaciones masivas encoladas exitosamente"
+                            },
+                            "400": {
+                                description: "Error de validación"
+                            }
+                        }
+                    }
+                },
+                "/api/notifications/test": {
+                    post: {
+                        tags: ["Notifications"],
+                        summary: "Enviar Notificación de Prueba",
+                        description: "Envía una notificación de prueba para verificar configuración",
+                        requestBody: {
+                            required: true,
+                            content: {
+                                "application/json": {
+                                    schema: {
+                                        type: "object",
+                                        properties: {
+                                            token: { type: "string" },
+                                            topic: { type: "string" },
+                                            title: { type: "string", default: "Test Notification" },
+                                            message: { type: "string", default: "This is a test notification" },
+                                            dryRun: { type: "boolean", default: true }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        responses: {
+                            "200": {
+                                description: "Notificación de prueba enviada exitosamente"
+                            }
+                        }
+                    }
+                },
+                "/api/notifications/{id}": {
+                    get: {
+                        tags: ["Notifications"],
+                        summary: "Obtener Estado de Notificación",
+                        description: "Obtiene el estado actual de una notificación específica",
+                        parameters: [
+                            {
+                                name: "id",
+                                in: "path",
+                                required: true,
+                                schema: { type: "string" },
+                                description: "ID de la notificación o Request ID"
+                            }
+                        ],
+                        responses: {
+                            "200": {
+                                description: "Estado de la notificación obtenido exitosamente"
+                            },
+                            "404": {
+                                description: "Notificación no encontrada"
+                            }
+                        }
+                    }
+                },
+                "/api/notifications": {
+                    get: {
+                        tags: ["Notifications"],
+                        summary: "Listar Notificaciones",
+                        description: "Obtiene una lista paginada de notificaciones",
+                        parameters: [
+                            {
+                                name: "page",
+                                in: "query",
+                                schema: { type: "integer", minimum: 1, default: 1 },
+                                description: "Número de página"
+                            },
+                            {
+                                name: "limit",
+                                in: "query",
+                                schema: { type: "integer", minimum: 1, maximum: 1000, default: 50 },
+                                description: "Número de elementos por página"
+                            },
+                            {
+                                name: "status",
+                                in: "query",
+                                schema: { type: "string", enum: ["queued", "processing", "completed", "failed", "cancelled"] },
+                                description: "Filtrar por estado"
+                            },
+                            {
+                                name: "type",
+                                in: "query",
+                                schema: { type: "string", enum: ["general", "appointment", "result", "emergency", "promotion", "reminder"] },
+                                description: "Filtrar por tipo"
+                            }
+                        ],
+                        responses: {
+                            "200": {
+                                description: "Lista de notificaciones obtenida exitosamente"
+                            }
+                        }
+                    }
+                },
+                "/api/stats": {
+                    get: {
+                        tags: ["Statistics"],
+                        summary: "Obtener Estadísticas",
+                        description: "Obtiene estadísticas y métricas del sistema",
+                        parameters: [
+                            {
+                                name: "period",
+                                in: "query",
+                                schema: { type: "string", enum: ["1h", "24h", "7d", "30d"], default: "24h" },
+                                description: "Período de estadísticas"
+                            }
+                        ],
+                        responses: {
+                            "200": {
+                                description: "Estadísticas obtenidas exitosamente"
+                            }
+                        }
+                    }
+                },
+                "/api/tokens/validate": {
+                    post: {
+                        tags: ["Tokens"],
+                        summary: "Validar Tokens FCM",
+                        description: "Valida el formato y disponibilidad de tokens FCM",
+                        requestBody: {
+                            required: true,
+                            content: {
+                                "application/json": {
+                                    schema: {
+                                        type: "object",
+                                        required: ["tokens"],
+                                        properties: {
+                                            tokens: {
+                                                type: "array",
+                                                items: { type: "string" },
+                                                maxItems: 100,
+                                                description: "Array de tokens FCM a validar"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        responses: {
+                            "200": {
+                                description: "Validación completada exitosamente"
+                            }
+                        }
+                    }
+                }
+            },
+            tags: [
+                {
+                    name: "Health",
+                    description: "Endpoints de verificación de salud del sistema"
+                },
+                {
+                    name: "Notifications",
+                    description: "Operaciones relacionadas con notificaciones push"
+                },
+                {
+                    name: "Statistics",
+                    description: "Estadísticas y métricas del sistema"
+                },
+                {
+                    name: "Tokens",
+                    description: "Gestión y validación de tokens FCM"
+                }
+            ]
+        };
+
+        // Initialize Swagger UI
+        window.onload = function() {
+            SwaggerUIBundle({
+                url: '', // We're using spec directly
+                spec: spec,
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout",
+                defaultModelsExpandDepth: 1,
+                defaultModelExpandDepth: 1,
+                docExpansion: 'list',
+                tryItOutEnabled: true,
+                filter: true,
+                supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
+                onComplete: function() {
+                    console.log('Swagger UI loaded successfully');
+                }
+            });
+
+            // Setup navigation
+            setupNavigation();
+        };
+
+        function setupNavigation() {
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                        
+                        // Update active navigation
+                        document.querySelectorAll('.nav-links a').forEach(link => {
+                            link.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                    }
+                });
+            });
+
+            // Update active navigation on scroll
+            window.addEventListener('scroll', () => {
+                const sections = ['overview', 'authentication', 'endpoints', 'examples'];
+                const scrollPos = window.scrollY + 100;
+
+                sections.forEach(sectionId => {
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        const top = section.offsetTop;
+                        const bottom = top + section.offsetHeight;
+
+                        if (scrollPos >= top && scrollPos <= bottom) {
+                            document.querySelectorAll('.nav-links a').forEach(link => {
+                                link.classList.remove('active');
+                            });
+                            const activeLink = document.querySelector(`a[href="#${sectionId}"]`);
+                            if (activeLink) {
+                                activeLink.classList.add('active');
+                            }
+                        }
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
