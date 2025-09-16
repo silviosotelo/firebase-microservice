@@ -1100,3 +1100,18 @@ TypeError: this.websocketService.broadcastStatsUpdate is not a function
 2025-09-16 15:26:55.730 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758047215727_swcfsom3o","method":"GET","url":"/","statusCode":200,"responseTime":"2ms","contentLength":29628}
 2025-09-16 15:27:03.940 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758047223940_5tu15z1mn","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
 2025-09-16 15:27:03.943 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758047223940_5tu15z1mn","method":"GET","url":"/","statusCode":200,"responseTime":"3ms","contentLength":29628}
+2025-09-16 15:27:09.087 [ERROR] [App] ❌ Failed to get overall stats:
+TypeError: database.getDatabase is not a function
+    at StatsService.getOverallStats (file:///home/project/src/services/statsService.js#cjs:155:33)
+    at StatsService.updateRealtimeStats (file:///home/project/src/services/statsService.js#cjs:474:40)
+    at Timeout.eval [as _onTimeout] (file:///home/project/src/services/statsService.js#cjs:85:28)
+    at https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:253:4719
+2025-09-16 15:27:09.088 [ERROR] [App] ❌ Failed to update real-time stats:
+TypeError: database.getDatabase is not a function
+    at StatsService.getOverallStats (file:///home/project/src/services/statsService.js#cjs:155:33)
+    at StatsService.updateRealtimeStats (file:///home/project/src/services/statsService.js#cjs:474:40)
+    at Timeout.eval [as _onTimeout] (file:///home/project/src/services/statsService.js#cjs:85:28)
+    at https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:253:4719
+2025-09-16 15:27:09.088 [ERROR] [App] ❌ Failed to update real-time stats:
+TypeError: this.websocketService.broadcastStatsUpdate is not a function
+    at Timeout.eval [as _onTimeout] (file:///home/project/src/services/statsService.js#cjs:87:43)
