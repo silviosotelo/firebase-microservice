@@ -1077,3 +1077,20 @@ TypeError: Cannot read properties of null (reading 'projectId')
 2025-09-16 15:26:22.871 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758047182869_n99c0xsel","method":"GET","url":"/","statusCode":200,"responseTime":"2ms","contentLength":29628}
 2025-09-16 15:26:31.096 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758047191096_8nkuzjt52","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
 2025-09-16 15:26:31.099 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758047191096_8nkuzjt52","method":"GET","url":"/","statusCode":200,"responseTime":"3ms","contentLength":29628}
+2025-09-16 15:26:39.088 [ERROR] [App] ❌ Failed to get overall stats:
+TypeError: database.getDatabase is not a function
+    at StatsService.getOverallStats (file:///home/project/src/services/statsService.js#cjs:155:33)
+    at StatsService.updateRealtimeStats (file:///home/project/src/services/statsService.js#cjs:474:40)
+    at Timeout.eval [as _onTimeout] (file:///home/project/src/services/statsService.js#cjs:85:28)
+    at https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:253:4719
+2025-09-16 15:26:39.088 [ERROR] [App] ❌ Failed to update real-time stats:
+TypeError: database.getDatabase is not a function
+    at StatsService.getOverallStats (file:///home/project/src/services/statsService.js#cjs:155:33)
+    at StatsService.updateRealtimeStats (file:///home/project/src/services/statsService.js#cjs:474:40)
+    at Timeout.eval [as _onTimeout] (file:///home/project/src/services/statsService.js#cjs:85:28)
+    at https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:253:4719
+2025-09-16 15:26:39.089 [ERROR] [App] ❌ Failed to update real-time stats:
+TypeError: this.websocketService.broadcastStatsUpdate is not a function
+    at Timeout.eval [as _onTimeout] (file:///home/project/src/services/statsService.js#cjs:87:43)
+2025-09-16 15:26:39.303 [INFO ] [RequestLogger] 📥 Request {"requestId":"req_1758047199302_wm58nhkz1","method":"GET","url":"/","ip":"127.0.0.1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-16 15:26:39.307 [INFO ] [RequestLogger] ✅ Response {"requestId":"req_1758047199302_wm58nhkz1","method":"GET","url":"/","statusCode":200,"responseTime":"4ms","contentLength":29628}
