@@ -9,9 +9,9 @@ const { ENVIRONMENTS, LOG_LEVELS } = require('../utils/constants');
 class ConfigurationManager {
     constructor() {
         this.env = process.env.NODE_ENV || ENVIRONMENTS.DEVELOPMENT;
-        this.isDevelopment = this.env === ENVIRONMENTS.DEVELOPMENT;
-        this.isProduction = this.env === ENVIRONMENTS.PRODUCTION;
-        this.isTest = this.env === ENVIRONMENTS.TESTING;
+        this._isDevelopment = this.env === ENVIRONMENTS.DEVELOPMENT;
+        this._isProduction = this.env === ENVIRONMENTS.PRODUCTION;
+        this._isTest = this.env === ENVIRONMENTS.TESTING;
         
         // Load configuration
         this.loadConfiguration();
@@ -36,21 +36,21 @@ class ConfigurationManager {
 
         // Rate Limiting Configuration
         this.rateLimit = {
-            enabled: this.getBoolean('ENABLE_RATE_LIMITING', !this.isDevelopment),
+            enabled: this.getBoolean('ENABLE_RATE_LIMITING', !this._isDevelopment),
             api: {
                 windowMs: this.getNumber('API_RATE_WINDOW', 15 * 60 * 1000), // 15 minutes
-                max: this.getNumber('API_RATE_MAX', this.isDevelopment ? 10000 : 1000)
+                max: this.getNumber('API_RATE_MAX', this._isDevelopment ? 10000 : 1000)
             },
             bulk: {
                 windowMs: this.getNumber('BULK_RATE_WINDOW', 60 * 60 * 1000), // 1 hour
-                max: this.getNumber('BULK_RATE_MAX', this.isDevelopment ? 100 : 10)
+                max: this.getNumber('BULK_RATE_MAX', this._isDevelopment ? 100 : 10)
             }
         };
 
         // CORS Configuration
         this.cors = {
             origins: this.getArray('ALLOWED_ORIGINS', 
-                this.isDevelopment ? ['*'] : ['http://localhost:3000']
+                this._isDevelopment ? ['*'] : ['http://localhost:3000']
             ),
             credentials: this.getBoolean('CORS_CREDENTIALS', true)
         };
@@ -87,7 +87,7 @@ class ConfigurationManager {
 
         // Authentication Configuration
         this.auth = {
-            enabled: this.getBoolean('AUTH_ENABLED', !this.isDevelopment),
+            enabled: this.getBoolean('AUTH_ENABLED', !this._isDevelopment),
             apiKeys: {
                 user: this.getString('API_KEY_USER', 'user-key-456'),
                 admin: this.getString('API_KEY_ADMIN', 'admin-key-789'),
@@ -113,7 +113,7 @@ class ConfigurationManager {
 
         // Logging Configuration
         this.logging = {
-            level: this.getString('LOG_LEVEL', this.isDevelopment ? LOG_LEVELS.DEBUG : LOG_LEVELS.INFO),
+            level: this.getString('LOG_LEVEL', this._isDevelopment ? LOG_LEVELS.DEBUG : LOG_LEVELS.INFO),
             file: this.getBoolean('LOG_TO_FILE', true),
             filePath: this.getString('LOG_FILE_PATH', './logs/app.log'),
             maxFiles: this.getNumber('LOG_MAX_FILES', 5),
@@ -124,7 +124,7 @@ class ConfigurationManager {
         this.security = {
             helmet: {
                 enabled: this.getBoolean('HELMET_ENABLED', true),
-                contentSecurityPolicy: this.getBoolean('CSP_ENABLED', !this.isDevelopment)
+                contentSecurityPolicy: this.getBoolean('CSP_ENABLED', !this._isDevelopment)
             },
             encryption: {
                 key: this.getString('ENCRYPTION_KEY', 'default-encryption-key-for-dev')
@@ -197,20 +197,20 @@ class ConfigurationManager {
     }
 
     isAuthenticationEnabled() {
-        return this.auth.enabled && !this.isDevelopment;
+        return this.auth.enabled && !this._isDevelopment;
     }
 
     // Configuration getters for easy access
     get isDev() {
-        return this.isDevelopment;
+        return this._isDevelopment;
     }
 
     get isProd() {
-        return this.isProduction;
+        return this._isProduction;
     }
 
     get isTest() {
-        return this.isTest;
+        return this._isTest;
     }
 
     // Export configuration as plain object
@@ -229,9 +229,9 @@ class ConfigurationManager {
             security: this.security,
             notifications: this.notifications,
             environment: {
-                isDevelopment: this.isDevelopment,
-                isProduction: this.isProduction,
-                isTest: this.isTest
+                isDevelopment: this._isDevelopment,
+                isProduction: this._isProduction,
+                isTest: this._isTest
             }
         };
     }
@@ -322,7 +322,7 @@ const validation = config.validate();
 if (!validation.valid && config.isProduction) {
     console.error('❌ Configuration validation failed:', validation.errors);
     // In development, just warn; in production, you might want to exit
-    if (config.isProduction) {
+    if (config._isProduction) {
         process.exit(1);
     }
 }
