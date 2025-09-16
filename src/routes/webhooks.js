@@ -5,48 +5,37 @@
 
 const express = require('express');
 const crypto = require('crypto');
-const database = require('../database');
-const config = require('../config');
 const AppLogger = require('../utils/logger');
 
-const router = express.Router();
 const logger = new AppLogger();
 
-// ==========================================
-// FIREBASE WEBHOOKS
-// ==========================================
-
-/**
- * Firebase Cloud Messaging delivery receipt webhook
- * POST /webhooks/firebase/delivery-receipt
- */
-router.post('/firebase/delivery-receipt', async (req, res) => {
-    try {
-        logger.info('📥 Firebase delivery receipt webhook received');
-
-        // Validate webhook signature if configured
-        if (config.auth.webhook.secret) {
-            const signature = req.headers['x-firebase-signature'];
-            if (!validateFirebaseSignature(req.body, signature)) {
-                logger.warn('❌ Invalid Firebase webhook signature');
-                return res.status(401).json({
+// Export function that accepts database instance
+module.exports = function(database) {
+    const router = express.Router();
+    
+    // ==========================================
+    // FIREBASE WEBHOOKS
+    // ==========================================
+    
+    /**
+     * Firebase Cloud Messaging delivery receipt webhook
+     * POST /webhooks/firebase/delivery-receipt
+     */
+    router.post('/firebase/delivery-receipt', async (req, res) => {
+        try {
+            logger.info('📥 Firebase delivery receipt webhook received');
+    
+            const { message_id, status, error_code, token, timestamp } = req.body;
+    
+            if (!message_id) {
+                return res.status(400).json({
                     success: false,
-                    error: 'Invalid signature'
+                    error: 'message_id is required'
                 });
             }
-        }
-
-        const { message_id, status, error_code, token, timestamp } = req.body;
-
-        if (!message_id) {
-            return res.status(400).json({
-                success: false,
-                error: 'message_id is required'
-            });
-        }
-
-        // Update delivery status in database
-        const db = database.getConnection();
+    
+            // Update delivery status in database
+            const db = database.getConnection();
         
         // Find the notification response by message_id
         const response = db.prepare(`
@@ -71,26 +60,26 @@ router.post('/firebase/delivery-receipt', async (req, res) => {
             );
 
             // Update notification statistics
-            await updateNotificationStats(response.notification_id);
+            await updateNotificationStats(response.notification_id, database);
 
             logger.info(`✅ Updated delivery status for message: ${message_id} -> ${status}`);
         } else {
             logger.warn(`⚠️ No response found for message_id: ${message_id}`);
         }
 
-        res.json({
-            success: true,
-            message: 'Delivery receipt processed'
-        });
-
-    } catch (error) {
-        logger.error('❌ Firebase delivery receipt webhook error:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to process delivery receipt'
-        });
-    }
-});
+            res.json({
+                success: true,
+                message: 'Delivery receipt processed'
+            });
+    
+        } catch (error) {
+            logger.error('❌ Firebase delivery receipt webhook error:', error);
+            res.status(500).json({
+                success: false,
+                error: 'Failed to process delivery receipt'
+            });
+        }
+    });
 
 /**
  * Firebase topic subscription webhook
@@ -110,7 +99,7 @@ router.post('/firebase/topic-subscription', async (req, res) => {
         }
 
         // Log topic subscription activity
-        const db = database.getConnection();
+            const db = database.getConnection();
         
         // Store topic subscription event (you might want a dedicated table for this)
         db.prepare(`
@@ -249,7 +238,7 @@ router.post('/external/:system', async (req, res) => {
         } = req.body;
 
         // Log the webhook event
-        const db = database.getConnection();
+            const db = database.getConnection();
         db.prepare(`
             INSERT INTO system_config (key, value, description)
             VALUES (?, ?, ?)
@@ -337,7 +326,7 @@ router.post('/register', async (req, res) => {
             });
         }
 
-        const db = database.getConnection();
+            const db = database.getConnection();
         
         // Store webhook configuration
         const webhookConfig = {
@@ -387,7 +376,7 @@ router.post('/register', async (req, res) => {
  */
 router.get('/list', async (req, res) => {
     try {
-        const db = database.getDatabase();
+            const db = database.getConnection();
         
         const webhooks = db.prepare(`
             SELECT key, value, description, updated_at
@@ -442,7 +431,7 @@ router.post('/test/:name', async (req, res) => {
         const webhookName = req.params.name;
         const testData = req.body;
 
-        const db = database.getConnection();
+            const db = database.getConnection();
         
         // Get webhook configuration
         const webhook = db.prepare(`
@@ -460,7 +449,6 @@ router.post('/test/:name', async (req, res) => {
 
         // Send test webhook
         try {
-        const db = database.getConnection();
             const testPayload = {
                 test: true,
                 timestamp: new Date().toISOString(),
@@ -508,33 +496,17 @@ router.post('/test/:name', async (req, res) => {
     }
 });
 
+    return router;
+};
+
 // ==========================================
 // UTILITY FUNCTIONS
 // ==========================================
 
 /**
- * Validate Firebase webhook signature
- */
-function validateFirebaseSignature(payload, signature) {
-    if (!config.auth.webhook.secret || !signature) {
-        return false;
-    }
-
-    const expectedSignature = crypto
-        .createHmac('sha256', config.auth.webhook.secret)
-        .update(JSON.stringify(payload))
-        .digest('hex');
-
-    return crypto.timingSafeEqual(
-        Buffer.from(signature),
-        Buffer.from(`sha256=${expectedSignature}`)
-    );
-}
-
-/**
  * Update notification statistics
  */
-async function updateNotificationStats(notificationId) {
+async function updateNotificationStats(notificationId, database) {
     try {
         const db = database.getConnection();
         
@@ -573,5 +545,3 @@ async function updateNotificationStats(notificationId) {
         logger.error('❌ Failed to update notification stats:', error);
     }
 }
-
-module.exports = router;

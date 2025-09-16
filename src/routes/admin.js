@@ -5,38 +5,40 @@
 
 const express = require('express');
 const rateLimit = require('express-rate-limit');
-const database = require('../config/database');
 const { requireRole } = require('../middleware/auth');
 const { USER_ROLES } = require('../utils/constants');
 const AppLogger = require('../utils/logger');
 
-const router = express.Router();
 const logger = new AppLogger();
 
-// Admin rate limiting
-const adminLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100,
-    message: {
-        success: false,
-        error: 'Too many admin requests',
-        retryAfter: 900
-    }
-});
-
-router.use(adminLimiter);
-
-// ==========================================
-// DASHBOARD ROUTES
-// ==========================================
-
-/**
- * Get admin dashboard data
- * GET /admin/dashboard
- */
-router.get('/dashboard', requireRole(USER_ROLES.ADMIN), async (req, res) => {
-    try {
-        const db = database.getDatabase();
+// Export function that accepts database instance
+module.exports = function(database) {
+    const router = express.Router();
+    
+    // Admin rate limiting
+    const adminLimiter = rateLimit({
+        windowMs: 15 * 60 * 1000, // 15 minutes
+        max: 100,
+        message: {
+            success: false,
+            error: 'Too many admin requests',
+            retryAfter: 900
+        }
+    });
+    
+    router.use(adminLimiter);
+    
+    // ==========================================
+    // DASHBOARD ROUTES
+    // ==========================================
+    
+    /**
+     * Get admin dashboard data
+     * GET /admin/dashboard
+     */
+    router.get('/dashboard', requireRole(USER_ROLES.ADMIN), async (req, res) => {
+        try {
+            const db = database.getConnection();
         
         // Get overall statistics
         const overallStats = db.prepare(`
@@ -162,7 +164,7 @@ router.get('/notifications', requireRole(USER_ROLES.ADMIN), async (req, res) => 
 
         const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-        const db = database.getDatabase();
+        const db = database.getConnection();
 
         // Get total count
         const { total } = db.prepare(`SELECT COUNT(*) as total FROM notifications ${whereClause}`).get(...params);
@@ -204,7 +206,7 @@ router.get('/notifications', requireRole(USER_ROLES.ADMIN), async (req, res) => 
 router.delete('/notifications/:id', requireRole(USER_ROLES.ADMIN), async (req, res) => {
     try {
         const notificationId = req.params.id;
-        const db = database.getDatabase();
+        const db = database.getConnection();
 
         // Check if notification exists
         const notification = db.prepare('SELECT * FROM notifications WHERE id = ?').get(notificationId);
@@ -249,7 +251,7 @@ router.delete('/notifications/:id', requireRole(USER_ROLES.ADMIN), async (req, r
  */
 router.get('/config', requireRole(USER_ROLES.ADMIN), async (req, res) => {
     try {
-        const db = database.getDatabase();
+        const db = database.getConnection();
         
         const configs = db.prepare('SELECT * FROM system_config ORDER BY key').all();
         
@@ -283,7 +285,7 @@ router.get('/config', requireRole(USER_ROLES.ADMIN), async (req, res) => {
 router.put('/config', requireRole(USER_ROLES.ADMIN), async (req, res) => {
     try {
         const updates = req.body;
-        const db = database.getDatabase();
+        const db = database.getConnection();
 
         const transaction = db.transaction(() => {
             for (const [key, data] of Object.entries(updates)) {
@@ -322,7 +324,7 @@ router.put('/config', requireRole(USER_ROLES.ADMIN), async (req, res) => {
 router.post('/maintenance/:operation', requireRole(USER_ROLES.ADMIN), async (req, res) => {
     try {
         const operation = req.params.operation;
-        const db = database.getDatabase();
+        const db = database.getConnection();
 
         let result = {};
 
@@ -445,7 +447,7 @@ router.get('/export/:type', requireRole(USER_ROLES.ADMIN), async (req, res) => {
         const exportType = req.params.type;
         const { format = 'json', date_from, date_to } = req.query;
         
-        const db = database.getDatabase();
+        const db = database.getConnection();
         
         let data = [];
         let filename = '';
@@ -571,4 +573,5 @@ router.get('/api-keys', requireRole(USER_ROLES.SUPER_ADMIN), async (req, res) =>
     }
 });
 
-module.exports = router;
+return router;
+};

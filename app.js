@@ -234,6 +234,23 @@ class FirebaseMicroservice {
             this.logger.error('❌ Failed to mount API routes:', error.message);
         }
 
+        // Load admin routes with database injection
+        try {
+            const adminRoutes = require('./src/routes/admin');
+            this.app.use('/admin', adminRoutes(this.database));
+            this.logger.info('✅ Admin routes mounted');
+        } catch (error) {
+            this.logger.error('❌ Failed to mount admin routes:', error.message);
+        }
+
+        // Load webhook routes with database injection
+        try {
+            const webhookRoutes = require('./src/routes/webhooks');
+            this.app.use('/webhooks', webhookRoutes(this.database));
+            this.logger.info('✅ Webhook routes mounted');
+        } catch (error) {
+            this.logger.error('❌ Failed to mount webhook routes:', error.message);
+        }
 
         // Default route
         this.app.get('/', (req, res) => {
