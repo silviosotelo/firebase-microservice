@@ -35,12 +35,18 @@ class DatabaseCore {
             return path.isAbsolute(envPath) ? envPath : path.resolve(process.cwd(), envPath);
         }
 
-        const defaultPath = path.join(process.cwd(), 'data', 'firebase_logs.db');
+        // Use /tmp directory for WebContainer compatibility
+        const defaultPath = path.join('/tmp', 'firebase_logs.db');
         
-        // Ensure data directory exists
-        const dataDir = path.dirname(defaultPath);
-        if (!fs.existsSync(dataDir)) {
-            fs.mkdirSync(dataDir, { recursive: true });
+        // Ensure /tmp directory is writable (it should be by default)
+        try {
+            // Test write access to /tmp
+            const testFile = path.join('/tmp', 'test_write_' + Date.now());
+            fs.writeFileSync(testFile, 'test');
+            fs.unlinkSync(testFile);
+        } catch (error) {
+            this.logger?.warn('⚠️ /tmp not writable, falling back to memory database');
+            return ':memory:';
         }
 
         return defaultPath;
@@ -80,23 +86,53 @@ class DatabaseCore {
     async connect() {
         return new Promise((resolve, reject) => {
             try {
+                // Handle special case for memory database
+                const dbPath = this.dbPath === ':memory:' ? ':memory:' : this.dbPath;
+                
+                // For file databases, ensure we can write to the directory
+                if (dbPath !== ':memory:') {
+                    const dir = path.dirname(dbPath);
+                    try {
+                        if (!fs.existsSync(dir)) {
+                            fs.mkdirSync(dir, { recursive: true, mode: 0o755 });
+                        }
+                        // Test write access
+                        fs.accessSync(dir, fs.constants.W_OK);
+                    } catch (accessError) {
+                        this.logger.warn('⚠️ Cannot write to database directory, using memory database');
+                        this.dbPath = ':memory:';
+                    }
+                }
+                
                 this.db = new sqlite3.Database(this.dbPath, (err) => {
                     if (err) {
-                        this.logger.error('❌ SQLite connection failed:', err);
+                        this.logger.error('❌ SQLite connection failed:', err.message);
+                        
+                        // Fallback to memory database if file database fails
+                        if (this.dbPath !== ':memory:') {
+                            this.logger.info('🔄 Falling back to in-memory database');
+                            this.dbPath = ':memory:';
+                            this.db = new sqlite3.Database(':memory:', (memErr) => {
+                                if (memErr) {
+                                    this.logger.error('❌ Memory database also failed:', memErr.message);
+                                    reject(memErr);
+                                    return;
+                                }
+                                this.logger.info('✅ SQLite in-memory database connected');
+                                this.configureDatabaseSettings();
+                                resolve();
+                            });
+                            return;
+                        }
+                        
                         reject(err);
                         return;
                     }
 
-                    this.logger.info('✅ SQLite database connected');
+                    const dbType = this.dbPath === ':memory:' ? 'in-memory' : 'file';
+                    this.logger.info(`✅ SQLite ${dbType} database connected`);
                     
-                    // Configure database settings
-                    this.db.serialize(() => {
-                        this.db.run('PRAGMA journal_mode = WAL');
-                        this.db.run('PRAGMA synchronous = NORMAL');
-                        this.db.run('PRAGMA cache_size = 10000');
-                        this.db.run('PRAGMA foreign_keys = ON');
-                        this.db.run('PRAGMA temp_store = memory');
-                    });
+                    this.configureDatabaseSettings();
 
                     resolve();
                 });

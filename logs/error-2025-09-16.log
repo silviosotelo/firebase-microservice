@@ -68,3 +68,11 @@ Error
     at FirebaseMicroservice.initializeServices (/home/project/app.js:178:41)
     at async FirebaseMicroservice.initialize (/home/project/app.js:70:13)
     at async FirebaseMicroservice.start (/home/project/app.js:368:9)
+2025-09-16 14:24:31.848 [ERROR] [FirebaseMicroservice] 💥 Uncaught Exception:
+TypeError: this.configureDatabaseSettings is not a function
+    at eval (file:///home/project/src/core/database.js#cjs:135:26)
+    at eval (file:///home/project/node_modules/sqlite3/lib/pure/database.js#cjs:44:13)
+    at processTicksAndRejections (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:196:998)
+    at _0x27b2d7.executeBootstrapper (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:833069)
+    at _0x2c1a1a.startExecution (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1560263)
+    at _0x2c1a1a.run (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1558931)

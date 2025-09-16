@@ -328,3 +328,109 @@ TypeError: Cannot set property isTest of #<ConfigurationManager> which has only 
     at Module.require (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:148:15469)
     at require3 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:166:2696)
     at _0x52ec33 (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:868754)
+2025-09-16 14:24:31.836 [INFO ] [DatabaseCore] 🗄️ Initializing database...
+2025-09-16 14:24:31.836 [INFO ] [DatabaseCore] 📍 Database path: /tmp/firebase_logs.db
+2025-09-16 14:24:31.843 [INFO ] [DatabaseCore] ✅ SQLite file database connected
+2025-09-16 14:24:31.846 [ERROR] [DatabaseCore] uncaughtException: this.configureDatabaseSettings is not a function
+TypeError: this.configureDatabaseSettings is not a function
+    at eval (file:///home/project/src/core/database.js#cjs:135:26)
+    at eval (file:///home/project/node_modules/sqlite3/lib/pure/database.js#cjs:44:13)
+    at processTicksAndRejections (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:196:998)
+    at _0x27b2d7.executeBootstrapper (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:833069)
+    at _0x2c1a1a.startExecution (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1560263)
+    at _0x2c1a1a.run (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1558931) {"error":{},"exception":true,"date":"Tue Sep 16 2025 14:24:31 GMT-0300 (hora estándar de Paraguay)","process":{"pid":43,"uid":1,"gid":1,"cwd":"/home/project","execPath":"/usr/local/bin/node","version":"v20.19.1","argv":["/usr/local/bin/node","/home/project/app.js"],"memoryUsage":{"rss":0,"heapTotal":0,"heapUsed":0,"external":0,"arrayBuffers":0}},"os":{"loadavg":[0,0,0],"uptime":350},"trace":[{"column":26,"file":"file:///home/project/src/core/database.js#cjs","function":"eval","line":135,"method":null,"native":false},{"column":13,"file":"file:///home/project/node_modules/sqlite3/lib/pure/database.js#cjs","function":"eval","line":44,"method":null,"native":false},{"column":998,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"processTicksAndRejections","line":196,"method":null,"native":false},{"column":833069,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x27b2d7.executeBootstrapper","line":31,"method":"executeBootstrapper","native":false},{"column":1560263,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x2c1a1a.startExecution","line":31,"method":"startExecution","native":false},{"column":1558931,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x2c1a1a.run","line":31,"method":"run","native":false}]}
+TypeError: this.configureDatabaseSettings is not a function
+    at eval (file:///home/project/src/core/database.js#cjs:135:26)
+    at eval (file:///home/project/node_modules/sqlite3/lib/pure/database.js#cjs:44:13)
+    at processTicksAndRejections (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:196:998)
+    at _0x27b2d7.executeBootstrapper (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:833069)
+    at _0x2c1a1a.startExecution (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1560263)
+    at _0x2c1a1a.run (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1558931)
+2025-09-16 14:24:31.846 [ERROR] [ErrorHandler] uncaughtException: this.configureDatabaseSettings is not a function
+TypeError: this.configureDatabaseSettings is not a function
+    at eval (file:///home/project/src/core/database.js#cjs:135:26)
+    at eval (file:///home/project/node_modules/sqlite3/lib/pure/database.js#cjs:44:13)
+    at processTicksAndRejections (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:196:998)
+    at _0x27b2d7.executeBootstrapper (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:833069)
+    at _0x2c1a1a.startExecution (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1560263)
+    at _0x2c1a1a.run (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1558931) {"error":{},"exception":true,"date":"Tue Sep 16 2025 14:24:31 GMT-0300 (hora estándar de Paraguay)","process":{"pid":43,"uid":1,"gid":1,"cwd":"/home/project","execPath":"/usr/local/bin/node","version":"v20.19.1","argv":["/usr/local/bin/node","/home/project/app.js"],"memoryUsage":{"rss":0,"heapTotal":0,"heapUsed":0,"external":0,"arrayBuffers":0}},"os":{"loadavg":[0,0,0],"uptime":350},"trace":[{"column":26,"file":"file:///home/project/src/core/database.js#cjs","function":"eval","line":135,"method":null,"native":false},{"column":13,"file":"file:///home/project/node_modules/sqlite3/lib/pure/database.js#cjs","function":"eval","line":44,"method":null,"native":false},{"column":998,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"processTicksAndRejections","line":196,"method":null,"native":false},{"column":833069,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x27b2d7.executeBootstrapper","line":31,"method":"executeBootstrapper","native":false},{"column":1560263,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x2c1a1a.startExecution","line":31,"method":"startExecution","native":false},{"column":1558931,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x2c1a1a.run","line":31,"method":"run","native":false}]}
+TypeError: this.configureDatabaseSettings is not a function
+    at eval (file:///home/project/src/core/database.js#cjs:135:26)
+    at eval (file:///home/project/node_modules/sqlite3/lib/pure/database.js#cjs:44:13)
+    at processTicksAndRejections (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:196:998)
+    at _0x27b2d7.executeBootstrapper (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:833069)
+    at _0x2c1a1a.startExecution (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1560263)
+    at _0x2c1a1a.run (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1558931)
+2025-09-16 14:24:31.847 [ERROR] [RequestLogger] uncaughtException: this.configureDatabaseSettings is not a function
+TypeError: this.configureDatabaseSettings is not a function
+    at eval (file:///home/project/src/core/database.js#cjs:135:26)
+    at eval (file:///home/project/node_modules/sqlite3/lib/pure/database.js#cjs:44:13)
+    at processTicksAndRejections (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:196:998)
+    at _0x27b2d7.executeBootstrapper (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:833069)
+    at _0x2c1a1a.startExecution (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1560263)
+    at _0x2c1a1a.run (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1558931) {"error":{},"exception":true,"date":"Tue Sep 16 2025 14:24:31 GMT-0300 (hora estándar de Paraguay)","process":{"pid":43,"uid":1,"gid":1,"cwd":"/home/project","execPath":"/usr/local/bin/node","version":"v20.19.1","argv":["/usr/local/bin/node","/home/project/app.js"],"memoryUsage":{"rss":0,"heapTotal":0,"heapUsed":0,"external":0,"arrayBuffers":0}},"os":{"loadavg":[0,0,0],"uptime":350},"trace":[{"column":26,"file":"file:///home/project/src/core/database.js#cjs","function":"eval","line":135,"method":null,"native":false},{"column":13,"file":"file:///home/project/node_modules/sqlite3/lib/pure/database.js#cjs","function":"eval","line":44,"method":null,"native":false},{"column":998,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"processTicksAndRejections","line":196,"method":null,"native":false},{"column":833069,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x27b2d7.executeBootstrapper","line":31,"method":"executeBootstrapper","native":false},{"column":1560263,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x2c1a1a.startExecution","line":31,"method":"startExecution","native":false},{"column":1558931,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x2c1a1a.run","line":31,"method":"run","native":false}]}
+TypeError: this.configureDatabaseSettings is not a function
+    at eval (file:///home/project/src/core/database.js#cjs:135:26)
+    at eval (file:///home/project/node_modules/sqlite3/lib/pure/database.js#cjs:44:13)
+    at processTicksAndRejections (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:196:998)
+    at _0x27b2d7.executeBootstrapper (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:833069)
+    at _0x2c1a1a.startExecution (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1560263)
+    at _0x2c1a1a.run (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1558931)
+2025-09-16 14:24:31.847 [ERROR] [DatabaseManager] uncaughtException: this.configureDatabaseSettings is not a function
+TypeError: this.configureDatabaseSettings is not a function
+    at eval (file:///home/project/src/core/database.js#cjs:135:26)
+    at eval (file:///home/project/node_modules/sqlite3/lib/pure/database.js#cjs:44:13)
+    at processTicksAndRejections (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:196:998)
+    at _0x27b2d7.executeBootstrapper (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:833069)
+    at _0x2c1a1a.startExecution (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1560263)
+    at _0x2c1a1a.run (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1558931) {"error":{},"exception":true,"date":"Tue Sep 16 2025 14:24:31 GMT-0300 (hora estándar de Paraguay)","process":{"pid":43,"uid":1,"gid":1,"cwd":"/home/project","execPath":"/usr/local/bin/node","version":"v20.19.1","argv":["/usr/local/bin/node","/home/project/app.js"],"memoryUsage":{"rss":0,"heapTotal":0,"heapUsed":0,"external":0,"arrayBuffers":0}},"os":{"loadavg":[0,0,0],"uptime":350},"trace":[{"column":26,"file":"file:///home/project/src/core/database.js#cjs","function":"eval","line":135,"method":null,"native":false},{"column":13,"file":"file:///home/project/node_modules/sqlite3/lib/pure/database.js#cjs","function":"eval","line":44,"method":null,"native":false},{"column":998,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"processTicksAndRejections","line":196,"method":null,"native":false},{"column":833069,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x27b2d7.executeBootstrapper","line":31,"method":"executeBootstrapper","native":false},{"column":1560263,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x2c1a1a.startExecution","line":31,"method":"startExecution","native":false},{"column":1558931,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x2c1a1a.run","line":31,"method":"run","native":false}]}
+TypeError: this.configureDatabaseSettings is not a function
+    at eval (file:///home/project/src/core/database.js#cjs:135:26)
+    at eval (file:///home/project/node_modules/sqlite3/lib/pure/database.js#cjs:44:13)
+    at processTicksAndRejections (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:196:998)
+    at _0x27b2d7.executeBootstrapper (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:833069)
+    at _0x2c1a1a.startExecution (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1560263)
+    at _0x2c1a1a.run (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1558931)
+2025-09-16 14:24:31.847 [ERROR] [ServiceManager] uncaughtException: this.configureDatabaseSettings is not a function
+TypeError: this.configureDatabaseSettings is not a function
+    at eval (file:///home/project/src/core/database.js#cjs:135:26)
+    at eval (file:///home/project/node_modules/sqlite3/lib/pure/database.js#cjs:44:13)
+    at processTicksAndRejections (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:196:998)
+    at _0x27b2d7.executeBootstrapper (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:833069)
+    at _0x2c1a1a.startExecution (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1560263)
+    at _0x2c1a1a.run (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1558931) {"error":{},"exception":true,"date":"Tue Sep 16 2025 14:24:31 GMT-0300 (hora estándar de Paraguay)","process":{"pid":43,"uid":1,"gid":1,"cwd":"/home/project","execPath":"/usr/local/bin/node","version":"v20.19.1","argv":["/usr/local/bin/node","/home/project/app.js"],"memoryUsage":{"rss":0,"heapTotal":0,"heapUsed":0,"external":0,"arrayBuffers":0}},"os":{"loadavg":[0,0,0],"uptime":350},"trace":[{"column":26,"file":"file:///home/project/src/core/database.js#cjs","function":"eval","line":135,"method":null,"native":false},{"column":13,"file":"file:///home/project/node_modules/sqlite3/lib/pure/database.js#cjs","function":"eval","line":44,"method":null,"native":false},{"column":998,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"processTicksAndRejections","line":196,"method":null,"native":false},{"column":833069,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x27b2d7.executeBootstrapper","line":31,"method":"executeBootstrapper","native":false},{"column":1560263,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x2c1a1a.startExecution","line":31,"method":"startExecution","native":false},{"column":1558931,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x2c1a1a.run","line":31,"method":"run","native":false}]}
+TypeError: this.configureDatabaseSettings is not a function
+    at eval (file:///home/project/src/core/database.js#cjs:135:26)
+    at eval (file:///home/project/node_modules/sqlite3/lib/pure/database.js#cjs:44:13)
+    at processTicksAndRejections (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:196:998)
+    at _0x27b2d7.executeBootstrapper (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:833069)
+    at _0x2c1a1a.startExecution (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1560263)
+    at _0x2c1a1a.run (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1558931)
+2025-09-16 14:24:31.831 [INFO ] [FirebaseMicroservice] 🚀 Initializing Firebase Microservice...
+2025-09-16 14:24:31.832 [INFO ] [FirebaseMicroservice] 🛡️ Setting up global error handling...
+2025-09-16 14:24:31.833 [INFO ] [FirebaseMicroservice] 🔧 Setting up middleware...
+2025-09-16 14:24:31.836 [INFO ] [FirebaseMicroservice] ✅ Middleware configured
+2025-09-16 14:24:31.836 [INFO ] [FirebaseMicroservice] 📊 Initializing database...
+2025-09-16 14:24:31.848 [ERROR] [FirebaseMicroservice] uncaughtException: this.configureDatabaseSettings is not a function
+TypeError: this.configureDatabaseSettings is not a function
+    at eval (file:///home/project/src/core/database.js#cjs:135:26)
+    at eval (file:///home/project/node_modules/sqlite3/lib/pure/database.js#cjs:44:13)
+    at processTicksAndRejections (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:196:998)
+    at _0x27b2d7.executeBootstrapper (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:833069)
+    at _0x2c1a1a.startExecution (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1560263)
+    at _0x2c1a1a.run (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1558931) {"error":{},"exception":true,"date":"Tue Sep 16 2025 14:24:31 GMT-0300 (hora estándar de Paraguay)","process":{"pid":43,"uid":1,"gid":1,"cwd":"/home/project","execPath":"/usr/local/bin/node","version":"v20.19.1","argv":["/usr/local/bin/node","/home/project/app.js"],"memoryUsage":{"rss":0,"heapTotal":0,"heapUsed":0,"external":0,"arrayBuffers":0}},"os":{"loadavg":[0,0,0],"uptime":350},"trace":[{"column":26,"file":"file:///home/project/src/core/database.js#cjs","function":"eval","line":135,"method":null,"native":false},{"column":13,"file":"file:///home/project/node_modules/sqlite3/lib/pure/database.js#cjs","function":"eval","line":44,"method":null,"native":false},{"column":998,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js","function":"processTicksAndRejections","line":196,"method":null,"native":false},{"column":833069,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x27b2d7.executeBootstrapper","line":31,"method":"executeBootstrapper","native":false},{"column":1560263,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x2c1a1a.startExecution","line":31,"method":"startExecution","native":false},{"column":1558931,"file":"https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js","function":"_0x2c1a1a.run","line":31,"method":"run","native":false}]}
+TypeError: this.configureDatabaseSettings is not a function
+    at eval (file:///home/project/src/core/database.js#cjs:135:26)
+    at eval (file:///home/project/node_modules/sqlite3/lib/pure/database.js#cjs:44:13)
+    at processTicksAndRejections (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:196:998)
+    at _0x27b2d7.executeBootstrapper (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:833069)
+    at _0x2c1a1a.startExecution (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1560263)
+    at _0x2c1a1a.run (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1558931)
+2025-09-16 14:24:31.848 [ERROR] [FirebaseMicroservice] 💥 Uncaught Exception:
+TypeError: this.configureDatabaseSettings is not a function
+    at eval (file:///home/project/src/core/database.js#cjs:135:26)
+    at eval (file:///home/project/node_modules/sqlite3/lib/pure/database.js#cjs:44:13)
+    at processTicksAndRejections (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/builtins.97a3df4f.js:196:998)
+    at _0x27b2d7.executeBootstrapper (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:833069)
+    at _0x2c1a1a.startExecution (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1560263)
+    at _0x2c1a1a.run (https://zp1v56uxy8rdx5ypatb0ockcb9tr6a-oci3.w-credentialless-staticblitz.com/blitz.96435430.js:31:1558931)
