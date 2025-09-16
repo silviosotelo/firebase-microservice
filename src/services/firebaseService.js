@@ -5,8 +5,9 @@
 
 const { GoogleAuth } = require('google-auth-library');
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 const AppLogger = require('../utils/logger');
-const { Config } = require('../models');
 const { 
     FIREBASE_SCOPES, 
     NOTIFICATION_TYPES, 
@@ -15,8 +16,12 @@ const {
 } = require('../utils/constants');
 
 class FirebaseService {
-    constructor() {
+    constructor(dependencies = {}, options = {}) {
         this.logger = new AppLogger('FirebaseService');
+        
+        // Dependencies
+        this.database = dependencies.database;
+        
         this.accessTokenCache = null;
         this.accessTokenExpiry = null;
         this.auth = null;
@@ -44,14 +49,32 @@ class FirebaseService {
     }
 
     /**
-     * Load Firebase configuration from database
+     * Load Firebase configuration from multiple sources
      */
     async loadConfiguration() {
         try {
-            const configs = await Config.getFirebaseConfig();
+            this.logger.info('📋 Loading Firebase configuration...');
+            
+            // Try to load from JSON file first
+            let configs = await this.loadFromJsonFile();
+            
+            // If not found in JSON, try database
+            if (!configs && this.database) {
+                configs = await this.loadFromDatabase();
+            }
+            
+            // If not found in database, try environment variables
+            if (!configs) {
+                configs = this.loadFromEnvironment();
+            }
             
             if (!configs.projectId || !configs.privateKey || !configs.clientEmail) {
                 throw new Error('Incomplete Firebase configuration. Please configure all required fields.');
+            }
+
+            // Save to database if we loaded from JSON file
+            if (configs._source === 'json' && this.database) {
+                await this.saveToDatabase(configs);
             }
 
             this.projectId = configs.projectId;
@@ -59,14 +82,189 @@ class FirebaseService {
                 type: 'service_account',
                 project_id: configs.projectId,
                 private_key: configs.privateKey.replace(/\\n/g, '\n'),
-                client_email: configs.clientEmail
+                client_email: configs.clientEmail,
+                client_id: configs.clientId,
+                auth_uri: configs.authUri || 'https://accounts.google.com/o/oauth2/auth',
+                token_uri: configs.tokenUri || 'https://oauth2.googleapis.com/token',
+                auth_provider_x509_cert_url: configs.authProviderX509CertUrl || 'https://www.googleapis.com/oauth2/v1/certs',
+                client_x509_cert_url: configs.clientX509CertUrl
             };
 
-            this.logger.info(`🎯 Firebase project configured: ${this.projectId}`);
+            this.logger.info(`🎯 Firebase project configured: ${this.projectId} (source: ${configs._source || 'unknown'})`);
             
         } catch (error) {
             this.logger.error('❌ Failed to load Firebase configuration:', error);
             throw error;
+        }
+    }
+
+    /**
+     * Load configuration from JSON file
+     */
+    async loadFromJsonFile() {
+        try {
+            const jsonPath = path.join(process.cwd(), 'firebase-service-account.json');
+            
+            if (!fs.existsSync(jsonPath)) {
+                this.logger.info('📄 firebase-service-account.json not found');
+                return null;
+            }
+
+            this.logger.info('📄 Loading Firebase config from JSON file...');
+            const fileContent = fs.readFileSync(jsonPath, 'utf8');
+            const jsonConfig = JSON.parse(fileContent);
+
+            return {
+                projectId: jsonConfig.project_id,
+                privateKey: jsonConfig.private_key,
+                clientEmail: jsonConfig.client_email,
+                clientId: jsonConfig.client_id,
+                authUri: jsonConfig.auth_uri,
+                tokenUri: jsonConfig.token_uri,
+                authProviderX509CertUrl: jsonConfig.auth_provider_x509_cert_url,
+                clientX509CertUrl: jsonConfig.client_x509_cert_url,
+                _source: 'json'
+            };
+
+        } catch (error) {
+            this.logger.warn('⚠️ Failed to load from JSON file:', error.message);
+            return null;
+        }
+    }
+
+    /**
+     * Load configuration from database
+     */
+    async loadFromDatabase() {
+        try {
+            if (!this.database || !this.database.getModels) {
+                this.logger.warn('⚠️ Database not available for config loading');
+                return null;
+            }
+
+            const models = this.database.getModels();
+            if (!models || !models.Config) {
+                this.logger.warn('⚠️ Config model not available');
+                return null;
+            }
+
+            this.logger.info('🗄️ Loading Firebase config from database...');
+            
+            const projectId = await models.Config.get('FIREBASE_PROJECT_ID');
+            const privateKey = await models.Config.get('FIREBASE_PRIVATE_KEY');
+            const clientEmail = await models.Config.get('FIREBASE_CLIENT_EMAIL');
+            const clientId = await models.Config.get('FIREBASE_CLIENT_ID');
+            const authUri = await models.Config.get('FIREBASE_AUTH_URI');
+            const tokenUri = await models.Config.get('FIREBASE_TOKEN_URI');
+            const authProviderX509CertUrl = await models.Config.get('FIREBASE_AUTH_PROVIDER_X509_CERT_URL');
+            const clientX509CertUrl = await models.Config.get('FIREBASE_CLIENT_X509_CERT_URL');
+
+            if (!projectId || !privateKey || !clientEmail) {
+                this.logger.info('📋 Incomplete Firebase config in database');
+                return null;
+            }
+
+            return {
+                projectId,
+                privateKey,
+                clientEmail,
+                clientId,
+                authUri,
+                tokenUri,
+                authProviderX509CertUrl,
+                clientX509CertUrl,
+                _source: 'database'
+            };
+
+        } catch (error) {
+            this.logger.warn('⚠️ Failed to load from database:', error.message);
+            return null;
+        }
+    }
+
+    /**
+     * Load configuration from environment variables
+     */
+    loadFromEnvironment() {
+        try {
+            const {
+                FIREBASE_PROJECT_ID,
+                FIREBASE_PRIVATE_KEY,
+                FIREBASE_CLIENT_EMAIL,
+                FIREBASE_CLIENT_ID,
+                FIREBASE_AUTH_URI,
+                FIREBASE_TOKEN_URI,
+                FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
+                FIREBASE_CLIENT_X509_CERT_URL
+            } = process.env;
+
+            if (!FIREBASE_PROJECT_ID || !FIREBASE_PRIVATE_KEY || !FIREBASE_CLIENT_EMAIL) {
+                this.logger.info('📋 Incomplete Firebase config in environment');
+                return null;
+            }
+
+            this.logger.info('🌍 Loading Firebase config from environment...');
+
+            return {
+                projectId: FIREBASE_PROJECT_ID,
+                privateKey: FIREBASE_PRIVATE_KEY,
+                clientEmail: FIREBASE_CLIENT_EMAIL,
+                clientId: FIREBASE_CLIENT_ID,
+                authUri: FIREBASE_AUTH_URI,
+                tokenUri: FIREBASE_TOKEN_URI,
+                authProviderX509CertUrl: FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
+                clientX509CertUrl: FIREBASE_CLIENT_X509_CERT_URL,
+                _source: 'environment'
+            };
+
+        } catch (error) {
+            this.logger.warn('⚠️ Failed to load from environment:', error.message);
+            return null;
+        }
+    }
+
+    /**
+     * Save configuration to database
+     */
+    async saveToDatabase(configs) {
+        try {
+            if (!this.database || !this.database.getModels) {
+                this.logger.warn('⚠️ Database not available for saving config');
+                return;
+            }
+
+            const models = this.database.getModels();
+            if (!models || !models.Config) {
+                this.logger.warn('⚠️ Config model not available for saving');
+                return;
+            }
+
+            this.logger.info('💾 Saving Firebase config to database...');
+
+            await models.Config.set('FIREBASE_PROJECT_ID', configs.projectId, 'Firebase Project ID', 'string', false);
+            await models.Config.set('FIREBASE_PRIVATE_KEY', configs.privateKey, 'Firebase Private Key', 'string', true);
+            await models.Config.set('FIREBASE_CLIENT_EMAIL', configs.clientEmail, 'Firebase Client Email', 'string', false);
+            
+            if (configs.clientId) {
+                await models.Config.set('FIREBASE_CLIENT_ID', configs.clientId, 'Firebase Client ID', 'string', false);
+            }
+            if (configs.authUri) {
+                await models.Config.set('FIREBASE_AUTH_URI', configs.authUri, 'Firebase Auth URI', 'string', false);
+            }
+            if (configs.tokenUri) {
+                await models.Config.set('FIREBASE_TOKEN_URI', configs.tokenUri, 'Firebase Token URI', 'string', false);
+            }
+            if (configs.authProviderX509CertUrl) {
+                await models.Config.set('FIREBASE_AUTH_PROVIDER_X509_CERT_URL', configs.authProviderX509CertUrl, 'Firebase Auth Provider Cert URL', 'string', false);
+            }
+            if (configs.clientX509CertUrl) {
+                await models.Config.set('FIREBASE_CLIENT_X509_CERT_URL', configs.clientX509CertUrl, 'Firebase Client Cert URL', 'string', false);
+            }
+
+            this.logger.info('✅ Firebase config saved to database');
+
+        } catch (error) {
+            this.logger.error('❌ Failed to save Firebase config to database:', error);
         }
     }
 
