@@ -3,15 +3,15 @@
 // Real-time statistics and analytics service
 // ==========================================
 
-const database = require('../config/database');
 const config = require('../config');
 const AppLogger = require('../utils/logger');
 const cron = require('cron');
 
 class StatsService {
-    constructor(websocketService = null) {
+    constructor(dependencies = {}, options = {}) {
         this.logger = new AppLogger();
-        this.websocketService = websocketService;
+        this.websocketService = options.websocketService || null;
+        this.database = dependencies.database;
         this.isInitialized = false;
         this.cache = new Map();
         this.cacheExpiry = new Map();
@@ -152,7 +152,7 @@ class StatsService {
         }
 
         try {
-            const db = database.getDatabase();
+            const db = this.database.getConnection();
             
             const stats = db.prepare(`
                 SELECT 
@@ -193,7 +193,7 @@ class StatsService {
         }
 
         try {
-            const db = database.getDatabase();
+            const db = this.database.getConnection();
             
             const stats = db.prepare(`
                 SELECT 
@@ -232,7 +232,7 @@ class StatsService {
         }
 
         try {
-            const db = database.getDatabase();
+            const db = this.database.getConnection();
             
             const stats = db.prepare(`
                 SELECT 
@@ -270,7 +270,7 @@ class StatsService {
         }
 
         try {
-            const db = database.getDatabase();
+            const db = this.database.getConnection();
             
             const stats = db.prepare(`
                 SELECT 
@@ -306,7 +306,7 @@ class StatsService {
         }
 
         try {
-            const db = database.getDatabase();
+            const db = this.database.getConnection();
             
             const stats = db.prepare(`
                 SELECT 
@@ -345,7 +345,7 @@ class StatsService {
         }
 
         try {
-            const db = database.getDatabase();
+            const db = this.database.getConnection();
             
             const errorStats = db.prepare(`
                 SELECT 
@@ -399,7 +399,7 @@ class StatsService {
         }
 
         try {
-            const db = database.getDatabase();
+            const db = this.database.getConnection();
             
             // Processing time percentiles
             const processingTimes = db.prepare(`
@@ -436,7 +436,7 @@ class StatsService {
      */
     async getThroughputMetrics() {
         try {
-            const db = database.getDatabase();
+            const db = this.database.getConnection();
             
             const hourlyThroughput = db.prepare(`
                 SELECT 
@@ -512,7 +512,7 @@ class StatsService {
         try {
             this.logger.info('📊 Running daily statistics aggregation...');
             
-            const db = database.getDatabase();
+            const db = this.database.getConnection();
             const yesterday = new Date();
             yesterday.setDate(yesterday.getDate() - 1);
             const dateStr = yesterday.toISOString().split('T')[0];
@@ -552,7 +552,7 @@ class StatsService {
         try {
             this.logger.info('📊 Running weekly statistics aggregation...');
             
-            const db = database.getDatabase();
+            const db = this.database.getConnection();
             
             // Get last week's data
             const weeklyStats = db.prepare(`
@@ -587,7 +587,7 @@ class StatsService {
      */
     async cleanupExpiredCache() {
         try {
-            const db = database.getDatabase();
+            const db = this.database.getConnection();
             const result = db.prepare(`
                 DELETE FROM stats_cache WHERE expires_at < datetime('now')
             `).run();

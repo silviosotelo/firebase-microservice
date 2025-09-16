@@ -5,7 +5,7 @@
 
 const express = require('express');
 const crypto = require('crypto');
-const database = require('../config/database');
+const database = require('../database');
 const config = require('../config');
 const AppLogger = require('../utils/logger');
 
@@ -46,7 +46,7 @@ router.post('/firebase/delivery-receipt', async (req, res) => {
         }
 
         // Update delivery status in database
-        const db = database.getDatabase();
+        const db = database.getConnection();
         
         // Find the notification response by message_id
         const response = db.prepare(`
@@ -110,7 +110,7 @@ router.post('/firebase/topic-subscription', async (req, res) => {
         }
 
         // Log topic subscription activity
-        const db = database.getDatabase();
+        const db = database.getConnection();
         
         // Store topic subscription event (you might want a dedicated table for this)
         db.prepare(`
@@ -249,7 +249,7 @@ router.post('/external/:system', async (req, res) => {
         } = req.body;
 
         // Log the webhook event
-        const db = database.getDatabase();
+        const db = database.getConnection();
         db.prepare(`
             INSERT INTO system_config (key, value, description)
             VALUES (?, ?, ?)
@@ -337,7 +337,7 @@ router.post('/register', async (req, res) => {
             });
         }
 
-        const db = database.getDatabase();
+        const db = database.getConnection();
         
         // Store webhook configuration
         const webhookConfig = {
@@ -442,7 +442,7 @@ router.post('/test/:name', async (req, res) => {
         const webhookName = req.params.name;
         const testData = req.body;
 
-        const db = database.getDatabase();
+        const db = database.getConnection();
         
         // Get webhook configuration
         const webhook = db.prepare(`
@@ -460,7 +460,7 @@ router.post('/test/:name', async (req, res) => {
 
         // Send test webhook
         try {
-            const axios = require('axios');
+        const db = database.getConnection();
             const testPayload = {
                 test: true,
                 timestamp: new Date().toISOString(),
@@ -536,7 +536,7 @@ function validateFirebaseSignature(payload, signature) {
  */
 async function updateNotificationStats(notificationId) {
     try {
-        const db = database.getDatabase();
+        const db = database.getConnection();
         
         // Recalculate statistics for the notification
         const stats = db.prepare(`
