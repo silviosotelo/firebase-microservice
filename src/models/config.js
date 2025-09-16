@@ -644,29 +644,5 @@ class ConfigModel {
         }
     }
 }
-    /**
-     * Get configuration statistics
-     */
-    async getStats() {
-        try {
-            const allConfigs = await this.query('SELECT * FROM config');
-            const stats = {
-                total: allConfigs.length,
-                encrypted: allConfigs.filter(c => c.encrypted).length,
-                byType: {}
-            };
-
-            // Count by type
-            for (const config of allConfigs) {
-                stats.byType[config.type] = (stats.byType[config.type] || 0) + 1;
-            }
-
-            return stats;
-
-        } catch (error) {
-            this.logger.error('❌ Failed to get config stats:', error);
-            throw new Error(`Failed to get configuration statistics: ${error.message}`);
-        }
-    }
 
 module.exports = ConfigModel;
