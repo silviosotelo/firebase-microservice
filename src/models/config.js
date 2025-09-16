@@ -91,6 +91,16 @@ class ConfigModel {
             
             const iv = Buffer.from(ivHex, 'hex');
             const decipher = crypto.createDecipheriv('aes-256-cbc', this.encryptionKey, iv);
+            
+            let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+            decrypted += decipher.final('utf8');
+            
+            return decrypted;
+            
+        } catch (error) {
+            this.logger.error('❌ Decryption failed:', error.message);
+            return encryptedValue; // Return original value if decryption fails
+        }
     }
 
     /**

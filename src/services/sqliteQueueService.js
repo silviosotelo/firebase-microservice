@@ -49,18 +49,13 @@ class SQLiteQueueService {
         try {
             this.logger.info('📦 Initializing SQLite Queue service...');
             
-            // Get database connection - prefer injected models
+            // Use injected database connection
             if (this.models) {
                 this.logger.info('📦 Using injected models...');
-                // Get database from injected models
-                const database = require('../config/database');
-                this.db = database.getConnection();
+                // Use the database connection from the injected models
+                this.db = this.models.db || this.models.database;
             } else {
-                this.logger.info('📦 Getting database from config...');
-                // Fallback to importing database
-                const database = require('../config/database');
-                this.db = database.getConnection();
-                this.models = database.getModels();
+                throw new Error('Models must be injected during initialization');
             }
             
             if (!this.db) {

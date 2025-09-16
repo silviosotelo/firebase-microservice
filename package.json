@@ -61,11 +61,11 @@
     "joi": "^17.11.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
+    "node-cron": "^4.2.1",
     "socket.io": "^4.7.4",
     "sqlite3": "^5.1.7",
     "uuid": "^9.0.1",
     "validator": "^13.11.0",
-    "winston": "^3.11.0",
     "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
